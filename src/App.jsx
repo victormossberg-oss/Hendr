@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-import initialEvents from "./data/events";
+import { useEffect, useState } from "react";
 
 import Feed from "./components/Feed";
 import EventDetail from "./components/EventDetail";
@@ -11,7 +9,7 @@ import BottomNav from "./components/BottomNav";
 import "./App.css";
 
 function App() {
-  const [events, setEvents] = useState(initialEvents);
+  const [events, setEvents] = useState([]);
 
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -23,6 +21,17 @@ function App() {
 
   const [observations, setObservations] =
     useState([]);
+
+    useEffect(() => {
+  fetch("http://localhost:3000/api/events")
+    .then((response) => response.json())
+    .then((data) => {
+      setEvents(data);
+    })
+    .catch((error) => {
+      console.error("Kunde inte hämta events:", error);
+    });
+}, []);
 
   // =========================
   // SKAPA NY HÄNDELSE

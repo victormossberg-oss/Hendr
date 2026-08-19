@@ -10,41 +10,62 @@ function NewEventForm({ onBack, onCreateEvent }) {
   const [image, setImage] = useState(null);
 
   function handleImageChange(e) {
-  const file = e.target.files[0];
+    const file = e.target.files[0];
 
-  if (!file) {
-    return;
+    if (!file) {
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setImage(imageUrl);
   }
 
-  const imageUrl = URL.createObjectURL(file);
-
-  setImage(imageUrl);
-}
-
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    const newEvent = {
-      id: Date.now(),
-      title: title,
-      category: category,
-      description: description,
-      latitude: location?.latitude ?? null,
-      longitude: location?.longitude ?? null,
-      time: "Just nu",
-      observations: 1,
-      confirmations: 0,
-      image: image,
-      color: "#6c4ce8"
-    };
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/events",
+        {
+          method: "POST",
 
-    onCreateEvent(newEvent);
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            title: title,
+            description: description,
+            category: category,
+            status: "Aktiv"
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Kunde inte skapa händelsen");
+      }
+
+      const newEvent = await response.json();
+
+      onCreateEvent(newEvent);
+
+    } catch (error) {
+      console.error(
+        "Fel vid skapande av händelse:",
+        error
+      );
+    }
   }
 
   return (
     <main className="observation-page">
 
-      <button className="back-button" onClick={onBack}>
+      <button
+        className="back-button"
+        onClick={onBack}
+      >
         <ArrowLeft />
         Tillbaka
       </button>
@@ -108,34 +129,36 @@ function NewEventForm({ onBack, onCreateEvent }) {
           />
 
           <label className="image-upload">
-  {image ? (
-    <img
-      src={image}
-      alt="Förhandsvisning"
-    />
-  ) : (
-    <>
-      <Image />
-      <span>Lägg till bild</span>
-    </>
-  )}
 
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImageChange}
-  />
-</label>
+            {image ? (
+              <img
+                src={image}
+                alt="Förhandsvisning"
+              />
+            ) : (
+              <>
+                <Image />
+                <span>Lägg till bild</span>
+              </>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+
+          </label>
 
           <label>
-  Plats
-</label>
+            Plats
+          </label>
 
-<LocationPicker
-  onLocationChange={(newLocation) => {
-    setLocation(newLocation);
-  }}
-/>
+          <LocationPicker
+            onLocationChange={(newLocation) => {
+              setLocation(newLocation);
+            }}
+          />
 
           <button
             type="submit"
