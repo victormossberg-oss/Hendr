@@ -1,7 +1,6 @@
-import events from "../data/events";
 import EventCard from "./EventCard";
 
-function Feed({ onEventClick }) {
+function Feed({ events, onEventClick }) {
   return (
     <main className="feed">
       {events.map((event) => (

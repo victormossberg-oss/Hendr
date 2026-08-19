@@ -5,7 +5,7 @@ import {
   UserRound
 } from "lucide-react";
 
-function BottomNav() {
+function BottomNav({ onCreateEvent }) {
   return (
     <nav className="bottom-nav">
 
@@ -19,9 +19,12 @@ function BottomNav() {
         <span>Karta</span>
       </button>
 
-      <button className="report-button">
-        +
-      </button>
+   <button
+  className="report-button"
+  onClick={onCreateEvent}
+>
+  +
+</button>
 
       <button className="nav-item">
         <Bookmark className="nav-icon" />

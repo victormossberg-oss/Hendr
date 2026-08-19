@@ -1,28 +1,53 @@
 import { useState } from "react";
-import { ArrowLeft, MapPin, Image } from "lucide-react";
+import { ArrowLeft, Image } from "lucide-react";
+import LocationPicker from "./LocationPicker";
 
-function ObservationForm({
-  event,
-  onBack,
-  onSubmitObservation
-}) {
-  const [description, setDescription] = useState("");
+function ObservationForm({ event, onBack, onSubmitObservation }) {
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState(null);
+    const [location, setLocation] = useState(null);
+
+    <LocationPicker
+  onLocationChange={(newLocation) => {
+    setLocation(newLocation);
+  }}
+/>
+
+    function handleImageChange(e) {
+  const file = e.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+
+  setImage(imageUrl);
+}
 
   function handleSubmit(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  const newObservation = {
-    id: Date.now(),
-    eventID: event.id,
-    description: description,
-    createdAt: new Date().toLocaleTimeString("sv-SE", {
-      hour: "2-digit",
-      minute: "2-digit"
-    })
-  };
+    const newObservation = {
+  id: Date.now(),
+  eventID: event.id,
+  username: "Victor",
+  description: description,
 
-  onSubmitObservation(newObservation);
-}
+  latitude: location?.latitude ?? null,
+  longitude: location?.longitude ?? null,
+
+  createdAt: new Date().toLocaleTimeString("sv-SE", {
+    hour: "2-digit",
+    minute: "2-digit"
+  }),
+
+  confirmations: 0,
+  image: image
+};
+
+    onSubmitObservation(newObservation);
+  }
 
   return (
     <main className="observation-page">
@@ -38,7 +63,7 @@ function ObservationForm({
           className="event-category"
           style={{ color: event.color }}
         >
-          Ny observation
+          Observation
         </span>
 
         <h1>{event.title}</h1>
@@ -62,19 +87,35 @@ function ObservationForm({
             required
           />
 
-          <div className="observation-option">
-            <Image />
-            <span>Lägg till bild</span>
-          </div>
+         <label className="image-upload">
+  {image ? (
+    <img
+      src={image}
+      alt="Förhandsvisning"
+    />
+  ) : (
+    <>
+      <Image />
+      <span>Lägg till bild</span>
+    </>
+  )}
 
-          <div className="observation-location">
-            <MapPin />
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImageChange}
+  />
+</label>
 
-            <div>
-              <strong>Plats</strong>
-              <span>{event.location}</span>
-            </div>
-          </div>
+          <label>
+  Plats
+</label>
+
+<LocationPicker
+  onLocationChange={(location) => {
+    console.log("Observationens plats:", location);
+  }}
+/>
 
           <button
             type="submit"

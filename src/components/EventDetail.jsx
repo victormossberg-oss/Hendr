@@ -1,4 +1,5 @@
-import { ArrowLeft, Eye, ShieldCheck, MapPin } from "lucide-react";
+import { ArrowLeft, Eye, ShieldCheck } from "lucide-react";
+import LocationDisplay from "./LocationDisplay";
 
 function EventDetail({
   event,
@@ -35,10 +36,10 @@ function EventDetail({
 
         <h1>{event.title}</h1>
 
-        <div className="detail-location">
-          <MapPin />
-          {event.location}
-        </div>
+        <LocationDisplay
+  latitude={event.latitude}
+  longitude={event.longitude}
+/>
 
         <p className="detail-description">
           {event.description}
@@ -83,6 +84,18 @@ function EventDetail({
           </div>
 
           <p>{observation.description}</p>
+          <LocationDisplay
+  latitude={observation.latitude}
+  longitude={observation.longitude}
+/>
+          {observation.image && (
+  <img
+    className="observation-image"
+    src={observation.image}
+    alt="Bild från observation"
+  />
+)}
+
         </div>
       </div>
     ))
