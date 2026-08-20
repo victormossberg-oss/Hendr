@@ -157,27 +157,23 @@
 
 .event-stats {
   display: flex;
-  gap: 14px;
-
-  padding-top: 9px;
-
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
   border-top: 1px solid #eeeeF2;
-
   color: #777782;
-
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .event-stats span {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 .event-stats svg {
   width: 15px;
   height: 15px;
-  stroke-width: 1.8;
 }
 
 .event-image {
@@ -364,43 +360,77 @@
 }
 
 .detail-stats {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
-  margin-bottom: 30px;
-}
-
-.detail-stats div {
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 16px 10px;
+  margin: 28px 0;
 
   background: white;
 
   border: 1px solid #e9e9ef;
-  border-radius: 16px;
+  border-radius: 20px;
+
+  overflow: hidden;
 }
 
-.detail-stats svg {
-  width: 20px;
-  height: 20px;
+.detail-stat {
+  min-height: 130px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  background: transparent;
+  border: none;
+
+  color: #777782;
+}
+
+.detail-stat + .detail-stat {
+  border-left: 1px solid #e5e5eb;
+}
+
+.detail-stat svg {
+  width: 28px;
+  height: 28px;
+
+  margin-bottom: 5px;
 
   color: #6c4ce8;
-
-  margin-bottom: 8px;
 }
 
-.detail-stats strong {
-  font-size: 20px;
+.detail-stat strong {
+  font-size: 28px;
+  line-height: 1;
+
+  color: #15151a;
 }
 
-.detail-stats span {
-  color: #888893;
-  font-size: 12px;
+.detail-stat span {
+  font-size: 14px;
+}
+
+.confirmation-stat {
+  cursor: pointer;
+}
+
+.confirmation-stat:hover {
+  background: #faf8ff;
+}
+
+.confirmation-stat.confirmed {
+  color: #6c4ce8;
+}
+
+.confirmation-stat.confirmed strong {
+  color: #6c4ce8;
+}
+
+.confirmation-stat:disabled {
+  cursor: default;
 }
 
 .timeline {
@@ -839,4 +869,116 @@
 .location-display span {
   color: #9999a5;
   font-size: 11px;
+}
+
+.confirmation-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 20px 0;
+
+  padding: 14px 18px;
+
+  border: 1px solid #6c4ce8;
+  border-radius: 14px;
+
+  background: white;
+  color: #6c4ce8;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.confirmation-button:hover {
+  background: #f5f2ff;
+}
+
+.confirmation-button.confirmed {
+  background: #6c4ce8;
+  color: white;
+}
+
+.confirmation-button:disabled {
+  cursor: default;
+}
+
+.confirmation-button svg {
+  width: 19px;
+  height: 19px;
+}
+
+.confirmation-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  border: none;
+  background: transparent;
+
+  padding: 0;
+
+  color: #777782;
+
+  cursor: pointer;
+}
+
+.confirmation-stat svg {
+  width: 22px;
+  height: 22px;
+}
+
+.confirmation-stat:hover {
+  color: #6c4ce8;
+}
+
+.confirmation-stat.confirmed {
+  color: #6c4ce8;
+}
+
+.confirmation-stat:disabled {
+  cursor: default;
+}
+
+.feed-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  border: none;
+  background: transparent;
+
+  padding: 0;
+
+  color: #777782;
+
+  font-size: inherit;
+
+  cursor: pointer;
+}
+
+.feed-confirmation svg {
+  width: 15px;
+  height: 15px;
+}
+
+.feed-confirmation:hover {
+  color: #6c4ce8;
+}
+
+.feed-confirmation.confirmed {
+  color: #6c4ce8;
+}
+
+.feed-confirmation.confirmed svg {
+  color: #6c4ce8;
+}
+
+.feed-confirmation:disabled {
+  cursor: default;
 }

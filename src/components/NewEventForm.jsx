@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Image } from "lucide-react";
 import LocationPicker from "./LocationPicker";
+import { API_URL } from "../config";
 
 function NewEventForm({ onBack, onCreateEvent }) {
   const [title, setTitle] = useState("");
@@ -8,56 +9,65 @@ function NewEventForm({ onBack, onCreateEvent }) {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState(null);
   const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);   
 
-  function handleImageChange(e) {
-    const file = e.target.files[0];
+ function handleImageChange(e) {
+  const file = e.target.files[0];
 
-    if (!file) {
-      return;
-    }
-
-    const imageUrl = URL.createObjectURL(file);
-
-    setImage(imageUrl);
+  if (!file) {
+    return;
   }
+
+  const imageUrl =
+    URL.createObjectURL(file);
+
+  setImage(imageUrl);
+  setImageFile(file);
+}
 
   async function handleSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await fetch(
-        "http://localhost:3000/api/events",
-        {
-          method: "POST",
+  try {
+    const formData = new FormData();
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("status", "Aktiv");
 
-          body: JSON.stringify({
-            title: title,
-            description: description,
-            category: category,
-            status: "Aktiv"
-          })
-        }
-      );
+    if (imageFile) {
+  formData.append(
+    "image",
+    imageFile
+  );
+}
 
-      if (!response.ok) {
-        throw new Error("Kunde inte skapa händelsen");
+    const response = await fetch(
+  `${API_URL}/api/events`,
+      {
+        method: "POST",
+        body: formData
       }
+    );
 
-      const newEvent = await response.json();
-
-      onCreateEvent(newEvent);
-
-    } catch (error) {
-      console.error(
-        "Fel vid skapande av händelse:",
-        error
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte skapa händelsen"
       );
     }
+
+    const newEvent = await response.json();
+
+    onCreateEvent(newEvent);
+
+  } catch (error) {
+    console.error(
+      "Fel vid skapande av händelse:",
+      error
+    );
   }
+}
 
   return (
     <main className="observation-page">

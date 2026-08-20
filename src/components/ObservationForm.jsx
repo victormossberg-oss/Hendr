@@ -1,58 +1,92 @@
 import { useState } from "react";
 import { ArrowLeft, Image } from "lucide-react";
 import LocationPicker from "./LocationPicker";
+import { API_URL } from "../config";
 
-function ObservationForm({ event, onBack, onSubmitObservation }) {
-    const [description, setDescription] = useState("");
-    const [image, setImage] = useState(null);
-    const [location, setLocation] = useState(null);
+function ObservationForm({
+  event,
+  onBack,
+  onSubmitObservation
+}) {
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [location, setLocation] = useState(null);
 
-    <LocationPicker
-  onLocationChange={(newLocation) => {
-    setLocation(newLocation);
-  }}
-/>
+  function handleImageChange(e) {
+    const file = e.target.files[0];
 
-    function handleImageChange(e) {
-  const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
 
-  if (!file) {
-    return;
+    const imageUrl = URL.createObjectURL(file);
+
+    setImage(imageUrl);
+    setImageFile(file);
   }
 
-  const imageUrl = URL.createObjectURL(file);
-
-  setImage(imageUrl);
-}
-
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    const newObservation = {
-  id: Date.now(),
-  eventID: event.id,
-  username: "Victor",
-  description: description,
+    try {
+      const formData = new FormData();
 
-  latitude: location?.latitude ?? null,
-  longitude: location?.longitude ?? null,
+      formData.append("userID", "1");
 
-  createdAt: new Date().toLocaleTimeString("sv-SE", {
-    hour: "2-digit",
-    minute: "2-digit"
-  }),
+      formData.append(
+        "eventID",
+        event.id
+      );
 
-  confirmations: 0,
-  image: image
-};
+      formData.append(
+        "description",
+        description
+      );
 
-    onSubmitObservation(newObservation);
+      if (imageFile) {
+        formData.append(
+          "image",
+          imageFile
+        );
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/observations`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Kunde inte skapa observationen"
+        );
+      }
+
+      const newObservation =
+        await response.json();
+
+      onSubmitObservation(
+        newObservation
+      );
+
+    } catch (error) {
+      console.error(
+        "Fel vid skapande av observation:",
+        error
+      );
+    }
   }
 
   return (
     <main className="observation-page">
 
-      <button className="back-button" onClick={onBack}>
+      <button
+        className="back-button"
+        onClick={onBack}
+      >
         <ArrowLeft />
         Tillbaka
       </button>
@@ -81,41 +115,45 @@ function ObservationForm({ event, onBack, onSubmitObservation }) {
           <textarea
             id="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) =>
+              setDescription(e.target.value)
+            }
             placeholder="Skriv vad du ser, hör eller upplever..."
             rows="6"
             required
           />
 
-         <label className="image-upload">
-  {image ? (
-    <img
-      src={image}
-      alt="Förhandsvisning"
-    />
-  ) : (
-    <>
-      <Image />
-      <span>Lägg till bild</span>
-    </>
-  )}
+          <label className="image-upload">
 
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImageChange}
-  />
-</label>
+            {image ? (
+              <img
+                src={image}
+                alt="Förhandsvisning"
+              />
+            ) : (
+              <>
+                <Image />
+                <span>Lägg till bild</span>
+              </>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+
+          </label>
 
           <label>
-  Plats
-</label>
+            Plats
+          </label>
 
-<LocationPicker
-  onLocationChange={(location) => {
-    console.log("Observationens plats:", location);
-  }}
-/>
+          <LocationPicker
+            onLocationChange={(newLocation) => {
+              setLocation(newLocation);
+            }}
+          />
 
           <button
             type="submit"
