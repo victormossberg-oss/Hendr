@@ -799,15 +799,22 @@ app.get(
 // TA BORT HÄNDELSE
 // =========================
 
+// =========================
+// TA BORT HÄNDELSE
+// ENDAST SKAPAREN
+// =========================
+
 app.delete(
   "/api/events/:eventID",
-
+  authenticateToken,
   async (req, res) => {
 
     const {
       eventID
     } = req.params;
 
+    const userID =
+      req.user.userid;
 
     const client =
       await pool.connect();
@@ -815,9 +822,247 @@ app.delete(
 
     try {
 
+      // =========================
+      // HÄMTA HÄNDELSEN
+      // =========================
+
+      const eventResult =
+        await client.query(
+          `
+          SELECT
+            eventID,
+            userid
+
+          FROM Events
+
+          WHERE eventID = $1
+          `,
+          [eventID]
+        );
+
+
+      // =========================
+      // HÄNDELSEN FINNS INTE
+      // =========================
+
+      if (
+        eventResult.rows.length === 0
+      ) {
+
+        return res.status(404).json({
+          message:
+            "Händelsen hittades inte."
+        });
+
+      }
+
+
+      const event =
+        eventResult.rows[0];
+
+
+      // =========================
+      // KONTROLLERA ÄGARE
+      // =========================
+
+      if (
+        event.userid !== userID
+      ) {
+
+        return res.status(403).json({
+          message:
+            "Du har inte behörighet att ta bort denna händelse."
+        });
+
+      }
+
+
+      // =========================
+      // TRANSAKTION
+      // =========================
+
       await client.query(
         "BEGIN"
       );
+
+
+      // =========================
+      // TA BORT BEKRÄFTELSER
+      // =========================
+
+      await client.query(
+        `
+        DELETE FROM EventConfirmations
+
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+      // TA BORT OBSERVATIONER
+      // =========================
+
+      await client.query(
+        `
+        DELETE FROM Observations
+
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+// TA BORT HÄNDELSE
+// ENDAST SKAPAREN
+// =========================
+
+app.delete(
+  "/api/events/:eventID",
+  authenticateToken,
+  async (req, res) => {
+
+    const { eventID } = req.params;
+    const userID = req.user.userid;
+
+    const client = await pool.connect();
+
+    try {
+
+      // =========================
+      // HÄMTA HÄNDELSEN
+      // =========================
+
+      const eventResult = await client.query(
+        `
+        SELECT
+          eventID,
+          userid
+        FROM Events
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+      // HÄNDELSEN FINNS INTE
+      // =========================
+
+      if (eventResult.rows.length === 0) {
+
+        return res.status(404).json({
+          message:
+            "Händelsen hittades inte."
+        });
+
+      }
+
+
+      const event = eventResult.rows[0];
+
+
+      // =========================
+      // KONTROLLERA ÄGARE
+      // =========================
+
+      if (event.userid !== userID) {
+
+        return res.status(403).json({
+          message:
+            "Du har inte behörighet att ta bort denna händelse."
+        });
+
+      }
+
+
+      // =========================
+      // STARTA TRANSAKTION
+      // =========================
+
+      await client.query("BEGIN");
+
+
+      // =========================
+      // TA BORT BEKRÄFTELSER
+      // =========================
+
+      await client.query(
+        `
+        DELETE FROM EventConfirmations
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+      // TA BORT OBSERVATIONER
+      // =========================
+
+      await client.query(
+        `
+        DELETE FROM Observations
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+      // TA BORT HÄNDELSEN
+      // =========================
+
+      await client.query(
+        `
+        DELETE FROM Events
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+
+      // =========================
+      // BEKRÄFTA
+      // =========================
+
+      await client.query("COMMIT");
+
+
+      res.json({
+        message:
+          "Händelsen har tagits bort.",
+
+        eventID:
+          Number(eventID)
+      });
+
+
+    } catch (error) {
+
+      await client.query("ROLLBACK");
+
+      console.error(
+        "Fel vid borttagning av händelse:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte ta bort händelsen."
+      });
+
+
+    } finally {
+
+      client.release();
+
+    }
+
+  }
+);
 
 
       // =========================
