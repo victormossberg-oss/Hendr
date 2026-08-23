@@ -3,6 +3,8 @@ const cors = require("cors");
 const multer = require("multer");
 const axios = require("axios");
 const cloudinary = require("./cloudinary");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
@@ -247,6 +249,7 @@ app.get(
 
 app.post(
   "/api/events",
+  authenticateToken,
   upload.single("image"),
 
   async (req, res) => {
@@ -320,54 +323,46 @@ app.post(
       // =========================
 
       const result =
-        await pool.query(
-          `
-          INSERT INTO Events
-          (
-            title,
-            description,
-            category,
-            status,
-            image_url,
-            latitude,
-            longitude
-          )
+  await pool.query(
+    `
+    INSERT INTO Events
+    (
+      title,
+      description,
+      category,
+      status,
+      image_url,
+      latitude,
+      longitude,
+      userid
+    )
 
-          VALUES
-          ($1, $2, $3, $4, $5, $6, $7)
+    VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8)
 
-
-          RETURNING
-
-            eventID AS id,
-
-            title,
-
-            description,
-
-            category,
-
-            status,
-
-            created_at AS "createdAt",
-
-            image_url AS "imageUrl",
-
-            latitude,
-
-            longitude
-          `,
-
-          [
-            title,
-            description,
-            category,
-            status,
-            imageUrl,
-            parsedLatitude,
-            parsedLongitude
-          ]
-        );
+    RETURNING
+      eventID AS id,
+      title,
+      description,
+      category,
+      status,
+      created_at AS "createdAt",
+      image_url AS "imageUrl",
+      latitude,
+      longitude,
+      userid
+    `,
+    [
+      title,
+      description,
+      category,
+      status,
+      imageUrl,
+      parsedLatitude,
+      parsedLongitude,
+      req.user.userid
+    ]
+  );
 
 
       res.status(201).json(
@@ -956,6 +951,387 @@ app.listen(
     console.log(
       `HENDR API körs på port ${PORT}`
     );
+
+  }
+);
+
+// =========================
+// REGISTRERA ANVÄNDARE
+// =========================
+
+app.post(
+  "/api/auth/register",
+  async (req, res) => {
+
+    try {
+
+      const {
+        username,
+        email,
+        password
+      } = req.body;
+
+
+      // =========================
+      // VALIDERING
+      // =========================
+
+      if (
+        !username ||
+        !email ||
+        !password
+      ) {
+
+        return res.status(400).json({
+          message:
+            "Användarnamn, e-post och lösenord krävs."
+        });
+
+      }
+
+
+      if (password.length < 6) {
+
+        return res.status(400).json({
+          message:
+            "Lösenordet måste vara minst 6 tecken."
+        });
+
+      }
+
+
+      // =========================
+      // KONTROLLERA E-POST
+      // =========================
+
+      const existingUser =
+        await pool.query(
+          `
+          SELECT userid
+          FROM Users
+          WHERE email = $1
+          `,
+          [email]
+        );
+
+
+      if (
+        existingUser.rows.length > 0
+      ) {
+
+        return res.status(409).json({
+          message:
+            "Det finns redan en användare med denna e-post."
+        });
+
+      }
+
+
+      // =========================
+      // HASH LÖSENORD
+      // =========================
+
+      const passwordHash =
+        await bcrypt.hash(
+          password,
+          10
+        );
+
+
+      // =========================
+      // SKAPA ANVÄNDARE
+      // =========================
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO Users
+          (
+            username,
+            email,
+            password_hash
+          )
+
+          VALUES
+          ($1, $2, $3)
+
+          RETURNING
+            userid,
+            username,
+            email,
+            created_at
+          `,
+          [
+            username,
+            email,
+            passwordHash
+          ]
+        );
+
+
+      // =========================
+      // SVARA
+      // =========================
+
+      res.status(201).json({
+        message:
+          "Användaren har skapats.",
+
+        user:
+          result.rows[0]
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid registrering:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte skapa användaren."
+      });
+
+    }
+
+  }
+);
+
+// =========================
+// LOGGA IN ANVÄNDARE
+// =========================
+
+// =========================
+// LOGGA IN ANVÄNDARE
+// =========================
+
+app.post(
+  "/api/auth/login",
+  async (req, res) => {
+
+    try {
+
+      const {
+        email,
+        password
+      } = req.body;
+
+
+      // =========================
+      // VALIDERING
+      // =========================
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        return res.status(400).json({
+          message:
+            "E-post och lösenord krävs."
+        });
+
+      }
+
+
+      // =========================
+      // HÄMTA ANVÄNDARE
+      // =========================
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            userid,
+            username,
+            email,
+            password_hash,
+            created_at
+          FROM Users
+          WHERE email = $1
+          `,
+          [email]
+        );
+
+
+      if (
+        result.rows.length === 0
+      ) {
+
+        return res.status(401).json({
+          message:
+            "Fel e-post eller lösenord."
+        });
+
+      }
+
+
+      const user =
+        result.rows[0];
+
+
+      // =========================
+      // KONTROLLERA LÖSENORD
+      // =========================
+
+      const passwordCorrect =
+        await bcrypt.compare(
+          password,
+          user.password_hash
+        );
+
+
+      if (!passwordCorrect) {
+
+        return res.status(401).json({
+          message:
+            "Fel e-post eller lösenord."
+        });
+
+      }
+
+
+      // =========================
+      // SKAPA JWT
+      // =========================
+
+      const token =
+        jwt.sign(
+          {
+            userid:
+              user.userid,
+
+            username:
+              user.username,
+
+            email:
+              user.email
+          },
+
+          process.env.JWT_SECRET,
+
+          {
+            expiresIn: "7d"
+          }
+        );
+
+
+      // =========================
+      // SVARA
+      // =========================
+
+      res.json({
+
+        message:
+          "Inloggningen lyckades.",
+
+        token,
+
+        user: {
+
+          userid:
+            user.userid,
+
+          username:
+            user.username,
+
+          email:
+            user.email,
+
+          created_at:
+            user.created_at
+
+        }
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid inloggning:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte logga in."
+      });
+
+    }
+
+  }
+);
+
+// =========================
+// AUTENTISERING
+// =========================
+
+function authenticateToken(
+  req,
+  res,
+  next
+) {
+
+  const authHeader =
+    req.headers.authorization;
+
+
+  const token =
+    authHeader &&
+    authHeader.split(" ")[1];
+
+
+  if (!token) {
+
+    return res.status(401).json({
+      message:
+        "Du måste vara inloggad."
+    });
+
+  }
+
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (error, user) => {
+
+      if (error) {
+
+        return res.status(403).json({
+          message:
+            "Ogiltig eller utgången token."
+        });
+
+      }
+
+
+      req.user = user;
+
+      next();
+
+    }
+  );
+
+}
+
+// =========================
+// TESTA INLOGGAD ANVÄNDARE
+// =========================
+
+app.get(
+  "/api/auth/me",
+  authenticateToken,
+  (req, res) => {
+
+    res.json({
+      user: req.user
+    });
 
   }
 );
