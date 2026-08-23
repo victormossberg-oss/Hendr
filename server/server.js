@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path");
 const axios = require("axios");
+const cloudinary = require("./cloudinary");
 
 require("dotenv").config();
 
@@ -18,38 +18,47 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use(
-  "/uploads",
-  express.static(
-    path.join(__dirname, "uploads")
-  )
-);
-
 
 // =========================
 // BILDUPPLADDNING
 // =========================
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-
-  filename: (req, file, cb) => {
-    const extension = path.extname(
-      file.originalname
-    );
-
-    const filename =
-      `${Date.now()}${extension}`;
-
-    cb(null, filename);
-  }
-});
+// Bilder sparas tillfälligt i minnet
+// och skickas sedan till Cloudinary.
 
 const upload = multer({
-  storage: storage
+  storage: multer.memoryStorage()
 });
+
+
+// =========================
+// LADDA UPP BILD TILL CLOUDINARY
+// =========================
+
+function uploadToCloudinary(file, folder) {
+
+  return new Promise((resolve, reject) => {
+
+    const stream =
+      cloudinary.uploader.upload_stream(
+        {
+          folder: folder
+        },
+
+        (error, result) => {
+
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(result);
+        }
+      );
+
+    stream.end(file.buffer);
+  });
+}
 
 
 // =========================
@@ -107,6 +116,7 @@ async function getLocationName(
       address.county ||
       null
     );
+
 
   } catch (error) {
 
@@ -254,6 +264,28 @@ app.post(
 
 
       // =========================
+      // LADDA UPP BILD
+      // =========================
+
+      let imageUrl = null;
+
+
+      if (req.file) {
+
+        const uploadedImage =
+          await uploadToCloudinary(
+            req.file,
+            "hendr/events"
+          );
+
+
+        imageUrl =
+          uploadedImage.secure_url;
+
+      }
+
+
+      // =========================
       // KONVERTERA KOORDINATER
       // =========================
 
@@ -281,16 +313,6 @@ app.post(
             parsedLongitude
         }
       );
-
-
-      // =========================
-      // BILD
-      // =========================
-
-      const imageUrl =
-        req.file
-          ? `/uploads/${req.file.filename}`
-          : null;
 
 
       // =========================
@@ -355,7 +377,11 @@ app.post(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Fel vid skapande av händelse:",
+        error
+      );
+
 
       res.status(500).json({
         message:
@@ -389,6 +415,32 @@ app.post(
       } = req.body;
 
 
+      // =========================
+      // LADDA UPP BILD
+      // =========================
+
+      let imageUrl = null;
+
+
+      if (req.file) {
+
+        const uploadedImage =
+          await uploadToCloudinary(
+            req.file,
+            "hendr/observations"
+          );
+
+
+        imageUrl =
+          uploadedImage.secure_url;
+
+      }
+
+
+      // =========================
+      // KONVERTERA KOORDINATER
+      // =========================
+
       const parsedLatitude =
         latitude !== undefined &&
         latitude !== ""
@@ -403,11 +455,9 @@ app.post(
           : null;
 
 
-      const imageUrl =
-        req.file
-          ? `/uploads/${req.file.filename}`
-          : null;
-
+      // =========================
+      // SPARA OBSERVATION
+      // =========================
 
       const result =
         await pool.query(
@@ -463,7 +513,11 @@ app.post(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Fel vid skapande av observation:",
+        error
+      );
+
 
       res.status(500).json({
         message:
@@ -584,7 +638,6 @@ app.post(
           FROM EventConfirmations
 
           WHERE eventID = $1
-
           AND userID = $2
           `,
 
@@ -608,7 +661,6 @@ app.post(
           DELETE FROM EventConfirmations
 
           WHERE eventID = $1
-
           AND userID = $2
           `,
 
@@ -715,7 +767,6 @@ app.get(
           FROM EventConfirmations
 
           WHERE eventID = $1
-
           AND userID = $2
           `,
 
@@ -748,79 +799,138 @@ app.get(
   }
 );
 
+
 // =========================
 // TA BORT HÄNDELSE
 // =========================
 
 app.delete(
   "/api/events/:eventID",
-  async (req, res) => {
-    const { eventID } = req.params;
 
-    const client = await pool.connect();
+  async (req, res) => {
+
+    const {
+      eventID
+    } = req.params;
+
+
+    const client =
+      await pool.connect();
+
 
     try {
-      await client.query("BEGIN");
 
-      // Ta bort bekräftelser
+      await client.query(
+        "BEGIN"
+      );
+
+
+      // =========================
+      // TA BORT BEKRÄFTELSER
+      // =========================
+
       await client.query(
         `
         DELETE FROM EventConfirmations
+
         WHERE eventID = $1
         `,
+
         [eventID]
       );
 
-      // Ta bort observationer
+
+      // =========================
+      // TA BORT OBSERVATIONER
+      // =========================
+
       await client.query(
         `
         DELETE FROM Observations
+
         WHERE eventID = $1
         `,
+
         [eventID]
       );
 
-      // Ta bort själva händelsen
-      const result = await client.query(
-        `
-        DELETE FROM Events
-        WHERE eventID = $1
-        RETURNING eventID
-        `,
-        [eventID]
-      );
 
-      if (result.rows.length === 0) {
-        await client.query("ROLLBACK");
+      // =========================
+      // TA BORT HÄNDELSEN
+      // =========================
+
+      const result =
+        await client.query(
+          `
+          DELETE FROM Events
+
+          WHERE eventID = $1
+
+          RETURNING eventID
+          `,
+
+          [eventID]
+        );
+
+
+      if (
+        result.rows.length === 0
+      ) {
+
+        await client.query(
+          "ROLLBACK"
+        );
+
 
         return res.status(404).json({
-          message: "Händelsen hittades inte."
+          message:
+            "Händelsen hittades inte."
         });
+
       }
 
-      await client.query("COMMIT");
+
+      await client.query(
+        "COMMIT"
+      );
+
 
       res.json({
-        message: "Händelsen har tagits bort.",
-        eventID: Number(eventID)
+
+        message:
+          "Händelsen har tagits bort.",
+
+        eventID:
+          Number(eventID)
+
       });
+
 
     } catch (error) {
 
-      await client.query("ROLLBACK");
+      await client.query(
+        "ROLLBACK"
+      );
+
 
       console.error(
         "Fel vid borttagning av händelse:",
         error
       );
 
+
       res.status(500).json({
-        message: "Kunde inte ta bort händelsen."
+        message:
+          "Kunde inte ta bort händelsen."
       });
 
+
     } finally {
+
       client.release();
+
     }
+
   }
 );
 
@@ -829,7 +939,12 @@ app.delete(
 // STARTA SERVERN
 // =========================
 
-const PORT = 3000;
+// Render tilldelar porten via
+// process.env.PORT.
+// Lokalt används port 3000.
+
+const PORT =
+  process.env.PORT || 3000;
 
 
 app.listen(
