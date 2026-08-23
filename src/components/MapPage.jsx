@@ -8,7 +8,32 @@ import {
 
 import { useEffect, useState } from "react";
 
+import L from "leaflet";
+
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
 import "leaflet/dist/leaflet.css";
+
+
+// =========================
+// LEAFLET MARKÖR-IKON
+// =========================
+
+const defaultIcon = new L.Icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+
+  iconSize: [25, 41],
+
+  iconAnchor: [12, 41],
+
+  popupAnchor: [1, -34],
+
+  shadowSize: [41, 41]
+});
 
 
 // =========================
@@ -30,6 +55,7 @@ const DEFAULT_POSITION = [
 function MapLocationController({
   userLocation
 }) {
+
   const map = useMap();
 
   useEffect(() => {
@@ -93,7 +119,20 @@ function MapPage({
           position.coords.longitude
         ];
 
+        console.log(
+          "GPS-position:",
+          {
+            latitude:
+              position.coords.latitude,
+
+            longitude:
+              position.coords.longitude
+          }
+        );
+
         setUserLocation(location);
+
+        setLocationError("");
 
       },
 
@@ -133,6 +172,11 @@ function MapPage({
   return (
     <main className="map-page">
 
+
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div className="map-header">
 
         <h1>
@@ -153,11 +197,17 @@ function MapPage({
       {locationError && (
 
         <div className="map-location-error">
+
           {locationError}
+
         </div>
 
       )}
 
+
+      {/* =========================
+          KARTA
+      ========================= */}
 
       <div className="map-container">
 
@@ -168,12 +218,13 @@ function MapPage({
           className="map"
         >
 
+
           {/* =========================
               KARTLAGER
           ========================= */}
 
           <TileLayer
-            attribution='&copy; OpenStreetMap contributors'
+            attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
@@ -195,10 +246,15 @@ function MapPage({
 
             <Marker
               position={userLocation}
+              icon={defaultIcon}
             >
 
               <Popup>
-                Du är här
+
+                <strong>
+                  Du är här
+                </strong>
+
               </Popup>
 
             </Marker>
@@ -212,13 +268,24 @@ function MapPage({
 
           {events.map((event) => {
 
+
+            // -------------------------
+            // SAKNAR KOORDINATER
+            // -------------------------
+
             if (
               event.latitude == null ||
               event.longitude == null
             ) {
+
               return null;
+
             }
 
+
+            // -------------------------
+            // KONVERTERA TILL NUMBER
+            // -------------------------
 
             const latitude =
               Number(event.latitude);
@@ -227,27 +294,49 @@ function MapPage({
               Number(event.longitude);
 
 
+            // -------------------------
+            // OGILTIGA KOORDINATER
+            // -------------------------
+
             if (
               Number.isNaN(latitude) ||
               Number.isNaN(longitude)
             ) {
+
               return null;
+
             }
 
+
+            console.log(
+              "Event på karta:",
+              event.title,
+              latitude,
+              longitude
+            );
+
+
+            // -------------------------
+            // MARKÖR
+            // -------------------------
 
             return (
 
               <Marker
                 key={event.id}
+
                 position={[
                   latitude,
                   longitude
                 ]}
+
+                icon={defaultIcon}
               >
 
                 <Popup>
 
                   <div className="map-popup">
+
 
                     <strong>
                       {event.title}
@@ -260,20 +349,24 @@ function MapPage({
 
 
                     {event.location && (
+
                       <span>
                         📍 {event.location}
                       </span>
+
                     )}
 
 
                     <button
                       type="button"
+
                       onClick={() =>
                         onEventClick(event)
                       }
                     >
                       Visa händelse
                     </button>
+
 
                   </div>
 
@@ -285,9 +378,11 @@ function MapPage({
 
           })}
 
+
         </MapContainer>
 
       </div>
+
 
     </main>
   );
