@@ -5,11 +5,20 @@ import { API_URL } from "../config";
 
 function NewEventForm({ onBack, onCreateEvent }) {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Evenemang");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState(null);
-  const [image, setImage] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
+  const [category, setCategory] =
+    useState("Evenemang");
+  const [description, setDescription] =
+    useState("");
+  const [location, setLocation] =
+    useState(null);
+  const [image, setImage] =
+    useState(null);
+  const [imageFile, setImageFile] =
+    useState(null);
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
 
   // =========================
   // BILD
@@ -37,8 +46,20 @@ function NewEventForm({ onBack, onCreateEvent }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // Förhindra flera klick
+    if (submitting) {
+      return;
+    }
+
     try {
-      const formData = new FormData();
+
+      // Lås formuläret direkt
+      setSubmitting(true);
+
+
+      const formData =
+        new FormData();
+
 
       // =========================
       // HÄNDELSEDATA
@@ -70,6 +91,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
       // =========================
 
       if (location) {
+
         formData.append(
           "latitude",
           location.latitude
@@ -79,6 +101,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
           "longitude",
           location.longitude
         );
+
       }
 
 
@@ -87,10 +110,12 @@ function NewEventForm({ onBack, onCreateEvent }) {
       // =========================
 
       if (imageFile) {
+
         formData.append(
           "image",
           imageFile
         );
+
       }
 
 
@@ -104,23 +129,31 @@ function NewEventForm({ onBack, onCreateEvent }) {
       );
 
 
+      console.log(
+        "Skapar händelse..."
+      );
+
+
       // =========================
       // API
       // =========================
 
-      const response = await fetch(
-        `${API_URL}/api/events`,
-        {
-          method: "POST",
-          body: formData
-        }
-      );
+      const response =
+        await fetch(
+          `${API_URL}/api/events`,
+          {
+            method: "POST",
+            body: formData
+          }
+        );
 
 
       if (!response.ok) {
+
         throw new Error(
           "Kunde inte skapa händelsen"
         );
+
       }
 
 
@@ -134,9 +167,14 @@ function NewEventForm({ onBack, onCreateEvent }) {
       );
 
 
+      // =========================
+      // KLAR
+      // =========================
+
       onCreateEvent(
         newEvent
       );
+
 
     } catch (error) {
 
@@ -145,12 +183,20 @@ function NewEventForm({ onBack, onCreateEvent }) {
         error
       );
 
+
+      // Om något går fel
+      // får användaren försöka igen
+
+      setSubmitting(false);
+
     }
+
   }
 
 
   return (
     <main className="observation-page">
+
 
       {/* =========================
           TILLBAKA
@@ -159,21 +205,26 @@ function NewEventForm({ onBack, onCreateEvent }) {
       <button
         className="back-button"
         onClick={onBack}
+        disabled={submitting}
       >
         <ArrowLeft />
+
         Tillbaka
       </button>
 
 
       <div className="observation-content">
 
+
         <span className="event-category">
           Ny händelse
         </span>
 
+
         <h1>
           Vad händer?
         </h1>
+
 
         <p className="observation-intro">
           Skapa en ny händelse som andra
@@ -185,6 +236,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
           onSubmit={handleSubmit}
         >
 
+
           {/* =========================
               RUBRIK
           ========================= */}
@@ -193,15 +245,19 @@ function NewEventForm({ onBack, onCreateEvent }) {
             Rubrik
           </label>
 
+
           <input
             id="title"
             type="text"
             value={title}
             onChange={(e) =>
-              setTitle(e.target.value)
+              setTitle(
+                e.target.value
+              )
             }
             placeholder="Ex. Livemusik på Almedalen"
             required
+            disabled={submitting}
           />
 
 
@@ -213,13 +269,18 @@ function NewEventForm({ onBack, onCreateEvent }) {
             Kategori
           </label>
 
+
           <select
             id="category"
             value={category}
             onChange={(e) =>
-              setCategory(e.target.value)
+              setCategory(
+                e.target.value
+              )
             }
+            disabled={submitting}
           >
+
             <option value="Evenemang">
               Evenemang
             </option>
@@ -247,6 +308,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
             <option value="Övrigt">
               Övrigt
             </option>
+
           </select>
 
 
@@ -257,6 +319,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
           <label htmlFor="description">
             Beskrivning
           </label>
+
 
           <textarea
             id="description"
@@ -269,6 +332,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
             placeholder="Berätta vad som händer..."
             rows="6"
             required
+            disabled={submitting}
           />
 
 
@@ -276,7 +340,13 @@ function NewEventForm({ onBack, onCreateEvent }) {
               BILD
           ========================= */}
 
-          <label className="image-upload">
+          <label
+            className={`image-upload ${
+              submitting
+                ? "disabled"
+                : ""
+            }`}
+          >
 
             {image ? (
 
@@ -297,12 +367,14 @@ function NewEventForm({ onBack, onCreateEvent }) {
 
             )}
 
+
             <input
               type="file"
               accept="image/*"
               onChange={
                 handleImageChange
               }
+              disabled={submitting}
             />
 
           </label>
@@ -316,10 +388,15 @@ function NewEventForm({ onBack, onCreateEvent }) {
             Plats
           </label>
 
+
           <LocationPicker
             onLocationChange={(
               newLocation
             ) => {
+
+              if (submitting) {
+                return;
+              }
 
               setLocation(
                 newLocation
@@ -336,9 +413,15 @@ function NewEventForm({ onBack, onCreateEvent }) {
           <button
             type="submit"
             className="submit-observation"
+            disabled={submitting}
           >
-            Skapa händelse
+
+            {submitting
+              ? "Laddar upp..."
+              : "Skapa händelse"}
+
           </button>
+
 
         </form>
 

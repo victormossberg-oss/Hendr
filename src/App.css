@@ -1096,3 +1096,18 @@
 .delete-event-button:hover {
   background: #fff5f5;
 }
+
+.submit-observation:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-upload.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
