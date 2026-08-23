@@ -18,8 +18,50 @@ function EventDetail({
   observations,
   onBack,
   onAddObservation,
-  onConfirmationChange
+  onDelete
 }) {
+
+  async function handleDelete() {
+
+  const confirmed =
+    window.confirm(
+      "Är du säker på att du vill ta bort denna händelse?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `${API_URL}/api/events/${event.id}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte ta bort händelsen"
+      );
+    }
+
+    onDelete(event.id);
+
+  } catch (error) {
+
+    console.error(
+      "Fel vid borttagning av händelse:",
+      error
+    );
+
+    alert(
+      "Kunde inte ta bort händelsen."
+    );
+  }
+}
+  
 
   // =========================
   // BEKRÄFTELSE
@@ -468,15 +510,18 @@ function EventDetail({
         ========================= */}
 
         <button
-          className="observation-button"
-          onClick={
-            onAddObservation
-          }
-        >
+  className="observation-button"
+  onClick={onAddObservation}
+>
+  + Lägg till observation
+</button>
 
-          + Lägg till observation
-
-        </button>
+<button
+  className="delete-event-button"
+  onClick={handleDelete}
+>
+  Ta bort händelse
+</button>
 
 
       </div>

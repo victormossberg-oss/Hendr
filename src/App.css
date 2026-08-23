@@ -1073,3 +1073,26 @@
 
   font-size: 14px;
 }
+
+.delete-event-button {
+  width: 100%;
+  margin-top: 12px;
+
+  padding: 14px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+
+  background: white;
+
+  color: #d64545;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.delete-event-button:hover {
+  background: #fff5f5;
+}

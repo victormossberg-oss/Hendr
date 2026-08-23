@@ -748,6 +748,82 @@ app.get(
   }
 );
 
+// =========================
+// TA BORT HÄNDELSE
+// =========================
+
+app.delete(
+  "/api/events/:eventID",
+  async (req, res) => {
+    const { eventID } = req.params;
+
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      // Ta bort bekräftelser
+      await client.query(
+        `
+        DELETE FROM EventConfirmations
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+      // Ta bort observationer
+      await client.query(
+        `
+        DELETE FROM Observations
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+      // Ta bort själva händelsen
+      const result = await client.query(
+        `
+        DELETE FROM Events
+        WHERE eventID = $1
+        RETURNING eventID
+        `,
+        [eventID]
+      );
+
+      if (result.rows.length === 0) {
+        await client.query("ROLLBACK");
+
+        return res.status(404).json({
+          message: "Händelsen hittades inte."
+        });
+      }
+
+      await client.query("COMMIT");
+
+      res.json({
+        message: "Händelsen har tagits bort.",
+        eventID: Number(eventID)
+      });
+
+    } catch (error) {
+
+      await client.query("ROLLBACK");
+
+      console.error(
+        "Fel vid borttagning av händelse:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Kunde inte ta bort händelsen."
+      });
+
+    } finally {
+      client.release();
+    }
+  }
+);
+
 
 // =========================
 // STARTA SERVERN

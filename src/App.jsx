@@ -230,22 +230,29 @@ function App() {
 
     content = (
       <EventDetail
-        event={selectedEvent}
+  event={selectedEvent}
+  observations={observations}
 
-        observations={observations}
+  onBack={() =>
+    setSelectedEvent(null)
+  }
 
-        onBack={() =>
-          setSelectedEvent(null)
-        }
+  onAddObservation={() =>
+    setShowObservationForm(true)
+  }
 
-        onAddObservation={() =>
-          setShowObservationForm(true)
-        }
+  onDelete={(eventID) => {
 
-        onConfirmationChange={
-          handleConfirmationChange
-        }
-      />
+    setEvents((current) =>
+      current.filter(
+        (event) =>
+          event.id !== eventID
+      )
+    );
+
+    setSelectedEvent(null);
+  }}
+/>
     );
 
   }
