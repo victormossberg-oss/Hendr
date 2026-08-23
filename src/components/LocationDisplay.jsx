@@ -1,26 +1,43 @@
 import { MapPin } from "lucide-react";
 
-function LocationDisplay({ latitude, longitude }) {
-  if (!latitude || !longitude) {
+function LocationDisplay({
+  latitude,
+  longitude,
+  location
+}) {
+  if (
+    latitude == null ||
+    longitude == null
+  ) {
     return (
       <div className="location-display">
         <MapPin />
-        <span>Plats saknas</span>
+
+        <span>
+          Plats saknas
+        </span>
       </div>
     );
   }
 
   return (
     <div className="location-display">
+
       <MapPin />
 
       <div>
-        <strong>Visby</strong>
+
+        <strong>
+          {location || "Okänd plats"}
+        </strong>
 
         <span>
-          {latitude.toFixed(5)}, {longitude.toFixed(5)}
+          {Number(latitude).toFixed(5)},{" "}
+          {Number(longitude).toFixed(5)}
         </span>
+
       </div>
+
     </div>
   );
 }

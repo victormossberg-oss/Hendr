@@ -276,14 +276,11 @@ function EventDetail({
         {event.latitude != null &&
           event.longitude != null && (
 
-            <LocationDisplay
-              latitude={
-                event.latitude
-              }
-              longitude={
-                event.longitude
-              }
-            />
+          <LocationDisplay
+  latitude={event.latitude}
+  longitude={event.longitude}
+  location={event.location}
+/>
 
         )}
 

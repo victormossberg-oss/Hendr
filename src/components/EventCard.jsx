@@ -206,9 +206,9 @@ function EventCard({
             PLATS
         ========================= */}
 
-        <div className="event-location">
-          📍 Plats
-        </div>
+       <div className="event-location">
+  📍 {event.location || "Okänd plats"}
+</div>
 
 
         {/* =========================

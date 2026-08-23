@@ -12,6 +12,7 @@ function Feed({
 
         <EventCard
           key={event.id}
+
           event={event}
 
           onClick={() =>
