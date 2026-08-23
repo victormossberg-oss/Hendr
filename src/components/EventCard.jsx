@@ -271,7 +271,7 @@ function EventCard({
         <div className="event-image">
 
           <img
-            src={`${API_URL}${event.imageUrl}`}
+            src={event.imageUrl}
             alt=""
           />
 

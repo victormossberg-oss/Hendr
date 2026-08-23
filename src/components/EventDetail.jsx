@@ -255,7 +255,7 @@ function EventDetail({
         <div className="detail-image">
 
           <img
-            src={`${API_URL}${event.imageUrl}`}
+            src={event.imageUrl}
             alt={event.title}
           />
 
@@ -487,7 +487,7 @@ function EventDetail({
 
                       <img
                         className="observation-image"
-                        src={`${API_URL}${observation.imageUrl}`}
+                        src={observation.imageUrl}
                         alt="Bild från observation"
                       />
 
