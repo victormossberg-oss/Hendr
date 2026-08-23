@@ -1,3 +1,3 @@
 const API_HOST = window.location.hostname;
 
-export const API_URL = `http://${API_HOST}:3000`;
+export const API_URL = "https://hendr.onrender.com";
