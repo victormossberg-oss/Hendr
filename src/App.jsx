@@ -34,6 +34,9 @@ function App() {
   const [showLogin, setShowLogin] =
     useState(false);
 
+  const [loginReason, setLoginReason] =
+    useState(null);
+
 
   // =========================
   // INLOGGAD ANVÄNDARE
@@ -61,9 +64,37 @@ function App() {
 
   setShowLogin(false);
 
-  setCurrentPage("home");
 
-  setCreatingEvent(true);
+  // =========================
+  // LOGIN FRÅN SKAPA HÄNDELSE
+  // =========================
+
+  if (loginReason === "createEvent") {
+
+    setCreatingEvent(true);
+    setShowObservationForm(false);
+    setCurrentPage("home");
+
+  }
+
+
+  // =========================
+  // LOGIN FRÅN OBSERVATION
+  // =========================
+
+  else if (loginReason === "observation") {
+
+    setCreatingEvent(false);
+    setShowObservationForm(true);
+
+  }
+
+
+  // =========================
+  // RENSAR LOGIN-ORSAKEN
+  // =========================
+
+  setLoginReason(null);
 
 }
 
@@ -256,9 +287,12 @@ if (showLogin) {
         handleLogin
       }
 
-      onBack={() =>
-        setShowLogin(false)
-      }
+      onBack={() => {
+
+  setShowLogin(false);
+  setLoginReason(null);
+
+}}
 
     />
 
@@ -377,9 +411,20 @@ if (showLogin) {
           setSelectedEvent(null)
         }
 
-        onAddObservation={() =>
-          setShowObservationForm(true)
-        }
+        onAddObservation={() => {
+
+  if (!user) {
+
+    setLoginReason("observation");
+    setShowLogin(true);
+
+    return;
+
+  }
+
+  setShowObservationForm(true);
+
+}}
 
         onDelete={(eventID) => {
 
@@ -521,20 +566,19 @@ if (showLogin) {
 
   onCreateEvent={() => {
 
-    console.log("SKAPA KLICKAD");
+  if (!user) {
 
-    if (!user) {
+    setLoginReason("createEvent");
+    setShowLogin(true);
 
-      setShowLogin(true);
+    return;
 
-      return;
+  }
 
-    }
+  setCreatingEvent(true);
+  setCurrentPage("home");
 
-    setCreatingEvent(true);
-    setCurrentPage("home");
-
-  }}
+}}
 
 />
 
