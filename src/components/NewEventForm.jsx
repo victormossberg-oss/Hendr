@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { ArrowLeft, Image } from "lucide-react";
+import { Image } from "lucide-react";
 import LocationPicker from "./LocationPicker";
 import { API_URL } from "../config";
 
-function NewEventForm({ onBack, onCreateEvent }) {
-  const [title, setTitle] = useState("");
+function NewEventForm({ onCreateEvent }) {
+
+  const [title, setTitle] =
+    useState("");
+
   const [category, setCategory] =
     useState("Evenemang");
+
   const [description, setDescription] =
     useState("");
+
   const [location, setLocation] =
     useState(null);
+
   const [image, setImage] =
     useState(null);
+
   const [imageFile, setImageFile] =
     useState(null);
 
@@ -25,7 +32,9 @@ function NewEventForm({ onBack, onCreateEvent }) {
   // =========================
 
   function handleImageChange(e) {
-    const file = e.target.files[0];
+
+    const file =
+      e.target.files[0];
 
     if (!file) {
       return;
@@ -36,6 +45,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
 
     setImage(imageUrl);
     setImageFile(file);
+
   }
 
 
@@ -44,18 +54,16 @@ function NewEventForm({ onBack, onCreateEvent }) {
   // =========================
 
   async function handleSubmit(e) {
+
     e.preventDefault();
 
-    // Förhindra flera klick
     if (submitting) {
       return;
     }
 
     try {
 
-      // Lås formuläret direkt
       setSubmitting(true);
-
 
       const formData =
         new FormData();
@@ -120,37 +128,42 @@ function NewEventForm({ onBack, onCreateEvent }) {
 
 
       // =========================
-      // DEBUG
-      // =========================
-
-      console.log(
-        "Plats som skickas:",
-        location
-      );
-
-
-      console.log(
-        "Skapar händelse..."
-      );
-
-
-      // =========================
       // API
       // =========================
+
+      const token =
+        localStorage.getItem(
+          "hendr_token"
+        );
+
 
       const response =
         await fetch(
           `${API_URL}/api/events`,
           {
             method: "POST",
+
+            headers: {
+
+              Authorization:
+                `Bearer ${token}`
+
+            },
+
             body: formData
+
           }
         );
 
 
       if (!response.ok) {
 
+        const errorData =
+          await response.json()
+            .catch(() => null);
+
         throw new Error(
+          errorData?.message ||
           "Kunde inte skapa händelsen"
         );
 
@@ -167,10 +180,6 @@ function NewEventForm({ onBack, onCreateEvent }) {
       );
 
 
-      // =========================
-      // KLAR
-      // =========================
-
       onCreateEvent(
         newEvent
       );
@@ -183,10 +192,6 @@ function NewEventForm({ onBack, onCreateEvent }) {
         error
       );
 
-
-      // Om något går fel
-      // får användaren försöka igen
-
       setSubmitting(false);
 
     }
@@ -195,26 +200,10 @@ function NewEventForm({ onBack, onCreateEvent }) {
 
 
   return (
+
     <main className="observation-page">
 
-
-      {/* =========================
-          TILLBAKA
-      ========================= */}
-
-      <button
-        className="back-button"
-        onClick={onBack}
-        disabled={submitting}
-      >
-        <ArrowLeft />
-
-        Tillbaka
-      </button>
-
-
       <div className="observation-content">
-
 
         <span className="event-category">
           Ny händelse
@@ -251,9 +240,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
             type="text"
             value={title}
             onChange={(e) =>
-              setTitle(
-                e.target.value
-              )
+              setTitle(e.target.value)
             }
             placeholder="Ex. Livemusik på Almedalen"
             required
@@ -274,9 +261,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
             id="category"
             value={category}
             onChange={(e) =>
-              setCategory(
-                e.target.value
-              )
+              setCategory(e.target.value)
             }
             disabled={submitting}
           >
@@ -428,6 +413,7 @@ function NewEventForm({ onBack, onCreateEvent }) {
       </div>
 
     </main>
+
   );
 }
 

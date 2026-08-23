@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "./config";
+
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
 import EventDetail from "./components/EventDetail";
 import ObservationForm from "./components/ObservationForm";
 import NewEventForm from "./components/NewEventForm";
 import BottomNav from "./components/BottomNav";
+import Login from "./pages/Login";
 
 import "./App.css";
 
 function App() {
-  const [events, setEvents] = useState([]);
+
+  const [events, setEvents] =
+    useState([]);
+
   const [currentPage, setCurrentPage] =
-  useState("home");
+    useState("home");
+
   const [selectedEvent, setSelectedEvent] =
     useState(null);
 
@@ -25,31 +31,103 @@ function App() {
   const [observations, setObservations] =
     useState([]);
 
+  const [showLogin, setShowLogin] =
+    useState(false);
+
+
+  // =========================
+  // INLOGGAD ANVÄNDARE
+  // =========================
+
+  const [user, setUser] = useState(() => {
+
+    const savedUser =
+      localStorage.getItem("hendr_user");
+
+    return savedUser
+      ? JSON.parse(savedUser)
+      : null;
+
+  });
+
+
+  // =========================
+  // LOGIN
+  // =========================
+
+  function handleLogin(loggedInUser) {
+
+  setUser(loggedInUser);
+
+  setShowLogin(false);
+
+  setCurrentPage("home");
+
+  setCreatingEvent(true);
+
+}
+
+
+  // =========================
+  // LOGGA UT
+  // =========================
+
+  function handleLogout() {
+
+    localStorage.removeItem(
+      "hendr_token"
+    );
+
+    localStorage.removeItem(
+      "hendr_user"
+    );
+
+    setUser(null);
+
+    setSelectedEvent(null);
+    setShowObservationForm(false);
+    setCreatingEvent(false);
+    setCurrentPage("home");
+
+  }
+
 
   // =========================
   // HÄMTA ALLA HÄNDELSER
   // =========================
 
   useEffect(() => {
+
     fetch(`${API_URL}/api/events`)
       .then((response) => {
+
         if (!response.ok) {
+
           throw new Error(
             "Kunde inte hämta händelser"
           );
+
         }
 
         return response.json();
+
       })
+
       .then((data) => {
+
         setEvents(data);
+
       })
+
       .catch((error) => {
+
         console.error(
           "Fel vid hämtning av events:",
           error
         );
+
       });
+
   }, []);
 
 
@@ -58,6 +136,7 @@ function App() {
   // =========================
 
   useEffect(() => {
+
     if (!selectedEvent) {
       return;
     }
@@ -65,23 +144,34 @@ function App() {
     fetch(
       `${API_URL}/api/events/${selectedEvent.id}/observations`
     )
+
       .then((response) => {
+
         if (!response.ok) {
+
           throw new Error(
             "Kunde inte hämta observationer"
           );
+
         }
 
         return response.json();
+
       })
+
       .then((data) => {
+
         setObservations(data);
+
       })
+
       .catch((error) => {
+
         console.error(
           "Fel vid hämtning av observationer:",
           error
         );
+
       });
 
   }, [selectedEvent]);
@@ -96,6 +186,7 @@ function App() {
     eventID,
     confirmed
   ) {
+
     setEvents((currentEvents) =>
       currentEvents.map((event) => {
 
@@ -109,6 +200,7 @@ function App() {
           ) || 0;
 
         return {
+
           ...event,
 
           confirmationCount:
@@ -118,10 +210,12 @@ function App() {
                   0,
                   currentCount - 1
                 )
+
         };
 
       })
     );
+
   }
 
 
@@ -129,7 +223,9 @@ function App() {
   // SKAPA NY HÄNDELSE
   // =========================
 
-  function handleCreateEvent(newEvent) {
+  function handleCreateEvent(
+    newEvent
+  ) {
 
     setEvents((current) => [
       newEvent,
@@ -137,50 +233,85 @@ function App() {
     ]);
 
     setCreatingEvent(false);
+
   }
 
-
-  // =========================
+   // =========================
   // INNEHÅLL
   // =========================
 
   let content;
+
+  // =========================
+// LOGIN
+// =========================
+
+if (showLogin) {
+
+  content = (
+
+    <Login
+
+      onLogin={
+        handleLogin
+      }
+
+      onBack={() =>
+        setShowLogin(false)
+      }
+
+    />
+
+  );
+
+}
+
 
 
   // =========================
   // SKAPA HÄNDELSE
   // =========================
 
-  if (creatingEvent) {
-
-    content = (
-      <NewEventForm
-        onBack={() =>
-          setCreatingEvent(false)
-        }
-
-        onCreateEvent={
-          handleCreateEvent
-        }
-      />
-    );
-
-  }
-
-  else if (currentPage === "map") {
+  else if (creatingEvent) {
 
   content = (
-    <MapPage
-      events={events}
 
-      onEventClick={(event) => {
-        setSelectedEvent(event);
-        setCurrentPage("home");
-      }}
+    <NewEventForm
+      onCreateEvent={
+        handleCreateEvent
+      }
     />
+
   );
 
 }
+
+  // =========================
+  // KARTA
+  // =========================
+
+  else if (
+    currentPage === "map"
+  ) {
+
+    content = (
+
+      <MapPage
+
+        events={events}
+
+        onEventClick={(event) => {
+
+          setSelectedEvent(event);
+          setCurrentPage("home");
+
+        }}
+
+      />
+
+    );
+
+  }
 
 
   // =========================
@@ -193,7 +324,9 @@ function App() {
   ) {
 
     content = (
+
       <ObservationForm
+
         event={selectedEvent}
 
         onBack={() =>
@@ -216,7 +349,9 @@ function App() {
           );
 
         }}
+
       />
+
     );
 
   }
@@ -229,30 +364,38 @@ function App() {
   else if (selectedEvent) {
 
     content = (
+
       <EventDetail
-  event={selectedEvent}
-  observations={observations}
 
-  onBack={() =>
-    setSelectedEvent(null)
-  }
+        event={selectedEvent}
 
-  onAddObservation={() =>
-    setShowObservationForm(true)
-  }
+        observations={
+          observations
+        }
 
-  onDelete={(eventID) => {
+        onBack={() =>
+          setSelectedEvent(null)
+        }
 
-    setEvents((current) =>
-      current.filter(
-        (event) =>
-          event.id !== eventID
-      )
-    );
+        onAddObservation={() =>
+          setShowObservationForm(true)
+        }
 
-    setSelectedEvent(null);
-  }}
-/>
+        onDelete={(eventID) => {
+
+          setEvents((current) =>
+            current.filter(
+              (event) =>
+                event.id !== eventID
+            )
+          );
+
+          setSelectedEvent(null);
+
+        }}
+
+      />
+
     );
 
   }
@@ -265,19 +408,24 @@ function App() {
   else {
 
     content = (
+
       <>
+
         <header className="header">
 
           <div className="logo">
             HENDR
           </div>
 
+
           <div className="search">
+
             🔍
 
             <span>
               Sök efter händelser...
             </span>
+
           </div>
 
         </header>
@@ -288,6 +436,7 @@ function App() {
           <p>
             Vad händer nära dig?
           </p>
+
 
           <div className="filters">
 
@@ -309,24 +458,32 @@ function App() {
 
 
         <Feed
-  events={events}
 
-  onEventClick={(event) =>
-    setSelectedEvent(event)
-  }
+          events={events}
 
-  onConfirmationChange={
-    handleConfirmationChange
-  }
-/>
+          onEventClick={(event) =>
+            setSelectedEvent(event)
+          }
+
+          onConfirmationChange={
+            handleConfirmationChange
+          }
+
+        />
 
       </>
+
     );
 
   }
 
 
+  // =========================
+  // APP
+  // =========================
+
   return (
+
     <div className="app">
 
       {content}
@@ -339,30 +496,52 @@ function App() {
       <BottomNav
 
   onHome={() => {
+
+    console.log("HEM KLICKAD");
+
+    setCreatingEvent(false);
     setSelectedEvent(null);
     setShowObservationForm(false);
-    setCreatingEvent(false);
     setCurrentPage("home");
+
   }}
 
 
   onMap={() => {
+
+    console.log("KARTA KLICKAD");
+
+    setCreatingEvent(false);
     setSelectedEvent(null);
     setShowObservationForm(false);
-    setCreatingEvent(false);
     setCurrentPage("map");
+
   }}
 
 
   onCreateEvent={() => {
-    setCurrentPage("home");
+
+    console.log("SKAPA KLICKAD");
+
+    if (!user) {
+
+      setShowLogin(true);
+
+      return;
+
+    }
+
     setCreatingEvent(true);
+    setCurrentPage("home");
+
   }}
 
 />
 
     </div>
+
   );
+
 }
 
 export default App;

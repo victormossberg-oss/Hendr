@@ -10,30 +10,52 @@ function BottomNav({
   onMap,
   onCreateEvent
 }) {
+
   return (
+
     <nav className="bottom-nav">
 
-      {/* HEM */}
+
+      {/* =========================
+          HEM
+      ========================= */}
+
       <button
         className="nav-item"
         onClick={onHome}
       >
+
         <House className="nav-icon" />
-        <span>Hem</span>
+
+        <span>
+          Hem
+        </span>
+
       </button>
 
 
-      {/* KARTA */}
+      {/* =========================
+          KARTA
+      ========================= */}
+
       <button
         className="nav-item"
         onClick={onMap}
       >
+
         <Map className="nav-icon" />
-        <span>Karta</span>
+
+        <span>
+          Karta
+        </span>
+
       </button>
 
 
-      {/* SKAPA HÄNDELSE */}
+      {/* =========================
+          SKAPA
+      ========================= */}
+
       <button
         className="report-button"
         onClick={onCreateEvent}
@@ -42,21 +64,44 @@ function BottomNav({
       </button>
 
 
-      {/* SPARADE */}
-      <button className="nav-item">
+      {/* =========================
+          SPARADE
+      ========================= */}
+
+      <button
+        className="nav-item"
+      >
+
         <Bookmark className="nav-icon" />
-        <span>Sparade</span>
+
+        <span>
+          Sparade
+        </span>
+
       </button>
 
 
-      {/* PROFIL */}
-      <button className="nav-item">
+      {/* =========================
+          PROFIL
+      ========================= */}
+
+      <button
+        className="nav-item"
+      >
+
         <UserRound className="nav-icon" />
-        <span>Profil</span>
+
+        <span>
+          Profil
+        </span>
+
       </button>
+
 
     </nav>
+
   );
+
 }
 
 export default BottomNav;
