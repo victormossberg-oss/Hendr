@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 
 function BottomNav({
+  currentPage,
   onHome,
   onMap,
   onCreateEvent
@@ -21,9 +22,13 @@ function BottomNav({
       ========================= */}
 
       <button
-        className="nav-item"
-        onClick={onHome}
-      >
+  className={`nav-item ${
+    currentPage === "home"
+      ? "active"
+      : ""
+  }`}
+  onClick={onHome}
+>
 
         <House className="nav-icon" />
 
@@ -39,9 +44,13 @@ function BottomNav({
       ========================= */}
 
       <button
-        className="nav-item"
-        onClick={onMap}
-      >
+  className={`nav-item ${
+    currentPage === "map"
+      ? "active"
+      : ""
+  }`}
+  onClick={onMap}
+>
 
         <Map className="nav-icon" />
 

@@ -539,8 +539,9 @@ if (showLogin) {
       ========================= */}
 
       <BottomNav
+        currentPage={currentPage}
 
-  onHome={() => {
+        onHome={() => {
 
     console.log("HEM KLICKAD");
 
