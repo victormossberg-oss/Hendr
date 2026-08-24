@@ -11,6 +11,7 @@ function EventCard({
   onClick,
   onConfirmationChange
 }) {
+
   const [confirmed, setConfirmed] =
     useState(false);
 
@@ -28,30 +29,71 @@ function EventCard({
   // =========================
 
   useEffect(() => {
+
     async function checkConfirmation() {
+
       try {
-        const response = await fetch(
-          `${API_URL}/api/events/${event.id}/confirmation`
-        );
+
+        const token =
+          localStorage.getItem(
+            "hendr_token"
+          );
+
+
+        // =========================
+        // INTE INLOGGAD
+        // =========================
+
+        if (!token) {
+
+          setConfirmed(false);
+
+          return;
+
+        }
+
+
+        const response =
+          await fetch(
+            `${API_URL}/api/events/${event.id}/confirmation`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
 
         if (!response.ok) {
+
           throw new Error(
             "Kunde inte kontrollera bekräftelsen"
           );
+
         }
+
 
         const data =
           await response.json();
 
-        setConfirmed(data.confirmed);
+
+        setConfirmed(
+          data.confirmed
+        );
+
 
       } catch (error) {
+
         console.error(
           "Fel vid kontroll av bekräftelse:",
           error
         );
+
       }
+
     }
+
 
     checkConfirmation();
 
@@ -64,38 +106,73 @@ function EventCard({
   // =========================
 
   async function handleConfirm(e) {
+
     e.stopPropagation();
+
 
     if (confirming) {
       return;
     }
 
+
     try {
+
+      const token =
+        localStorage.getItem(
+          "hendr_token"
+        );
+
+
+      // =========================
+      // KONTROLLERA LOGIN
+      // =========================
+
+      if (!token) {
+
+        alert(
+          "Du måste vara inloggad för att bekräfta en händelse."
+        );
+
+        return;
+
+      }
+
+
       setConfirming(true);
 
-      const response = await fetch(
-        `${API_URL}/api/events/${event.id}/confirm`,
-        {
-          method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+      const response =
+        await fetch(
+          `${API_URL}/api/events/${event.id}/confirm`,
+          {
+            method: "POST",
 
-          body: JSON.stringify({
-            userID: 1
-          })
-        }
-      );
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
 
       if (!response.ok) {
+
+        const errorData =
+          await response.json()
+            .catch(() => null);
+
+
         throw new Error(
+          errorData?.message ||
           "Kunde inte ändra bekräftelsen"
         );
+
       }
+
 
       const data =
         await response.json();
+
 
       console.log(
         "Bekräftelse ändrad:",
@@ -103,14 +180,18 @@ function EventCard({
       );
 
 
-      // Uppdatera lokal status
+      // =========================
+      // UPPDATERA STATUS
+      // =========================
 
       setConfirmed(
         data.confirmed
       );
 
 
-      // Uppdatera lokal räknare
+      // =========================
+      // UPPDATERA RÄKNARE
+      // =========================
 
       setConfirmationCount(
         (current) =>
@@ -123,31 +204,44 @@ function EventCard({
       );
 
 
-      // Informera App.jsx
+      // =========================
+      // SYNKA APP.JSX
+      // =========================
 
-      onConfirmationChange(
-        event.id,
-        data.confirmed
-      );
+      if (onConfirmationChange) {
+
+        onConfirmationChange(
+          event.id,
+          data.confirmed
+        );
+
+      }
 
 
     } catch (error) {
+
       console.error(
         "Fel vid ändring av bekräftelse:",
         error
       );
 
+
     } finally {
+
       setConfirming(false);
+
     }
+
   }
 
 
   return (
+
     <article
       className="event-card"
       onClick={onClick}
     >
+
 
       {/* =========================
           EVENT-IKON
@@ -170,6 +264,7 @@ function EventCard({
 
       <div className="event-content">
 
+
         {/* =========================
             HEADER
         ========================= */}
@@ -181,6 +276,7 @@ function EventCard({
           </span>
 
           <span className="event-time">
+
             {event.createdAt
               ? new Date(
                   event.createdAt
@@ -188,6 +284,7 @@ function EventCard({
                   "sv-SE"
                 )
               : ""}
+
           </span>
 
         </div>
@@ -206,9 +303,11 @@ function EventCard({
             PLATS
         ========================= */}
 
-       <div className="event-location">
-  📍 {event.location || "Okänd plats"}
-</div>
+        <div className="event-location">
+
+          📍 {event.location || "Okänd plats"}
+
+        </div>
 
 
         {/* =========================
@@ -226,12 +325,15 @@ function EventCard({
 
         <div className="event-stats">
 
+
           {/* OBSERVATIONER */}
 
           <span>
+
             <Eye />
 
             {event.observationCount}
+
           </span>
 
 
@@ -243,8 +345,15 @@ function EventCard({
                 ? "confirmed"
                 : ""
             }`}
-            onClick={handleConfirm}
-            disabled={confirming}
+
+            onClick={
+              handleConfirm
+            }
+
+            disabled={
+              confirming
+            }
+
             title={
               confirmed
                 ? "Ta bort din bekräftelse"
@@ -258,7 +367,9 @@ function EventCard({
 
           </button>
 
+
         </div>
+
 
       </div>
 
@@ -268,6 +379,7 @@ function EventCard({
       ========================= */}
 
       {event.imageUrl && (
+
         <div className="event-image">
 
           <img
@@ -276,10 +388,14 @@ function EventCard({
           />
 
         </div>
+
       )}
 
+
     </article>
+
   );
+
 }
 
 export default EventCard;

@@ -127,9 +127,31 @@ function EventDetail({
 
       try {
 
-        const response = await fetch(
-          `${API_URL}/api/events/${event.id}/confirmation`
-        );
+        const token =
+  localStorage.getItem(
+    "hendr_token"
+  );
+
+
+if (!token) {
+
+  setConfirmed(false);
+
+  return;
+
+}
+
+
+const response =
+  await fetch(
+    `${API_URL}/api/events/${event.id}/confirmation`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`
+      }
+    }
+  );
 
         if (!response.ok) {
           throw new Error(
