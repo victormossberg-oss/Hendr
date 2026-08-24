@@ -1289,3 +1289,71 @@
 
   line-height: 1.4;
 }
+
+/* =========================
+   PROFIL - STATISTIK
+========================= */
+
+.profile-stats {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 10px;
+
+  margin-bottom: 28px;
+
+}
+
+
+.profile-stat {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 4px;
+
+  padding: 20px 10px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: #f7f7f8;
+
+  color: #222;
+
+  cursor: pointer;
+
+}
+
+
+.profile-stat strong {
+
+  font-size: 26px;
+
+  font-weight: 700;
+
+}
+
+
+.profile-stat span {
+
+  font-size: 13px;
+
+  color: #777;
+
+}
+
+
+.profile-stat:hover {
+
+  background: #f0f0f2;
+
+}

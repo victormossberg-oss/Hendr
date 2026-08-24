@@ -8,23 +8,26 @@ function Profile({
   const [events, setEvents] =
     useState([]);
 
-  const [loadingEvents, setLoadingEvents] =
-    useState(true);
-
   const [observations, setObservations] =
     useState([]);
 
-  const [loadingObservations, setLoadingObservations] =
+  const [loading, setLoading] =
     useState(true);
+
+  const [showEvents, setShowEvents] =
+    useState(false);
+
+    const [showObservations, setShowObservations] =
+    useState(false);
 
 
   // =========================
-  // HÄMTA MINA HÄNDELSER
+  // HÄMTA MINA DATA
   // =========================
 
   useEffect(() => {
 
-    async function fetchMyEvents() {
+    async function fetchMyData() {
 
       try {
 
@@ -39,19 +42,26 @@ function Profile({
         }
 
 
-        const response =
+        const headers = {
+          Authorization:
+            `Bearer ${token}`
+        };
+
+
+        // =========================
+        // HÄMTA HÄNDELSER
+        // =========================
+
+        const eventsResponse =
           await fetch(
             `${API_URL}/api/users/me/events`,
             {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
+              headers
             }
           );
 
 
-        if (!response.ok) {
+        if (!eventsResponse.ok) {
 
           throw new Error(
             "Kunde inte hämta dina händelser"
@@ -60,69 +70,29 @@ function Profile({
         }
 
 
-        const data =
-          await response.json();
+        const eventsData =
+          await eventsResponse.json();
 
 
-        setEvents(data);
-
-
-      } catch (error) {
-
-        console.error(
-          "Fel vid hämtning av mina händelser:",
-          error
+        setEvents(
+          eventsData
         );
 
 
-      } finally {
+        // =========================
+        // HÄMTA OBSERVATIONER
+        // =========================
 
-        setLoadingEvents(false);
-
-      }
-
-    }
-
-
-    fetchMyEvents();
-
-  }, []);
-
-
-  // =========================
-  // HÄMTA MINA OBSERVATIONER
-  // =========================
-
-  useEffect(() => {
-
-    async function fetchMyObservations() {
-
-      try {
-
-        const token =
-          localStorage.getItem(
-            "hendr_token"
-          );
-
-
-        if (!token) {
-          return;
-        }
-
-
-        const response =
+        const observationsResponse =
           await fetch(
             `${API_URL}/api/users/me/observations`,
             {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
+              headers
             }
           );
 
 
-        if (!response.ok) {
+        if (!observationsResponse.ok) {
 
           throw new Error(
             "Kunde inte hämta dina observationer"
@@ -131,31 +101,33 @@ function Profile({
         }
 
 
-        const data =
-          await response.json();
+        const observationsData =
+          await observationsResponse.json();
 
 
-        setObservations(data);
+        setObservations(
+          observationsData
+        );
 
 
       } catch (error) {
 
         console.error(
-          "Fel vid hämtning av mina observationer:",
+          "Fel vid hämtning av profildata:",
           error
         );
 
 
       } finally {
 
-        setLoadingObservations(false);
+        setLoading(false);
 
       }
 
     }
 
 
-    fetchMyObservations();
+    fetchMyData();
 
   }, []);
 
@@ -188,8 +160,125 @@ function Profile({
 
 
   // =========================
-  // RENDER
+  // MINA HÄNDELSER
   // =========================
+
+  if (showEvents) {
+
+    return (
+
+      <main className="profile-page">
+
+        <div className="profile-content">
+
+
+          <section className="profile-list-page">
+
+            <button
+              className="back-button"
+              type="button"
+              onClick={() =>
+                setShowEvents(false)
+              }
+            >
+
+              ← Tillbaka
+
+            </button>
+
+
+            <h1>
+              Mina händelser
+            </h1>
+
+
+            {loading ? (
+
+              <div className="profile-empty">
+
+                Hämtar dina händelser...
+
+              </div>
+
+            ) : events.length === 0 ? (
+
+              <div className="profile-empty">
+
+                Du har inte skapat några
+                händelser ännu.
+
+              </div>
+
+            ) : (
+
+              <div className="profile-events">
+
+                {events.map(
+                  (event) => (
+
+                    <div
+                      className="profile-event"
+                      key={event.id}
+                    >
+
+                      <span className="event-category">
+
+                        {event.category}
+
+                      </span>
+
+
+                      <h3>
+
+                        {event.title}
+
+                      </h3>
+
+
+                      <p>
+
+                        {event.description}
+
+                      </p>
+
+
+                      <span className="event-time">
+
+                        {event.createdAt
+                          ? new Date(
+                              event.createdAt
+                            ).toLocaleString(
+                              "sv-SE"
+                            )
+                          : ""}
+
+                      </span>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </section>
+
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+  // =========================
+// MINA OBSERVATIONER
+// =========================
+
+if (showObservations) {
 
   return (
 
@@ -197,140 +286,27 @@ function Profile({
 
       <div className="profile-content">
 
+        <section className="profile-list-page">
 
-        {/* =========================
-            PROFILHEADER
-        ========================= */}
+          <button
+            className="back-button"
+            type="button"
+            onClick={() =>
+              setShowObservations(false)
+            }
+          >
 
-        <section className="profile-header">
+            ← Tillbaka
 
-          <div className="profile-avatar">
-            {initial}
-          </div>
+          </button>
 
 
           <h1>
-            {user.username}
+            Mina observationer
           </h1>
 
 
-          <p>
-            {user.email}
-          </p>
-
-        </section>
-
-
-        {/* =========================
-            KONTO
-        ========================= */}
-
-        <section className="profile-section">
-
-          <h2>
-            Mitt konto
-          </h2>
-
-
-          <div className="profile-info">
-
-            <div className="profile-info-row">
-
-              <span>
-                Konto skapades
-              </span>
-
-              <strong>
-                {createdDate}
-              </strong>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        {/* =========================
-            MINA HÄNDELSER
-        ========================= */}
-
-        <section className="profile-section">
-
-          <h2>
-            Mina händelser
-          </h2>
-
-
-          {loadingEvents ? (
-
-            <div className="profile-empty">
-
-              Hämtar dina händelser...
-
-            </div>
-
-          ) : events.length === 0 ? (
-
-            <div className="profile-empty">
-
-              Du har inte skapat några
-              händelser ännu.
-
-            </div>
-
-          ) : (
-
-            <div className="profile-events">
-
-              {events.map(
-                (event) => (
-
-                  <div
-                    className="profile-event"
-                    key={event.id}
-                  >
-
-                    <span className="event-category">
-
-                      {event.category}
-
-                    </span>
-
-
-                    <h3>
-                      {event.title}
-                    </h3>
-
-
-                    <p>
-                      {event.description}
-                    </p>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-        </section>
-
-
-        {/* =========================
-            MINA OBSERVATIONER
-        ========================= */}
-
-        <section className="profile-section">
-
-          <h2>
-            Mina observationer
-          </h2>
-
-
-          {loadingObservations ? (
+          {loading ? (
 
             <div className="profile-empty">
 
@@ -367,7 +343,9 @@ function Profile({
 
 
                     <p>
+
                       {observation.description}
+
                     </p>
 
 
@@ -391,6 +369,160 @@ function Profile({
             </div>
 
           )}
+
+        </section>
+
+      </div>
+
+    </main>
+
+  );
+
+}
+
+  // =========================
+  // VANLIG PROFIL
+  // =========================
+
+  return (
+
+    <main className="profile-page">
+
+      <div className="profile-content">
+
+
+        {/* =========================
+            PROFILHEADER
+        ========================= */}
+
+        <section className="profile-header">
+
+          <div className="profile-avatar">
+
+            {initial}
+
+          </div>
+
+
+          <h1>
+
+            {user.username}
+
+          </h1>
+
+
+          <p>
+
+            {user.email}
+
+          </p>
+
+        </section>
+
+
+        {/* =========================
+            STATISTIK
+        ========================= */}
+
+        <section className="profile-stats">
+
+
+          {/* =========================
+              HÄNDELSER
+          ========================= */}
+
+          <button
+            className="profile-stat"
+            type="button"
+            onClick={() =>
+              setShowEvents(true)
+            }
+          >
+
+            <strong>
+
+              {loading
+                ? "–"
+                : events.length}
+
+            </strong>
+
+
+            <span>
+
+              Händelser
+
+            </span>
+
+          </button>
+
+
+          {/* =========================
+              OBSERVATIONER
+          ========================= */}
+
+          <button
+  className="profile-stat"
+  type="button"
+  onClick={() =>
+    setShowObservations(true)
+  }
+>
+
+            <strong>
+
+              {loading
+                ? "–"
+                : observations.length}
+
+            </strong>
+
+
+            <span>
+
+              Observationer
+
+            </span>
+
+          </button>
+
+
+        </section>
+
+
+        {/* =========================
+            KONTO
+        ========================= */}
+
+        <section className="profile-section">
+
+          <h2>
+
+            Mitt konto
+
+          </h2>
+
+
+          <div className="profile-info">
+
+            <div className="profile-info-row">
+
+              <span>
+
+                Konto skapades
+
+              </span>
+
+
+              <strong>
+
+                {createdDate}
+
+              </strong>
+
+            </div>
+
+          </div>
 
         </section>
 
