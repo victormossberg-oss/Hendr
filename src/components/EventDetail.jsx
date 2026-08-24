@@ -1,5 +1,4 @@
 import {
-  ArrowLeft,
   Eye,
   ShieldCheck
 } from "lucide-react";
@@ -16,7 +15,6 @@ import LocationDisplay from "./LocationDisplay";
 function EventDetail({
   event,
   observations,
-  onBack,
   onAddObservation,
   onDelete
 }) {
@@ -293,20 +291,8 @@ const response = await fetch(
     <main className="event-detail">
 
 
-      {/* =========================
-          TILLBAKA
-      ========================= */}
 
-      <button
-        className="back-button"
-        onClick={onBack}
-      >
-
-        <ArrowLeft />
-
-        Tillbaka
-
-      </button>
+     
 
 
       {/* =========================

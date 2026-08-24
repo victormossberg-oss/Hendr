@@ -1130,3 +1130,108 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* =========================
+   PROFIL
+========================= */
+
+.profile-page {
+  min-height: calc(100vh - 72px);
+  padding: 32px 20px 100px;
+}
+
+.profile-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+
+/* =========================
+   PROFILHEADER
+========================= */
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 88px;
+  height: 88px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f0f0f3;
+  color: #555;
+
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.profile-header h1 {
+  margin: 16px 0 4px;
+
+  font-size: 26px;
+}
+
+.profile-header p {
+  margin: 0;
+
+  color: #777;
+  font-size: 15px;
+}
+
+
+/* =========================
+   PROFILSEKTION
+========================= */
+
+.profile-section {
+  margin-top: 40px;
+}
+
+.profile-section h2 {
+  margin: 0 0 12px;
+
+  font-size: 18px;
+}
+
+
+/* =========================
+   KONTORAD
+========================= */
+
+.profile-info {
+  background: #f7f7f8;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+.profile-info-row {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 18px;
+
+  font-size: 14px;
+}
+
+.profile-info-row span {
+  color: #777;
+}
+
+.profile-info-row strong {
+  color: #222;
+
+  font-weight: 500;
+}

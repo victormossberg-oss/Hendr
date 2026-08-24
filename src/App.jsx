@@ -394,10 +394,6 @@ else if (
 
         event={selectedEvent}
 
-        onBack={() =>
-          setShowObservationForm(false)
-        }
-
         onSubmitObservation={(
           observation
         ) => {
@@ -436,10 +432,6 @@ else if (
 
         observations={
           observations
-        }
-
-        onBack={() =>
-          setSelectedEvent(null)
         }
 
         onAddObservation={() => {

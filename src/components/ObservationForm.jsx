@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { ArrowLeft, Image } from "lucide-react";
+import { Image } from "lucide-react";
 import LocationPicker from "./LocationPicker";
 import { API_URL } from "../config";
 
 function ObservationForm({
   event,
-  onBack,
   onSubmitObservation
 }) {
 
@@ -199,21 +198,6 @@ function ObservationForm({
     <main className="observation-page">
 
 
-      {/* =========================
-          TILLBAKA
-      ========================= */}
-
-      <button
-        className="back-button"
-        onClick={onBack}
-        disabled={submitting}
-      >
-
-        <ArrowLeft />
-
-        Tillbaka
-
-      </button>
 
 
       <div className="observation-content">
