@@ -1235,3 +1235,57 @@
 
   font-weight: 500;
 }
+
+/* =========================
+   MINA HÄNDELSER
+========================= */
+
+.profile-empty {
+  padding: 20px;
+
+  background: #f7f7f8;
+
+  border-radius: 14px;
+
+  color: #777;
+
+  font-size: 14px;
+
+  text-align: center;
+}
+
+
+.profile-events {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+.profile-event {
+  padding: 16px 18px;
+
+  background: #f7f7f8;
+
+  border-radius: 14px;
+}
+
+
+.profile-event h3 {
+  margin: 6px 0;
+
+  font-size: 17px;
+}
+
+
+.profile-event p {
+  margin: 0;
+
+  color: #777;
+
+  font-size: 14px;
+
+  line-height: 1.4;
+}

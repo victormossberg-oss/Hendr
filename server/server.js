@@ -885,6 +885,158 @@ app.delete(
       const event =
         eventResult.rows[0];
 
+        // =========================
+// HÄMTA MINA HÄNDELSER
+// =========================
+
+app.get(
+  "/api/users/me/events",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const userID =
+        req.user.userid;
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            eventID AS id,
+
+            title,
+
+            description,
+
+            category,
+
+            status,
+
+            created_at AS "createdAt",
+
+            placeID,
+
+            image_url AS "imageUrl",
+
+            latitude,
+
+            longitude,
+
+            userid
+
+          FROM Events
+
+          WHERE userid = $1
+
+          ORDER BY
+            created_at DESC
+          `,
+          [userID]
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av mina händelser:",
+        error
+      );
+
+
+      res.status(500).json({
+
+        message:
+          "Kunde inte hämta dina händelser."
+
+      });
+
+    }
+
+  }
+);
+
+// =========================
+// HÄMTA MINA OBSERVATIONER
+// =========================
+
+app.get(
+  "/api/users/me/observations",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const userID =
+        req.user.userid;
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            observationID AS id,
+
+            userID,
+
+            eventID,
+
+            description,
+
+            image_url AS "imageUrl",
+
+            created_at AS "createdAt",
+
+            latitude,
+
+            longitude
+
+          FROM Observations
+
+          WHERE userID = $1
+
+          ORDER BY
+            created_at DESC
+          `,
+          [userID]
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av mina observationer:",
+        error
+      );
+
+
+      res.status(500).json({
+
+        message:
+          "Kunde inte hämta dina observationer."
+
+      });
+
+    }
+
+  }
+);
+
 
       // =========================
       // KONTROLLERA ÄGARE
