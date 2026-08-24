@@ -1357,3 +1357,19 @@
   background: #f0f0f2;
 
 }
+
+.profile-event {
+  width: 100%;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  padding: 16px 18px;
+  background: #f7f7f8;
+  border-radius: 14px;
+}
+
+.profile-event:hover {
+  background: #f0f0f2;
+}

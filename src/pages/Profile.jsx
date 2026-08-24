@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 
 function Profile({
-  user
+  user,
+  onEventClick,
+  onObservationClick
 }) {
 
   const [events, setEvents] =
@@ -17,7 +19,7 @@ function Profile({
   const [showEvents, setShowEvents] =
     useState(false);
 
-    const [showObservations, setShowObservations] =
+  const [showObservations, setShowObservations] =
     useState(false);
 
 
@@ -171,7 +173,6 @@ function Profile({
 
         <div className="profile-content">
 
-
           <section className="profile-list-page">
 
             <button
@@ -181,9 +182,7 @@ function Profile({
                 setShowEvents(false)
               }
             >
-
               ← Tillbaka
-
             </button>
 
 
@@ -216,9 +215,13 @@ function Profile({
                 {events.map(
                   (event) => (
 
-                    <div
+                    <button
                       className="profile-event"
                       key={event.id}
+                      type="button"
+                      onClick={() =>
+                        onEventClick(event)
+                      }
                     >
 
                       <span className="event-category">
@@ -254,7 +257,7 @@ function Profile({
 
                       </span>
 
-                    </div>
+                    </button>
 
                   )
                 )}
@@ -265,6 +268,116 @@ function Profile({
 
           </section>
 
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+  // =========================
+  // MINA OBSERVATIONER
+  // =========================
+
+  if (showObservations) {
+
+    return (
+
+      <main className="profile-page">
+
+        <div className="profile-content">
+
+          <section className="profile-list-page">
+
+            <button
+              className="back-button"
+              type="button"
+              onClick={() =>
+                setShowObservations(false)
+              }
+            >
+              ← Tillbaka
+            </button>
+
+
+            <h1>
+              Mina observationer
+            </h1>
+
+
+            {loading ? (
+
+              <div className="profile-empty">
+
+                Hämtar dina observationer...
+
+              </div>
+
+            ) : observations.length === 0 ? (
+
+              <div className="profile-empty">
+
+                Du har inte lagt till några
+                observationer ännu.
+
+              </div>
+
+            ) : (
+
+              <div className="profile-events">
+
+                {observations.map(
+                  (observation) => (
+
+                    <button
+                      className="profile-event"
+                      key={observation.id}
+                      type="button"
+                      onClick={() =>
+                        onObservationClick(
+                          observation
+                        )
+                      }
+                    >
+
+                      <span className="event-category">
+
+                        Observation
+
+                      </span>
+
+
+                      <p>
+
+                        {observation.description}
+
+                      </p>
+
+
+                      <span className="event-time">
+
+                        {observation.createdAt
+                          ? new Date(
+                              observation.createdAt
+                            ).toLocaleString(
+                              "sv-SE"
+                            )
+                          : ""}
+
+                      </span>
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </section>
 
         </div>
 
@@ -274,111 +387,6 @@ function Profile({
 
   }
 
-  // =========================
-// MINA OBSERVATIONER
-// =========================
-
-if (showObservations) {
-
-  return (
-
-    <main className="profile-page">
-
-      <div className="profile-content">
-
-        <section className="profile-list-page">
-
-          <button
-            className="back-button"
-            type="button"
-            onClick={() =>
-              setShowObservations(false)
-            }
-          >
-
-            ← Tillbaka
-
-          </button>
-
-
-          <h1>
-            Mina observationer
-          </h1>
-
-
-          {loading ? (
-
-            <div className="profile-empty">
-
-              Hämtar dina observationer...
-
-            </div>
-
-          ) : observations.length === 0 ? (
-
-            <div className="profile-empty">
-
-              Du har inte lagt till några
-              observationer ännu.
-
-            </div>
-
-          ) : (
-
-            <div className="profile-events">
-
-              {observations.map(
-                (observation) => (
-
-                  <div
-                    className="profile-event"
-                    key={observation.id}
-                  >
-
-                    <span className="event-category">
-
-                      Observation
-
-                    </span>
-
-
-                    <p>
-
-                      {observation.description}
-
-                    </p>
-
-
-                    <span className="event-time">
-
-                      {observation.createdAt
-                        ? new Date(
-                            observation.createdAt
-                          ).toLocaleString(
-                            "sv-SE"
-                          )
-                        : ""}
-
-                    </span>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-        </section>
-
-      </div>
-
-    </main>
-
-  );
-
-}
 
   // =========================
   // VANLIG PROFIL
@@ -462,12 +470,12 @@ if (showObservations) {
           ========================= */}
 
           <button
-  className="profile-stat"
-  type="button"
-  onClick={() =>
-    setShowObservations(true)
-  }
->
+            className="profile-stat"
+            type="button"
+            onClick={() =>
+              setShowObservations(true)
+            }
+          >
 
             <strong>
 

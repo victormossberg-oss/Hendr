@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 
 import "./App.css";
 
+
 function App() {
 
   const [events, setEvents] =
@@ -61,54 +62,74 @@ function App() {
 
   function handleLogin(loggedInUser) {
 
-  setUser(loggedInUser);
+    setUser(loggedInUser);
 
-  setShowLogin(false);
+    setShowLogin(false);
 
 
-  // =========================
-  // LOGIN FRÅN SKAPA HÄNDELSE
-  // =========================
+    // =========================
+    // LOGIN FRÅN SKAPA HÄNDELSE
+    // =========================
 
-  if (loginReason === "createEvent") {
+    if (
+      loginReason === "createEvent"
+    ) {
 
-    setCreatingEvent(true);
-    setShowObservationForm(false);
-    setCurrentPage("home");
+      setCreatingEvent(true);
+      setShowObservationForm(false);
+      setSelectedEvent(null);
+      setCurrentPage("home");
+
+    }
+
+
+    // =========================
+    // LOGIN FRÅN OBSERVATION
+    // =========================
+
+    else if (
+      loginReason === "observation"
+    ) {
+
+      setCreatingEvent(false);
+      setShowObservationForm(true);
+
+    }
+
+
+    // =========================
+    // LOGIN FRÅN PROFIL
+    // =========================
+
+    else if (
+      loginReason === "profile"
+    ) {
+
+      setCreatingEvent(false);
+      setShowObservationForm(false);
+      setSelectedEvent(null);
+      setCurrentPage("profile");
+
+    }
+
+
+    // =========================
+    // VANLIG LOGIN
+    // =========================
+
+    else {
+
+      setCreatingEvent(false);
+      setShowObservationForm(false);
+      setSelectedEvent(null);
+      setCurrentPage("home");
+
+    }
+
+
+    setLoginReason(null);
 
   }
-
-
-  // =========================
-  // LOGIN FRÅN OBSERVATION
-  // =========================
-
-  else if (loginReason === "observation") {
-
-    setCreatingEvent(false);
-    setShowObservationForm(true);
-
-  }
-
-  else if (
-  loginReason === "profile"
-) {
-
-  setCreatingEvent(false);
-  setShowObservationForm(false);
-  setSelectedEvent(null);
-  setCurrentPage("profile");
-
-}
-
-
-  // =========================
-  // RENSAR LOGIN-ORSAKEN
-  // =========================
-
-  setLoginReason(null);
-
-}
 
 
   // =========================
@@ -176,13 +197,19 @@ function App() {
 
   // =========================
   // HÄMTA OBSERVATIONER
+  // FÖR VALD HÄNDELSE
   // =========================
 
   useEffect(() => {
 
     if (!selectedEvent) {
+
+      setObservations([]);
+
       return;
+
     }
+
 
     fetch(
       `${API_URL}/api/events/${selectedEvent.id}/observations`
@@ -237,10 +264,12 @@ function App() {
           return event;
         }
 
+
         const currentCount =
           Number(
             event.confirmationCount
           ) || 0;
+
 
         return {
 
@@ -279,39 +308,147 @@ function App() {
 
   }
 
-   // =========================
+
+  // =========================
+  // ÖPPNA HÄNDELSE
+  // =========================
+
+  function handleEventClick(event) {
+
+    setCreatingEvent(false);
+    setShowObservationForm(false);
+
+    setSelectedEvent(event);
+
+    setCurrentPage("home");
+
+  }
+
+
+  // =========================
+// ÖPPNA HÄNDELSE FRÅN
+// EN OBSERVATION
+// =========================
+
+async function handleObservationClick(
+  observation
+) {
+
+  try {
+
+    console.log(
+      "Öppnar observation:",
+      observation
+    );
+
+
+    const response =
+      await fetch(
+        `${API_URL}/api/events`
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Kunde inte hämta händelser"
+      );
+
+    }
+
+
+    const allEvents =
+      await response.json();
+
+
+    console.log(
+      "Observationens eventid:",
+      observation.eventid
+    );
+
+
+    const event =
+      allEvents.find(
+        (item) =>
+          String(item.id) ===
+          String(observation.eventid)
+      );
+
+
+    if (!event) {
+
+      console.error(
+        "Kunde inte hitta händelsen för observationen.",
+        {
+          observationEventID:
+            observation.eventid,
+
+          availableEventIDs:
+            allEvents.map(
+              (item) => item.id
+            )
+        }
+      );
+
+      return;
+
+    }
+
+
+    setCreatingEvent(false);
+
+    setShowObservationForm(false);
+
+    setSelectedEvent(event);
+
+    setCurrentPage("home");
+
+
+  } catch (error) {
+
+    console.error(
+      "Fel vid öppning av händelse:",
+      error
+    );
+
+  }
+
+}
+
+
+  // =========================
   // INNEHÅLL
   // =========================
 
   let content;
 
+
   // =========================
-// LOGIN
-// =========================
+  // LOGIN
+  // =========================
 
-if (showLogin) {
+  if (showLogin) {
 
-  content = (
+    content = (
 
-    <Login
+      <Login
 
-      onLogin={
-        handleLogin
-      }
+        onLogin={
+          handleLogin
+        }
 
-      onBack={() => {
+        onBack={() => {
 
-  setShowLogin(false);
-  setLoginReason(null);
+          setShowLogin(false);
+          setLoginReason(null);
 
-}}
+        }}
 
-    />
+      />
 
-  );
+    );
 
-}
-
+  }
 
 
   // =========================
@@ -320,36 +457,48 @@ if (showLogin) {
 
   else if (creatingEvent) {
 
-  content = (
+    content = (
 
-    <NewEventForm
-      onCreateEvent={
-        handleCreateEvent
-      }
-    />
+      <NewEventForm
+        onCreateEvent={
+          handleCreateEvent
+        }
+      />
 
-  );
+    );
 
-}
+  }
 
-// =========================
-// PROFIL
-// =========================
 
-else if (
-  currentPage === "profile" &&
-  user
-) {
+  // =========================
+  // PROFIL
+  // =========================
 
-  content = (
+  else if (
+    currentPage === "profile" &&
+    user
+  ) {
 
-    <Profile
-      user={user}
-    />
+    content = (
 
-  );
+      <Profile
 
-}
+        user={user}
+
+        onEventClick={
+          handleEventClick
+        }
+
+        onObservationClick={
+          handleObservationClick
+        }
+
+      />
+
+    );
+
+  }
+
 
   // =========================
   // KARTA
@@ -365,12 +514,9 @@ else if (
 
         events={events}
 
-        onEventClick={(event) => {
-
-          setSelectedEvent(event);
-          setCurrentPage("home");
-
-        }}
+        onEventClick={
+          handleEventClick
+        }
 
       />
 
@@ -434,20 +580,27 @@ else if (
           observations
         }
 
+
         onAddObservation={() => {
 
-  if (!user) {
+          if (!user) {
 
-    setLoginReason("observation");
-    setShowLogin(true);
+            setLoginReason(
+              "observation"
+            );
 
-    return;
+            setShowLogin(true);
 
-  }
+            return;
 
-  setShowObservationForm(true);
+          }
 
-}}
+          setShowObservationForm(
+            true
+          );
+
+        }}
+
 
         onDelete={(eventID) => {
 
@@ -529,8 +682,8 @@ else if (
 
           events={events}
 
-          onEventClick={(event) =>
-            setSelectedEvent(event)
+          onEventClick={
+            handleEventClick
           }
 
           onConfirmationChange={
@@ -562,83 +715,102 @@ else if (
       ========================= */}
 
       <BottomNav
-        currentPage={currentPage}
+
+        currentPage={
+          currentPage
+        }
+
 
         onHome={() => {
 
-    console.log("HEM KLICKAD");
+          console.log(
+            "HEM KLICKAD"
+          );
 
-    setCreatingEvent(false);
-    setSelectedEvent(null);
-    setShowObservationForm(false);
-    setCurrentPage("home");
+          setCreatingEvent(false);
+          setSelectedEvent(null);
+          setShowObservationForm(false);
+          setCurrentPage("home");
 
-  }}
-
-
-  onMap={() => {
-
-    console.log("KARTA KLICKAD");
-
-    setCreatingEvent(false);
-    setSelectedEvent(null);
-    setShowObservationForm(false);
-    setCurrentPage("map");
-
-  }}
+        }}
 
 
-  onCreateEvent={() => {
+        onMap={() => {
 
-  if (!user) {
+          console.log(
+            "KARTA KLICKAD"
+          );
 
-    setLoginReason("createEvent");
-    setShowLogin(true);
+          setCreatingEvent(false);
+          setSelectedEvent(null);
+          setShowObservationForm(false);
+          setCurrentPage("map");
 
-    return;
-
-  }
-
-  setCreatingEvent(true);
-  setCurrentPage("home");
-
-}}
-
-onProfile={() => {
-
-  setCreatingEvent(false);
-  setSelectedEvent(null);
-  setShowObservationForm(false);
+        }}
 
 
-  // =========================
-  // INTE INLOGGAD
-  // =========================
+        onCreateEvent={() => {
 
-  if (!user) {
+          if (!user) {
 
-    setLoginReason("profile");
-    setShowLogin(true);
+            setLoginReason(
+              "createEvent"
+            );
 
-    return;
+            setShowLogin(true);
 
-  }
+            return;
+
+          }
 
 
-  // =========================
-  // INLOGGAD
-  // =========================
+          setCreatingEvent(true);
+          setSelectedEvent(null);
+          setShowObservationForm(false);
+          setCurrentPage("home");
 
-  setCurrentPage("profile");
+        }}
 
-}}
 
-/>
+        onProfile={() => {
+
+          setCreatingEvent(false);
+          setSelectedEvent(null);
+          setShowObservationForm(false);
+
+
+          // =========================
+          // INTE INLOGGAD
+          // =========================
+
+          if (!user) {
+
+            setLoginReason(
+              "profile"
+            );
+
+            setShowLogin(true);
+
+            return;
+
+          }
+
+
+          // =========================
+          // INLOGGAD
+          // =========================
+
+          setCurrentPage("profile");
+
+        }}
+
+      />
 
     </div>
 
   );
 
 }
+
 
 export default App;
