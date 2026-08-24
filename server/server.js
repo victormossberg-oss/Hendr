@@ -395,6 +395,7 @@ app.post(
 
 app.post(
   "/api/observations",
+  authenticateToken,
   upload.single("image"),
 
   async (req, res) => {
@@ -402,12 +403,17 @@ app.post(
     try {
 
       const {
-        userID,
         eventID,
         description,
         latitude,
         longitude
       } = req.body;
+
+      // =========================
+      // INLOGGAD ANVÄNDARE
+      // =========================
+
+      const userID = req.user.userid;
 
 
       // =========================
@@ -599,12 +605,14 @@ app.get(
 
 
 // =========================
+// =========================
 // BEKRÄFTA / TA BORT
 // BEKRÄFTELSE
 // =========================
 
 app.post(
   "/api/events/:eventID/confirm",
+  authenticateToken,
 
   async (req, res) => {
 
@@ -615,9 +623,12 @@ app.post(
       } = req.params;
 
 
-      const {
-        userID
-      } = req.body;
+      // =========================
+      // INLOGGAD ANVÄNDARE
+      // =========================
+
+      const userID =
+        req.user.userid;
 
 
       // =========================
@@ -635,7 +646,6 @@ app.post(
           WHERE eventID = $1
           AND userID = $2
           `,
-
           [
             eventID,
             userID
@@ -658,7 +668,6 @@ app.post(
           WHERE eventID = $1
           AND userID = $2
           `,
-
           [
             eventID,
             userID
@@ -667,7 +676,9 @@ app.post(
 
 
         return res.json({
+
           confirmed: false
+
         });
 
       }
@@ -689,7 +700,6 @@ app.post(
           VALUES
           ($1, $2)
 
-
           RETURNING
 
             confirmationID AS id,
@@ -700,7 +710,6 @@ app.post(
 
             created_at AS "createdAt"
           `,
-
           [
             eventID,
             userID
@@ -720,11 +729,17 @@ app.post(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Fel vid ändring av bekräftelse:",
+        error
+      );
+
 
       res.status(500).json({
+
         message:
           "Kunde inte ändra bekräftelsen."
+
       });
 
     }
@@ -739,6 +754,7 @@ app.post(
 
 app.get(
   "/api/events/:eventID/confirmation",
+  authenticateToken,
 
   async (req, res) => {
 
@@ -749,8 +765,12 @@ app.get(
       } = req.params;
 
 
-      // Tillfällig testanvändare
-      const userID = 1;
+      // =========================
+      // INLOGGAD ANVÄNDARE
+      // =========================
+
+      const userID =
+        req.user.userid;
 
 
       const result =
@@ -764,7 +784,6 @@ app.get(
           WHERE eventID = $1
           AND userID = $2
           `,
-
           [
             eventID,
             userID
@@ -782,11 +801,17 @@ app.get(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Fel vid kontroll av bekräftelse:",
+        error
+      );
+
 
       res.status(500).json({
+
         message:
           "Kunde inte kontrollera bekräftelsen."
+
       });
 
     }

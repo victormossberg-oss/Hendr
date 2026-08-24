@@ -32,22 +32,56 @@ function EventDetail({
     return;
   }
 
+
   try {
 
-    const response = await fetch(
-      `${API_URL}/api/events/${event.id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        "Kunde inte ta bort händelsen"
+    const token =
+      localStorage.getItem(
+        "hendr_token"
       );
+
+
+    if (!token) {
+
+      alert(
+        "Du måste vara inloggad för att ta bort en händelse."
+      );
+
+      return;
+
     }
 
+
+    const response =
+      await fetch(
+        `${API_URL}/api/events/${event.id}`,
+        {
+          method: "DELETE",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+
+    if (!response.ok) {
+
+      const errorData =
+        await response.json()
+          .catch(() => null);
+
+      throw new Error(
+        errorData?.message ||
+        "Kunde inte ta bort händelsen"
+      );
+
+    }
+
+
     onDelete(event.id);
+
 
   } catch (error) {
 
@@ -57,9 +91,12 @@ function EventDetail({
     );
 
     alert(
+      error.message ||
       "Kunde inte ta bort händelsen."
     );
+
   }
+
 }
   
 
@@ -139,20 +176,34 @@ function EventDetail({
       setConfirming(true);
 
 
-      const response = await fetch(
-        `${API_URL}/api/events/${event.id}/confirm`,
-        {
-          method: "POST",
+      const token =
+  localStorage.getItem(
+    "hendr_token"
+  );
 
-          headers: {
-            "Content-Type": "application/json"
-          },
 
-          body: JSON.stringify({
-            userID: 1
-          })
-        }
-      );
+if (!token) {
+
+  alert(
+    "Du måste vara inloggad för att bekräfta en händelse."
+  );
+
+  return;
+
+}
+
+
+const response = await fetch(
+  `${API_URL}/api/events/${event.id}/confirm`,
+  {
+    method: "POST",
+
+    headers: {
+      Authorization:
+        `Bearer ${token}`
+    }
+  }
+);
 
 
       if (!response.ok) {
@@ -196,16 +247,6 @@ function EventDetail({
           );
 
         }
-      );
-
-
-      // =========================
-      // SYNKA MED APP.JSX
-      // =========================
-
-      onConfirmationChange(
-        event.id,
-        data.confirmed
       );
 
 
