@@ -9,7 +9,8 @@ function BottomNav({
   currentPage,
   onHome,
   onMap,
-  onCreateEvent
+  onCreateEvent,
+  onProfile
 }) {
 
   return (
@@ -74,37 +75,42 @@ function BottomNav({
 
 
       {/* =========================
-          SPARADE
-      ========================= */}
+    SPARADE
+========================= */}
 
-      <button
-        className="nav-item"
-      >
+<button
+  className="nav-item"
+>
+  
+  <Bookmark className="nav-icon" />
 
-        <Bookmark className="nav-icon" />
+  <span>
+    Sparade
+  </span>
 
-        <span>
-          Sparade
-        </span>
-
-      </button>
+</button>
 
 
       {/* =========================
-          PROFIL
-      ========================= */}
+    PROFIL
+========================= */}
 
-      <button
-        className="nav-item"
-      >
+<button
+  className={`nav-item ${
+    currentPage === "profile"
+      ? "active"
+      : ""
+  }`}
+  onClick={onProfile}
+>
 
-        <UserRound className="nav-icon" />
+  <UserRound className="nav-icon" />
 
-        <span>
-          Profil
-        </span>
+  <span>
+    Profil
+  </span>
 
-      </button>
+</button>
 
 
     </nav>

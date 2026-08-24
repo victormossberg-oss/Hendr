@@ -8,6 +8,7 @@ import ObservationForm from "./components/ObservationForm";
 import NewEventForm from "./components/NewEventForm";
 import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 import "./App.css";
 
@@ -88,6 +89,17 @@ function App() {
     setShowObservationForm(true);
 
   }
+
+  else if (
+  loginReason === "profile"
+) {
+
+  setCreatingEvent(false);
+  setShowObservationForm(false);
+  setSelectedEvent(null);
+  setCurrentPage("profile");
+
+}
 
 
   // =========================
@@ -314,6 +326,25 @@ if (showLogin) {
       onCreateEvent={
         handleCreateEvent
       }
+    />
+
+  );
+
+}
+
+// =========================
+// PROFIL
+// =========================
+
+else if (
+  currentPage === "profile" &&
+  user
+) {
+
+  content = (
+
+    <Profile
+      user={user}
     />
 
   );
@@ -578,6 +609,35 @@ if (showLogin) {
 
   setCreatingEvent(true);
   setCurrentPage("home");
+
+}}
+
+onProfile={() => {
+
+  setCreatingEvent(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
+
+
+  // =========================
+  // INTE INLOGGAD
+  // =========================
+
+  if (!user) {
+
+    setLoginReason("profile");
+    setShowLogin(true);
+
+    return;
+
+  }
+
+
+  // =========================
+  // INLOGGAD
+  // =========================
+
+  setCurrentPage("profile");
 
 }}
 
