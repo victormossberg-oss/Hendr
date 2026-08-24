@@ -138,22 +138,30 @@ function App() {
 
   function handleLogout() {
 
-    localStorage.removeItem(
-      "hendr_token"
-    );
+  localStorage.removeItem(
+    "hendr_token"
+  );
 
-    localStorage.removeItem(
-      "hendr_user"
-    );
+  localStorage.removeItem(
+    "hendr_user"
+  );
 
-    setUser(null);
 
-    setSelectedEvent(null);
-    setShowObservationForm(false);
-    setCreatingEvent(false);
-    setCurrentPage("home");
+  setUser(null);
 
-  }
+  setSelectedEvent(null);
+
+  setShowObservationForm(false);
+
+  setCreatingEvent(false);
+
+  setCurrentPage("home");
+
+  setShowLogin(false);
+
+  setLoginReason(null);
+
+}
 
 
   // =========================
@@ -482,18 +490,11 @@ async function handleObservationClick(
     content = (
 
       <Profile
-
-        user={user}
-
-        onEventClick={
-          handleEventClick
-        }
-
-        onObservationClick={
-          handleObservationClick
-        }
-
-      />
+  user={user}
+  onEventClick={handleEventClick}
+  onObservationClick={handleObservationClick}
+  onLogout={handleLogout}
+/>
 
     );
 
@@ -723,16 +724,13 @@ async function handleObservationClick(
 
         onHome={() => {
 
-          console.log(
-            "HEM KLICKAD"
-          );
+  setCreatingEvent(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
 
-          setCreatingEvent(false);
-          setSelectedEvent(null);
-          setShowObservationForm(false);
-          setCurrentPage("home");
+  setCurrentPage("home");
 
-        }}
+}}
 
 
         onMap={() => {
@@ -774,35 +772,22 @@ async function handleObservationClick(
 
         onProfile={() => {
 
-          setCreatingEvent(false);
-          setSelectedEvent(null);
-          setShowObservationForm(false);
+  setCreatingEvent(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
 
+  if (!user) {
 
-          // =========================
-          // INTE INLOGGAD
-          // =========================
+    setLoginReason("profile");
+    setShowLogin(true);
 
-          if (!user) {
+    return;
 
-            setLoginReason(
-              "profile"
-            );
+  }
 
-            setShowLogin(true);
+  setCurrentPage("profile");
 
-            return;
-
-          }
-
-
-          // =========================
-          // INLOGGAD
-          // =========================
-
-          setCurrentPage("profile");
-
-        }}
+}}
 
       />
 

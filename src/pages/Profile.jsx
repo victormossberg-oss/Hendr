@@ -4,7 +4,8 @@ import { API_URL } from "../config";
 function Profile({
   user,
   onEventClick,
-  onObservationClick
+  onObservationClick,
+  onLogout
 }) {
 
   const [events, setEvents] =
@@ -533,6 +534,19 @@ function Profile({
           </div>
 
         </section>
+
+
+        {/* =========================
+            LOGGA UT
+        ========================= */}
+
+        <button
+          className="logout-button"
+          type="button"
+          onClick={onLogout}
+        >
+          Logga ut
+        </button>
 
 
       </div>
