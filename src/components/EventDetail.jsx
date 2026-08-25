@@ -514,23 +514,23 @@ const response = await fetch(
 
                     <div className="timeline-meta">
 
-                      <strong>
-                        Användare
-                      </strong>
+  <strong>
 
-                      <span>
+    {observation.username || "Användare"}
 
-                        {observation.createdAt
-                          ? new Date(
-                              observation.createdAt
-                            ).toLocaleString(
-                              "sv-SE"
-                            )
-                          : ""}
+  </strong>
 
-                      </span>
+  <span>
 
-                    </div>
+    {observation.createdAt
+      ? new Date(
+          observation.createdAt
+        ).toLocaleString("sv-SE")
+      : ""}
+
+  </span>
+
+</div>
 
 
                     <p>
