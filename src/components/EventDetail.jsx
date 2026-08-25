@@ -356,8 +356,22 @@ const response = await fetch(
         ========================= */}
 
         <h1>
-          {event.title}
-        </h1>
+  {event.title}
+</h1>
+
+{event.username && (
+
+  <p className="event-author">
+
+    Skapad av{" "}
+
+    <strong>
+      {event.username}
+    </strong>
+
+  </p>
+
+)}
 
 
         {/* =========================

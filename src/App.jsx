@@ -187,9 +187,19 @@ function App() {
 
       .then((data) => {
 
-        setEvents(data);
+  console.log(
+  "Första eventet:",
+  data[0]
+);
 
-      })
+console.log(
+  "Username:",
+  data[0]?.username
+);
+
+  setEvents(data);
+
+})
 
       .catch((error) => {
 

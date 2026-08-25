@@ -210,23 +210,27 @@ app.get(
           `
           SELECT
 
-            e.eventID AS id,
+  e.eventID AS id,
 
-            e.title,
+  e.title,
 
-            e.description,
+  e.description,
 
-            e.category,
+  e.category,
 
-            e.status,
+  e.status,
 
-            e.created_at AS "createdAt",
+  e.created_at AS "createdAt",
 
-            e.image_url AS "imageUrl",
+  e.image_url AS "imageUrl",
 
-            e.latitude,
+  e.latitude,
 
-            e.longitude,
+  e.longitude,
+
+  e.userid,
+
+  u.username AS username,
 
             COUNT(
               DISTINCT o.observationID
@@ -238,14 +242,18 @@ app.get(
 
           FROM Events e
 
-          LEFT JOIN Observations o
-            ON o.eventID = e.eventID
+LEFT JOIN Users u
+  ON u.userid = e.userid
 
-          LEFT JOIN EventConfirmations ec
-            ON ec.eventID = e.eventID
+LEFT JOIN Observations o
+  ON o.eventID = e.eventID
+
+LEFT JOIN EventConfirmations ec
+  ON ec.eventID = e.eventID
 
           GROUP BY
-            e.eventID
+  e.eventID,
+  u.username
 
           ORDER BY
             e.created_at DESC
@@ -603,36 +611,41 @@ app.get(
 
 
       const result =
-        await pool.query(
-          `
-          SELECT
+  await pool.query(
+    `
+    SELECT
 
-            observationID AS id,
+      o.observationID AS id,
 
-            userID,
+      o.userID,
 
-            eventID,
+      o.eventID,
 
-            description,
+      o.description,
 
-            image_url AS "imageUrl",
+      o.image_url AS "imageUrl",
 
-            created_at AS "createdAt",
+      o.created_at AS "createdAt",
 
-            latitude,
+      o.latitude,
 
-            longitude
+      o.longitude,
 
-          FROM Observations
+      u.username AS username
 
-          WHERE eventID = $1
+    FROM Observations o
 
-          ORDER BY
-            created_at DESC
-          `,
+    LEFT JOIN Users u
+      ON u.userid = o.userID
 
-          [eventID]
-        );
+    WHERE o.eventID = $1
+
+    ORDER BY
+      o.created_at DESC
+    `,
+
+    [eventID]
+  );
 
 
       res.json(
