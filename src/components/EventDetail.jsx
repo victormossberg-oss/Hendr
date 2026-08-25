@@ -367,16 +367,14 @@ const response = await fetch(
     Skapad av{" "}
 
     <button
-      type="button"
-      className="event-author-button"
-      onClick={() =>
-        onUserClick(event.userid)
-      }
-    >
-
-      {event.username}
-
-    </button>
+  className="event-author-button"
+  type="button"
+  onClick={() =>
+    onUserClick(event.userid)
+  }
+>
+  {event.username}
+</button>
 
   </p>
 
