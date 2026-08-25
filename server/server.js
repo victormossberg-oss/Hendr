@@ -25,9 +25,6 @@ app.use(express.json());
 // BILDUPPLADDNING
 // =========================
 
-// Bilder sparas tillfälligt i minnet
-// och skickas sedan till Cloudinary.
-
 const upload = multer({
   storage: multer.memoryStorage()
 });
@@ -55,11 +52,14 @@ function uploadToCloudinary(file, folder) {
           }
 
           resolve(result);
+
         }
       );
 
     stream.end(file.buffer);
+
   });
+
 }
 
 
@@ -76,28 +76,33 @@ async function getLocationName(
     latitude == null ||
     longitude == null
   ) {
+
     return null;
+
   }
+
 
   try {
 
-    const response = await axios.get(
-      "https://nominatim.openstreetmap.org/reverse",
-      {
-        params: {
-          lat: latitude,
-          lon: longitude,
-          format: "json",
-          zoom: 10,
-          addressdetails: 1
-        },
+    const response =
+      await axios.get(
+        "https://nominatim.openstreetmap.org/reverse",
+        {
+          params: {
+            lat: latitude,
+            lon: longitude,
+            format: "json",
+            zoom: 10,
+            addressdetails: 1
+          },
 
-        headers: {
-          "User-Agent":
-            "HENDR/1.0"
+          headers: {
+            "User-Agent":
+              "HENDR/1.0"
+          }
+
         }
-      }
-    );
+      );
 
 
     const address =
@@ -128,7 +133,64 @@ async function getLocationName(
     );
 
     return null;
+
   }
+
+}
+
+
+// =========================
+// AUTENTISERING
+// =========================
+
+function authenticateToken(
+  req,
+  res,
+  next
+) {
+
+  const authHeader =
+    req.headers.authorization;
+
+
+  const token =
+    authHeader &&
+    authHeader.split(" ")[1];
+
+
+  if (!token) {
+
+    return res.status(401).json({
+      message:
+        "Du måste vara inloggad."
+    });
+
+  }
+
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+
+    (error, user) => {
+
+      if (error) {
+
+        return res.status(403).json({
+          message:
+            "Ogiltig eller utgången token."
+        });
+
+      }
+
+
+      req.user = user;
+
+      next();
+
+    }
+  );
+
 }
 
 
@@ -138,12 +200,14 @@ async function getLocationName(
 
 app.get(
   "/api/events",
+
   async (req, res) => {
 
     try {
 
       const result =
-        await pool.query(`
+        await pool.query(
+          `
           SELECT
 
             e.eventID AS id,
@@ -164,40 +228,30 @@ app.get(
 
             e.longitude,
 
-
             COUNT(
               DISTINCT o.observationID
             ) AS "observationCount",
-
 
             COUNT(
               DISTINCT ec.confirmationID
             ) AS "confirmationCount"
 
-
           FROM Events e
-
 
           LEFT JOIN Observations o
             ON o.eventID = e.eventID
 
-
           LEFT JOIN EventConfirmations ec
             ON ec.eventID = e.eventID
-
 
           GROUP BY
             e.eventID
 
-
           ORDER BY
             e.created_at DESC
-        `);
+          `
+        );
 
-
-      // =========================
-      // HÄMTA ORT
-      // =========================
 
       const eventsWithLocation =
         await Promise.all(
@@ -266,10 +320,6 @@ app.post(
       } = req.body;
 
 
-      // =========================
-      // LADDA UPP BILD
-      // =========================
-
       let imageUrl = null;
 
 
@@ -287,10 +337,6 @@ app.post(
 
       }
 
-
-      // =========================
-      // KONVERTERA KOORDINATER
-      // =========================
 
       const parsedLatitude =
         latitude !== undefined &&
@@ -318,51 +364,67 @@ app.post(
       );
 
 
-      // =========================
-      // SPARA HÄNDELSE
-      // =========================
-
       const result =
-  await pool.query(
-    `
-    INSERT INTO Events
-    (
-      title,
-      description,
-      category,
-      status,
-      image_url,
-      latitude,
-      longitude,
-      userid
-    )
+        await pool.query(
+          `
+          INSERT INTO Events
+          (
+            title,
+            description,
+            category,
+            status,
+            image_url,
+            latitude,
+            longitude,
+            userid
+          )
 
-    VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8)
+          VALUES
+          (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            $8
+          )
 
-    RETURNING
-      eventID AS id,
-      title,
-      description,
-      category,
-      status,
-      created_at AS "createdAt",
-      image_url AS "imageUrl",
-      latitude,
-      longitude,
-      userid
-    `,
-    [
-      title,
-      description,
-      category,
-      status,
-      imageUrl,
-      parsedLatitude,
-      parsedLongitude,
-      req.user.userid
-    ]
-  );
+          RETURNING
+
+            eventID AS id,
+
+            title,
+
+            description,
+
+            category,
+
+            status,
+
+            created_at AS "createdAt",
+
+            image_url AS "imageUrl",
+
+            latitude,
+
+            longitude,
+
+            userid
+          `,
+
+          [
+            title,
+            description,
+            category,
+            status,
+            imageUrl,
+            parsedLatitude,
+            parsedLongitude,
+            req.user.userid
+          ]
+        );
 
 
       res.status(201).json(
@@ -409,16 +471,10 @@ app.post(
         longitude
       } = req.body;
 
-      // =========================
-      // INLOGGAD ANVÄNDARE
-      // =========================
 
-      const userID = req.user.userid;
+      const userID =
+        req.user.userid;
 
-
-      // =========================
-      // LADDA UPP BILD
-      // =========================
 
       let imageUrl = null;
 
@@ -438,10 +494,6 @@ app.post(
       }
 
 
-      // =========================
-      // KONVERTERA KOORDINATER
-      // =========================
-
       const parsedLatitude =
         latitude !== undefined &&
         latitude !== ""
@@ -455,10 +507,6 @@ app.post(
           ? Number(longitude)
           : null;
 
-
-      // =========================
-      // SPARA OBSERVATION
-      // =========================
 
       const result =
         await pool.query(
@@ -474,8 +522,14 @@ app.post(
           )
 
           VALUES
-          ($1, $2, $3, $4, $5, $6)
-
+          (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6
+          )
 
           RETURNING
 
@@ -569,12 +623,9 @@ app.get(
 
             longitude
 
-
           FROM Observations
 
-
           WHERE eventID = $1
-
 
           ORDER BY
             created_at DESC
@@ -605,7 +656,6 @@ app.get(
 
 
 // =========================
-// =========================
 // BEKRÄFTA / TA BORT
 // BEKRÄFTELSE
 // =========================
@@ -623,17 +673,9 @@ app.post(
       } = req.params;
 
 
-      // =========================
-      // INLOGGAD ANVÄNDARE
-      // =========================
-
       const userID =
         req.user.userid;
 
-
-      // =========================
-      // KONTROLLERA BEKRÄFTELSE
-      // =========================
 
       const existing =
         await pool.query(
@@ -646,16 +688,13 @@ app.post(
           WHERE eventID = $1
           AND userID = $2
           `,
+
           [
             eventID,
             userID
           ]
         );
 
-
-      // =========================
-      // TA BORT
-      // =========================
 
       if (
         existing.rows.length > 0
@@ -668,6 +707,7 @@ app.post(
           WHERE eventID = $1
           AND userID = $2
           `,
+
           [
             eventID,
             userID
@@ -676,17 +716,11 @@ app.post(
 
 
         return res.json({
-
           confirmed: false
-
         });
 
       }
 
-
-      // =========================
-      // LÄGG TILL
-      // =========================
 
       const result =
         await pool.query(
@@ -698,7 +732,10 @@ app.post(
           )
 
           VALUES
-          ($1, $2)
+          (
+            $1,
+            $2
+          )
 
           RETURNING
 
@@ -710,6 +747,7 @@ app.post(
 
             created_at AS "createdAt"
           `,
+
           [
             eventID,
             userID
@@ -736,10 +774,8 @@ app.post(
 
 
       res.status(500).json({
-
         message:
           "Kunde inte ändra bekräftelsen."
-
       });
 
     }
@@ -765,10 +801,6 @@ app.get(
       } = req.params;
 
 
-      // =========================
-      // INLOGGAD ANVÄNDARE
-      // =========================
-
       const userID =
         req.user.userid;
 
@@ -784,6 +816,7 @@ app.get(
           WHERE eventID = $1
           AND userID = $2
           `,
+
           [
             eventID,
             userID
@@ -808,10 +841,8 @@ app.get(
 
 
       res.status(500).json({
-
         message:
           "Kunde inte kontrollera bekräftelsen."
-
       });
 
     }
@@ -831,35 +862,38 @@ app.delete(
 
   async (req, res) => {
 
-    const { eventID } = req.params;
-    const userID = req.user.userid;
+    const {
+      eventID
+    } = req.params;
 
-    const client = await pool.connect();
+
+    const userID =
+      req.user.userid;
+
+
+    const client =
+      await pool.connect();
+
 
     try {
-
-      // =========================
-      // HÄMTA HÄNDELSEN
-      // =========================
 
       const eventResult =
         await client.query(
           `
           SELECT
+
             eventID,
+
             userid
 
           FROM Events
 
           WHERE eventID = $1
           `,
+
           [eventID]
         );
 
-
-      // =========================
-      // HÄNDELSEN FINNS INTE
-      // =========================
 
       if (
         eventResult.rows.length === 0
@@ -877,10 +911,6 @@ app.delete(
         eventResult.rows[0];
 
 
-      // =========================
-      // KONTROLLERA ÄGARE
-      // =========================
-
       if (
         event.userid !== userID
       ) {
@@ -893,18 +923,10 @@ app.delete(
       }
 
 
-      // =========================
-      // STARTA TRANSAKTION
-      // =========================
-
       await client.query(
         "BEGIN"
       );
 
-
-      // =========================
-      // TA BORT BEKRÄFTELSER
-      // =========================
 
       await client.query(
         `
@@ -912,13 +934,10 @@ app.delete(
 
         WHERE eventID = $1
         `,
+
         [eventID]
       );
 
-
-      // =========================
-      // TA BORT OBSERVATIONER
-      // =========================
 
       await client.query(
         `
@@ -926,13 +945,10 @@ app.delete(
 
         WHERE eventID = $1
         `,
+
         [eventID]
       );
 
-
-      // =========================
-      // TA BORT HÄNDELSEN
-      // =========================
 
       const result =
         await client.query(
@@ -943,6 +959,7 @@ app.delete(
 
           RETURNING eventID
           `,
+
           [eventID]
         );
 
@@ -955,6 +972,7 @@ app.delete(
           "ROLLBACK"
         );
 
+
         return res.status(404).json({
           message:
             "Händelsen hittades inte."
@@ -962,10 +980,6 @@ app.delete(
 
       }
 
-
-      // =========================
-      // BEKRÄFTA
-      // =========================
 
       await client.query(
         "COMMIT"
@@ -1062,6 +1076,7 @@ app.get(
           ORDER BY
             created_at DESC
           `,
+
           [userID]
         );
 
@@ -1080,10 +1095,8 @@ app.get(
 
 
       res.status(500).json({
-
         message:
           "Kunde inte hämta dina händelser."
-
       });
 
     }
@@ -1136,6 +1149,7 @@ app.get(
           ORDER BY
             created_at DESC
           `,
+
           [userID]
         );
 
@@ -1154,10 +1168,8 @@ app.get(
 
 
       res.status(500).json({
-
         message:
           "Kunde inte hämta dina observationer."
-
       });
 
     }
@@ -1167,36 +1179,12 @@ app.get(
 
 
 // =========================
-// STARTA SERVERN
-// =========================
-
-// Render tilldelar porten via
-// process.env.PORT.
-// Lokalt används port 3000.
-
-const PORT =
-  process.env.PORT || 3000;
-
-
-app.listen(
-  PORT,
-  "0.0.0.0",
-
-  () => {
-
-    console.log(
-      `HENDR API körs på port ${PORT}`
-    );
-
-  }
-);
-
-// =========================
 // REGISTRERA ANVÄNDARE
 // =========================
 
 app.post(
   "/api/auth/register",
+
   async (req, res) => {
 
     try {
@@ -1226,11 +1214,56 @@ app.post(
       }
 
 
-      if (password.length < 6) {
+      // =========================
+      // TRIMMA OCH NORMALISERA
+      // =========================
+
+      const cleanUsername =
+        username.trim();
+
+      const cleanEmail =
+        email.trim().toLowerCase();
+
+
+      // =========================
+      // KONTROLLERA ANVÄNDARNAMN
+      // =========================
+
+      if (
+        cleanUsername.length < 3
+      ) {
 
         return res.status(400).json({
           message:
-            "Lösenordet måste vara minst 6 tecken."
+            "Användarnamnet måste vara minst 3 tecken."
+        });
+
+      }
+
+
+      if (
+        cleanUsername.length > 25
+      ) {
+
+        return res.status(400).json({
+          message:
+            "Användarnamnet får vara högst 25 tecken."
+        });
+
+      }
+
+
+      // =========================
+      // KONTROLLERA LÖSENORD
+      // =========================
+
+      if (
+        password.length < 8
+      ) {
+
+        return res.status(400).json({
+          message:
+            "Lösenordet måste vara minst 8 tecken."
         });
 
       }
@@ -1243,11 +1276,15 @@ app.post(
       const existingUser =
         await pool.query(
           `
-          SELECT userid
+          SELECT
+            userid
+
           FROM Users
+
           WHERE email = $1
           `,
-          [email]
+
+          [cleanEmail]
         );
 
 
@@ -1257,7 +1294,7 @@ app.post(
 
         return res.status(409).json({
           message:
-            "Det finns redan en användare med denna e-post."
+            "Det finns redan ett konto med den e-postadressen."
         });
 
       }
@@ -1289,19 +1326,58 @@ app.post(
           )
 
           VALUES
-          ($1, $2, $3)
+          (
+            $1,
+            $2,
+            $3
+          )
 
           RETURNING
+
             userid,
+
             username,
+
             email,
+
             created_at
           `,
+
           [
-            username,
-            email,
+            cleanUsername,
+            cleanEmail,
             passwordHash
           ]
+        );
+
+
+      const user =
+        result.rows[0];
+
+
+      // =========================
+      // SKAPA JWT
+      // =========================
+
+      const token =
+        jwt.sign(
+          {
+            userid:
+              user.userid,
+
+            username:
+              user.username,
+
+            email:
+              user.email
+          },
+
+          process.env.JWT_SECRET,
+
+          {
+            expiresIn:
+              "7d"
+          }
         );
 
 
@@ -1310,11 +1386,28 @@ app.post(
       // =========================
 
       res.status(201).json({
-        message:
-          "Användaren har skapats.",
 
-        user:
-          result.rows[0]
+        message:
+          "Kontot skapades.",
+
+        token,
+
+        user: {
+
+          userid:
+            user.userid,
+
+          username:
+            user.username,
+
+          email:
+            user.email,
+
+          created_at:
+            user.created_at
+
+        }
+
       });
 
 
@@ -1326,9 +1419,23 @@ app.post(
       );
 
 
+      // PostgreSQL unique constraint
+
+      if (
+        error.code === "23505"
+      ) {
+
+        return res.status(409).json({
+          message:
+            "Det finns redan ett konto med den e-postadressen."
+        });
+
+      }
+
+
       res.status(500).json({
         message:
-          "Kunde inte skapa användaren."
+          "Kunde inte skapa kontot."
       });
 
     }
@@ -1336,9 +1443,6 @@ app.post(
   }
 );
 
-// =========================
-// LOGGA IN ANVÄNDARE
-// =========================
 
 // =========================
 // LOGGA IN ANVÄNDARE
@@ -1346,6 +1450,7 @@ app.post(
 
 app.post(
   "/api/auth/login",
+
   async (req, res) => {
 
     try {
@@ -1373,6 +1478,10 @@ app.post(
       }
 
 
+      const cleanEmail =
+        email.trim().toLowerCase();
+
+
       // =========================
       // HÄMTA ANVÄNDARE
       // =========================
@@ -1381,15 +1490,23 @@ app.post(
         await pool.query(
           `
           SELECT
+
             userid,
+
             username,
+
             email,
+
             password_hash,
+
             created_at
+
           FROM Users
+
           WHERE email = $1
           `,
-          [email]
+
+          [cleanEmail]
         );
 
 
@@ -1420,7 +1537,9 @@ app.post(
         );
 
 
-      if (!passwordCorrect) {
+      if (
+        !passwordCorrect
+      ) {
 
         return res.status(401).json({
           message:
@@ -1450,7 +1569,8 @@ app.post(
           process.env.JWT_SECRET,
 
           {
-            expiresIn: "7d"
+            expiresIn:
+              "7d"
           }
         );
 
@@ -1503,58 +1623,6 @@ app.post(
   }
 );
 
-// =========================
-// AUTENTISERING
-// =========================
-
-function authenticateToken(
-  req,
-  res,
-  next
-) {
-
-  const authHeader =
-    req.headers.authorization;
-
-
-  const token =
-    authHeader &&
-    authHeader.split(" ")[1];
-
-
-  if (!token) {
-
-    return res.status(401).json({
-      message:
-        "Du måste vara inloggad."
-    });
-
-  }
-
-
-  jwt.verify(
-    token,
-    process.env.JWT_SECRET,
-    (error, user) => {
-
-      if (error) {
-
-        return res.status(403).json({
-          message:
-            "Ogiltig eller utgången token."
-        });
-
-      }
-
-
-      req.user = user;
-
-      next();
-
-    }
-  );
-
-}
 
 // =========================
 // TESTA INLOGGAD ANVÄNDARE
@@ -1563,11 +1631,35 @@ function authenticateToken(
 app.get(
   "/api/auth/me",
   authenticateToken,
+
   (req, res) => {
 
     res.json({
-      user: req.user
+      user:
+        req.user
     });
+
+  }
+);
+
+
+// =========================
+// STARTA SERVERN
+// =========================
+
+const PORT =
+  process.env.PORT || 3000;
+
+
+app.listen(
+  PORT,
+  "0.0.0.0",
+
+  () => {
+
+    console.log(
+      `HENDR API körs på port ${PORT}`
+    );
 
   }
 );

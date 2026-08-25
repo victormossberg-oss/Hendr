@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { API_URL } from "../config";
 
-function Login({ onLogin, onBack }) {
+function Login({
+  onLogin,
+  onBack
+}) {
+
+  const [registerMode, setRegisterMode] =
+    useState(false);
+
+  const [username, setUsername] =
+    useState("");
 
   const [email, setEmail] =
     useState("");
 
   const [password, setPassword] =
+    useState("");
+
+  const [confirmPassword, setConfirmPassword] =
     useState("");
 
   const [loading, setLoading] =
@@ -16,7 +28,11 @@ function Login({ onLogin, onBack }) {
     useState("");
 
 
-  async function handleSubmit(e) {
+  // =========================
+  // LOGGA IN
+  // =========================
+
+  async function handleLogin(e) {
 
     e.preventDefault();
 
@@ -68,6 +84,7 @@ function Login({ onLogin, onBack }) {
         data.token
       );
 
+
       localStorage.setItem(
         "hendr_user",
         JSON.stringify(
@@ -75,9 +92,6 @@ function Login({ onLogin, onBack }) {
         )
       );
 
-
-      // Skicka användaren
-      // vidare till App.jsx
 
       onLogin(
         data.user
@@ -91,9 +105,11 @@ function Login({ onLogin, onBack }) {
         error
       );
 
+
       setError(
         error.message
       );
+
 
     } finally {
 
@@ -104,38 +120,258 @@ function Login({ onLogin, onBack }) {
   }
 
 
+  // =========================
+  // SKAPA KONTO
+  // =========================
+
+  async function handleRegister(e) {
+
+    e.preventDefault();
+
+    setError("");
+
+
+    // =========================
+    // KONTROLLERA LÖSENORD
+    // =========================
+
+    if (
+      password !==
+      confirmPassword
+    ) {
+
+      setError(
+        "Lösenorden matchar inte."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      password.length < 8
+    ) {
+
+      setError(
+        "Lösenordet måste vara minst 8 tecken."
+      );
+
+      return;
+
+    }
+
+
+    setLoading(true);
+
+
+    try {
+
+      const response =
+        await fetch(
+          `${API_URL}/api/auth/register`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              username,
+              email,
+              password
+            })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message ||
+          "Kunde inte skapa kontot."
+        );
+
+      }
+
+
+      // =========================
+      // REGISTRERING LYCKADES
+      // =========================
+
+      localStorage.setItem(
+        "hendr_token",
+        data.token
+      );
+
+
+      localStorage.setItem(
+        "hendr_user",
+        JSON.stringify(
+          data.user
+        )
+      );
+
+
+      // =========================
+      // SKICKA VIDARE TILL APP
+      // =========================
+
+      onLogin(
+        data.user
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Registreringsfel:",
+        error
+      );
+
+
+      setError(
+        error.message
+      );
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }
+
+
+  // =========================
+  // BYT MELLAN LOGIN
+  // OCH REGISTRERING
+  // =========================
+
+  function switchMode() {
+
+    setRegisterMode(
+      !registerMode
+    );
+
+    setError("");
+
+    setUsername("");
+
+    setEmail("");
+
+    setPassword("");
+
+    setConfirmPassword("");
+
+  }
+
+
   return (
+
     <main className="observation-page">
 
       <div className="observation-content">
 
+
+        {/* =========================
+            LOGGA / HENDR
+        ========================= */}
+
         <span className="event-category">
+
           HENDR
+
         </span>
 
 
         <h1>
-          Logga in
+
+          {registerMode
+            ? "Skapa konto"
+            : "Logga in"}
+
         </h1>
 
 
         <p className="observation-intro">
-          Logga in för att skapa och
-          hantera dina händelser.
+
+          {registerMode
+
+            ? "Skapa ett konto för att kunna skapa och hantera dina händelser."
+
+            : "Logga in för att skapa och hantera dina händelser."}
+
         </p>
 
 
+        {/* =========================
+            FORMULÄR
+        ========================= */}
+
         <form
-          onSubmit={handleSubmit}
+          onSubmit={
+            registerMode
+              ? handleRegister
+              : handleLogin
+          }
         >
+
+
+          {/* =========================
+              ANVÄNDARNAMN
+              ENDAST REGISTRERING
+          ========================= */}
+
+          {registerMode && (
+
+            <>
+
+              <label htmlFor="username">
+
+                Användarnamn
+
+              </label>
+
+
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) =>
+                  setUsername(
+                    e.target.value
+                  )
+                }
+                placeholder="Ditt användarnamn"
+                minLength={3}
+                maxLength={25}
+                required
+                disabled={loading}
+              />
+
+            </>
+
+          )}
+
 
           {/* =========================
               E-POST
           ========================= */}
 
           <label htmlFor="email">
+
             E-post
+
           </label>
+
 
           <input
             id="email"
@@ -157,8 +393,11 @@ function Login({ onLogin, onBack }) {
           ========================= */}
 
           <label htmlFor="password">
+
             Lösenord
+
           </label>
+
 
           <input
             id="password"
@@ -170,9 +409,46 @@ function Login({ onLogin, onBack }) {
               )
             }
             placeholder="Ditt lösenord"
+            minLength={8}
             required
             disabled={loading}
           />
+
+
+          {/* =========================
+              BEKRÄFTA LÖSENORD
+              ENDAST REGISTRERING
+          ========================= */}
+
+          {registerMode && (
+
+            <>
+
+              <label htmlFor="confirmPassword">
+
+                Bekräfta lösenord
+
+              </label>
+
+
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(
+                    e.target.value
+                  )
+                }
+                placeholder="Skriv lösenordet igen"
+                minLength={8}
+                required
+                disabled={loading}
+              />
+
+            </>
+
+          )}
 
 
           {/* =========================
@@ -182,14 +458,16 @@ function Login({ onLogin, onBack }) {
           {error && (
 
             <p className="location-error">
+
               {error}
+
             </p>
 
           )}
 
 
           {/* =========================
-              LOGIN
+              HUVUDKNAPP
           ========================= */}
 
           <button
@@ -199,8 +477,39 @@ function Login({ onLogin, onBack }) {
           >
 
             {loading
-              ? "Loggar in..."
-              : "Logga in"}
+
+              ? (
+                  registerMode
+                    ? "Skapar konto..."
+                    : "Loggar in..."
+                )
+
+              : (
+                  registerMode
+                    ? "Skapa konto"
+                    : "Logga in"
+                )}
+
+          </button>
+
+
+          {/* =========================
+              BYT MELLAN LOGIN
+              OCH REGISTRERING
+          ========================= */}
+
+          <button
+            type="button"
+            className="back-button"
+            onClick={switchMode}
+            disabled={loading}
+          >
+
+            {registerMode
+
+              ? "Har du redan ett konto? Logga in"
+
+              : "Skapa konto"}
 
           </button>
 
@@ -209,25 +518,32 @@ function Login({ onLogin, onBack }) {
               TILLBAKA
           ========================= */}
 
-          {onBack && (
+          {!registerMode &&
+            onBack && (
 
-            <button
-              type="button"
-              className="back-button"
-              onClick={onBack}
-              disabled={loading}
-            >
-              Tillbaka
-            </button>
+              <button
+                type="button"
+                className="back-button"
+                onClick={onBack}
+                disabled={loading}
+              >
 
-          )}
+                Tillbaka
+
+              </button>
+
+            )}
+
 
         </form>
 
       </div>
 
     </main>
+
   );
+
 }
+
 
 export default Login;
