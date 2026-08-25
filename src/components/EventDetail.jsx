@@ -525,7 +525,7 @@ const response = await fetch(
     type="button"
     className="event-author-button"
     onClick={() =>
-      onUserClick(observation.userID)
+      onUserClick(observation.userid)
     }
   >
 
