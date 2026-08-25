@@ -16,7 +16,8 @@ function EventDetail({
   event,
   observations,
   onAddObservation,
-  onDelete
+  onDelete,
+  onUserClick
 }) {
 
   async function handleDelete() {
@@ -365,9 +366,17 @@ const response = await fetch(
 
     Skapad av{" "}
 
-    <strong>
+    <button
+      type="button"
+      className="event-author-button"
+      onClick={() =>
+        onUserClick(event.userid)
+      }
+    >
+
       {event.username}
-    </strong>
+
+    </button>
 
   </p>
 

@@ -1190,6 +1190,225 @@ app.get(
   }
 );
 
+// =========================
+// HÄMTA PUBLIK ANVÄNDARPROFIL
+// =========================
+
+app.get(
+  "/api/users/:userid",
+  async (req, res) => {
+
+    try {
+
+      const {
+        userid
+      } = req.params;
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            userid,
+            username,
+            created_at AS "createdAt"
+          FROM Users
+          WHERE userid = $1
+          `,
+          [userid]
+        );
+
+
+      if (
+        result.rows.length === 0
+      ) {
+
+        return res.status(404).json({
+          message:
+            "Användaren kunde inte hittas."
+        });
+
+      }
+
+
+      res.json(
+        result.rows[0]
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av publik användarprofil:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarprofilen."
+      });
+
+    }
+
+  }
+);
+
+// =========================
+// HÄMTA EN ANVÄNDARES
+// PUBLIKA HÄNDELSER
+// =========================
+
+app.get(
+  "/api/users/:userid/events",
+  async (req, res) => {
+
+    try {
+
+      const {
+        userid
+      } = req.params;
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            e.eventID AS id,
+
+            e.title,
+
+            e.description,
+
+            e.category,
+
+            e.status,
+
+            e.created_at AS "createdAt",
+
+            e.image_url AS "imageUrl",
+
+            e.latitude,
+
+            e.longitude,
+
+            e.userid,
+
+            u.username AS username
+
+          FROM Events e
+
+          LEFT JOIN Users u
+            ON u.userid = e.userid
+
+          WHERE e.userid = $1
+
+          ORDER BY
+            e.created_at DESC
+          `,
+          [userid]
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av användarens händelser:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarens händelser."
+      });
+
+    }
+
+  }
+);
+
+// =========================
+// HÄMTA EN ANVÄNDARES
+// PUBLIKA OBSERVATIONER
+// =========================
+
+app.get(
+  "/api/users/:userid/observations",
+  async (req, res) => {
+
+    try {
+
+      const {
+        userid
+      } = req.params;
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            o.observationID AS id,
+
+            o.userID,
+
+            o.eventID,
+
+            o.description,
+
+            o.image_url AS "imageUrl",
+
+            o.created_at AS "createdAt",
+
+            o.latitude,
+
+            o.longitude,
+
+            u.username AS username
+
+          FROM Observations o
+
+          LEFT JOIN Users u
+            ON u.userid = o.userID
+
+          WHERE o.userID = $1
+
+          ORDER BY
+            o.created_at DESC
+          `,
+          [userid]
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av användarens observationer:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarens observationer."
+      });
+
+    }
+
+  }
+);
 
 // =========================
 // REGISTRERA ANVÄNDARE

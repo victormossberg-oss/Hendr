@@ -9,6 +9,7 @@ import NewEventForm from "./components/NewEventForm";
 import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
 
 import "./App.css";
 
@@ -38,6 +39,9 @@ function App() {
 
   const [loginReason, setLoginReason] =
     useState(null);
+
+  const [selectedUserID, setSelectedUserID] =
+  useState(null);
 
 
   // =========================
@@ -342,6 +346,24 @@ console.log(
 
   }
 
+  // =========================
+// ÖPPNA PUBLIK PROFIL
+// =========================
+
+function handleUserClick(userid) {
+
+  setSelectedUserID(userid);
+
+  setSelectedEvent(null);
+
+  setCreatingEvent(false);
+
+  setShowObservationForm(false);
+
+  setCurrentPage("publicProfile");
+
+}
+
 
   // =========================
 // ÖPPNA HÄNDELSE FRÅN
@@ -486,7 +508,44 @@ async function handleObservationClick(
     );
 
   }
+// =========================
+// PUBLIK PROFIL
+// =========================
 
+else if (
+  currentPage === "publicProfile" &&
+  selectedUserID
+) {
+
+  content = (
+
+    <PublicProfile
+
+      userid={
+        selectedUserID
+      }
+
+      onEventClick={
+        handleEventClick
+      }
+
+      onObservationClick={
+        handleObservationClick
+      }
+
+      onBack={() => {
+
+        setSelectedUserID(null);
+
+        setCurrentPage("home");
+
+      }}
+
+    />
+
+  );
+
+}
 
   // =========================
   // PROFIL
@@ -589,6 +648,10 @@ async function handleObservationClick(
 
         observations={
           observations
+        }
+
+        onUserClick={
+          handleUserClick
         }
 
 
