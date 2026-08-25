@@ -521,11 +521,17 @@ const response = await fetch(
 
                     <div className="timeline-meta">
 
-  <strong>
+  <button
+    type="button"
+    className="event-author-button"
+    onClick={() =>
+      onUserClick(observation.userID)
+    }
+  >
 
     {observation.username || "Användare"}
 
-  </strong>
+  </button>
 
   <span>
 
