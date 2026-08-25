@@ -23,6 +23,12 @@ function PublicProfile({
   const [error, setError] =
     useState("");
 
+  const [showEvents, setShowEvents] =
+    useState(false);
+
+  const [showObservations, setShowObservations] =
+    useState(false);
+
 
   // =========================
   // HÄMTA PUBLIK PROFIL
@@ -36,7 +42,6 @@ function PublicProfile({
 
         setLoading(true);
         setError("");
-
 
         const [
           profileResponse,
@@ -179,7 +184,9 @@ function PublicProfile({
             type="button"
             onClick={onBack}
           >
+
             ← Tillbaka
+
           </button>
 
 
@@ -212,7 +219,226 @@ function PublicProfile({
 
 
   // =========================
-  // PROFIL
+  // HÄNDELSER
+  // =========================
+
+  if (showEvents) {
+
+    return (
+
+      <main className="profile-page">
+
+        <div className="profile-content">
+
+          <section className="profile-list-page">
+
+            <button
+              className="back-button"
+              type="button"
+              onClick={() =>
+                setShowEvents(false)
+              }
+            >
+
+              ← Tillbaka
+
+            </button>
+
+
+            <h1>
+
+              {profile.username}s händelser
+
+            </h1>
+
+
+            {events.length === 0 ? (
+
+              <div className="profile-empty">
+
+                {profile.username} har inte
+                skapat några händelser ännu.
+
+              </div>
+
+            ) : (
+
+              <div className="profile-events">
+
+                {events.map(
+                  (event) => (
+
+                    <button
+                      className="profile-event"
+                      key={event.id}
+                      type="button"
+                      onClick={() =>
+                        onEventClick(event)
+                      }
+                    >
+
+                      <span className="event-category">
+
+                        {event.category}
+
+                      </span>
+
+
+                      <h3>
+
+                        {event.title}
+
+                      </h3>
+
+
+                      <p>
+
+                        {event.description}
+
+                      </p>
+
+
+                      <span className="event-time">
+
+                        {event.createdAt
+                          ? new Date(
+                              event.createdAt
+                            ).toLocaleString(
+                              "sv-SE"
+                            )
+                          : ""}
+
+                      </span>
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </section>
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+  // =========================
+  // OBSERVATIONER
+  // =========================
+
+  if (showObservations) {
+
+    return (
+
+      <main className="profile-page">
+
+        <div className="profile-content">
+
+          <section className="profile-list-page">
+
+            <button
+              className="back-button"
+              type="button"
+              onClick={() =>
+                setShowObservations(false)
+              }
+            >
+
+              ← Tillbaka
+
+            </button>
+
+
+            <h1>
+
+              {profile.username}s observationer
+
+            </h1>
+
+
+            {observations.length === 0 ? (
+
+              <div className="profile-empty">
+
+                {profile.username} har inte
+                lagt till några observationer ännu.
+
+              </div>
+
+            ) : (
+
+              <div className="profile-events">
+
+                {observations.map(
+                  (observation) => (
+
+                    <button
+                      className="profile-event"
+                      key={observation.id}
+                      type="button"
+                      onClick={() =>
+                        onObservationClick(
+                          observation
+                        )
+                      }
+                    >
+
+                      <span className="event-category">
+
+                        Observation
+
+                      </span>
+
+
+                      <p>
+
+                        {observation.description}
+
+                      </p>
+
+
+                      <span className="event-time">
+
+                        {observation.createdAt
+                          ? new Date(
+                              observation.createdAt
+                            ).toLocaleString(
+                              "sv-SE"
+                            )
+                          : ""}
+
+                      </span>
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </section>
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+  // =========================
+  // VANLIG PROFIL
   // =========================
 
   return (
@@ -285,7 +511,21 @@ function PublicProfile({
 
         <section className="profile-stats">
 
-          <div className="profile-stat">
+
+          {/* =========================
+              HÄNDELSER
+          ========================= */}
+
+          <button
+            className="profile-stat"
+            type="button"
+            onClick={() => {
+
+              setShowEvents(true);
+              setShowObservations(false);
+
+            }}
+          >
 
             <strong>
 
@@ -293,16 +533,30 @@ function PublicProfile({
 
             </strong>
 
+
             <span>
 
               Händelser
 
             </span>
 
-          </div>
+          </button>
 
 
-          <div className="profile-stat">
+          {/* =========================
+              OBSERVATIONER
+          ========================= */}
+
+          <button
+            className="profile-stat"
+            type="button"
+            onClick={() => {
+
+              setShowObservations(true);
+              setShowEvents(false);
+
+            }}
+          >
 
             <strong>
 
@@ -310,158 +564,16 @@ function PublicProfile({
 
             </strong>
 
+
             <span>
 
               Observationer
 
             </span>
 
-          </div>
+          </button>
 
         </section>
-
-
-        {/* =========================
-            HÄNDELSER
-        ========================= */}
-
-        {events.length > 0 && (
-
-          <section className="profile-section">
-
-            <h2>
-
-              Händelser
-
-            </h2>
-
-
-            <div className="profile-events">
-
-              {events.map(
-                (event) => (
-
-                  <button
-                    className="profile-event"
-                    key={event.id}
-                    type="button"
-                    onClick={() =>
-                      onEventClick(event)
-                    }
-                  >
-
-                    <span className="event-category">
-
-                      {event.category}
-
-                    </span>
-
-
-                    <h3>
-
-                      {event.title}
-
-                    </h3>
-
-
-                    <p>
-
-                      {event.description}
-
-                    </p>
-
-
-                    <span className="event-time">
-
-                      {event.createdAt
-                        ? new Date(
-                            event.createdAt
-                          ).toLocaleString(
-                            "sv-SE"
-                          )
-                        : ""}
-
-                    </span>
-
-                  </button>
-
-                )
-              )}
-
-            </div>
-
-          </section>
-
-        )}
-
-
-        {/* =========================
-            OBSERVATIONER
-        ========================= */}
-
-        {observations.length > 0 && (
-
-          <section className="profile-section">
-
-            <h2>
-
-              Observationer
-
-            </h2>
-
-
-            <div className="profile-events">
-
-              {observations.map(
-                (observation) => (
-
-                  <button
-                    className="profile-event"
-                    key={observation.id}
-                    type="button"
-                    onClick={() =>
-                      onObservationClick(
-                        observation
-                      )
-                    }
-                  >
-
-                    <span className="event-category">
-
-                      Observation
-
-                    </span>
-
-
-                    <p>
-
-                      {observation.description}
-
-                    </p>
-
-
-                    <span className="event-time">
-
-                      {observation.createdAt
-                        ? new Date(
-                            observation.createdAt
-                          ).toLocaleString(
-                            "sv-SE"
-                          )
-                        : ""}
-
-                    </span>
-
-                  </button>
-
-                )
-              )}
-
-            </div>
-
-          </section>
-
-        )}
 
 
         {/* =========================
