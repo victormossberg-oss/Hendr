@@ -2773,14 +2773,14 @@ cursor: pointer;
   /* PLATS */
   .detail-location-row {
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 0;
   margin-bottom: 28px;
   padding: 0;
   border: none;
   background: none;
   color: #777;
   font: inherit;
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1.2;
   text-align: left;
   cursor: pointer;
