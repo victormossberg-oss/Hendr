@@ -219,8 +219,7 @@ function EventDetail({
     className="detail-location-row"
     onClick={() => onLocationClick?.(event)}
   >
-    <MapPin size={20} />
-    <span>{event.location}</span>
+    {event.location}
   </button>
 )}
 
