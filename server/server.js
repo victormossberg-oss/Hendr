@@ -910,8 +910,9 @@ app.delete(
 
 
       if (
-        event.userid !== userID
-      ) {
+  event.userid !== userID &&
+  req.user.role !== "Admin"
+) {
 
         return res.status(403).json({
           message:
@@ -1577,25 +1578,28 @@ app.post(
       // =========================
 
       const token =
-        jwt.sign(
-          {
-            userid:
-              user.userid,
+  jwt.sign(
+    {
+      userid:
+        user.userid,
 
-            username:
-              user.username,
+      username:
+        user.username,
 
-            email:
-              user.email
-          },
+      email:
+        user.email,
 
-          process.env.JWT_SECRET,
+      role:
+        user.role
+    },
 
-          {
-            expiresIn:
-              "7d"
-          }
-        );
+    process.env.JWT_SECRET,
+
+    {
+      expiresIn:
+        "7d"
+    }
+  );
 
 
       // =========================
