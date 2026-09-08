@@ -43,7 +43,12 @@ function formatRelativeTime(dateValue) {
   });
 }
 
-function EventCard({ event, onClick, onConfirmationChange }) {
+function EventCard({
+  event,
+  onClick,
+  onConfirmationChange,
+  onUserClick,
+}) {
   const [confirmed, setConfirmed] = useState(false);
   const [confirmationCount, setConfirmationCount] = useState(
     Number(event.confirmationCount) || 0
@@ -152,12 +157,28 @@ function EventCard({ event, onClick, onConfirmationChange }) {
       <div className="event-card-body">
         <div className="event-card-heading">
           <div>
-            <h2>{event.title}</h2>
-            <div className="event-location">
-  <MapPin size={15} />
-  <span>{event.location}</span>
+  <h2>{event.title}</h2>
+
+  {event.username && (
+    <button
+      type="button"
+      className="event-author"
+      onClick={(e) => {
+        e.stopPropagation();
+        onUserClick?.(event.userid);
+      }}
+    >
+      {event.username}
+    </button>
+  )}
+
+  {event.location && (
+    <div className="event-location">
+      <MapPin size={15} />
+      <span>{event.location}</span>
+    </div>
+  )}
 </div>
-          </div>
           <ChevronRight className="event-card-chevron" size={22} />
         </div>
 

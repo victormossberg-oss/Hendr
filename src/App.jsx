@@ -815,6 +815,10 @@ else if (
             handleConfirmationChange
           }
 
+          onUserClick={
+            handleUserClick
+          }
+
         />
 
       </>

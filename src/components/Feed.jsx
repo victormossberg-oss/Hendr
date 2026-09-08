@@ -3,7 +3,8 @@ import EventCard from "./EventCard";
 function Feed({
   events,
   onEventClick,
-  onConfirmationChange
+  onConfirmationChange,
+  onUserClick
 }) {
   return (
     <main className="feed">
@@ -21,6 +22,10 @@ function Feed({
 
           onConfirmationChange={
             onConfirmationChange
+          }
+
+          onUserClick={
+            onUserClick
           }
         />
 
