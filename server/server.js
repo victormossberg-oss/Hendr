@@ -1804,7 +1804,7 @@ app.post(
               user.username,
 
             email:
-              user.email
+              user.email,
 
             role:
               user.role
