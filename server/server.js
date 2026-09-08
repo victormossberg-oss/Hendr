@@ -1606,6 +1606,13 @@ app.post(
     }
   );
 
+  console.log(
+  "JWT skapad för:",
+  user.userid,
+  user.username,
+  user.role
+);
+
 
       // =========================
       // SVARA
@@ -1752,7 +1759,7 @@ app.post(
 
       const user =
         result.rows[0];
-        
+
         console.log("Användare från databasen:", {
   userid: user.userid,
   username: user.username,
