@@ -303,12 +303,16 @@ function EventDetail({
                 <article className="observation-item" key={observation.id}>
                   <div className="observation-item-top">
                     <button
-                      type="button"
-                      className="observation-user"
-                      onClick={() => onUserClick?.(observation.userID)}
-                    >
-                      {observation.username || "Användare"}
-                    </button>
+  type="button"
+  className="observation-user"
+  onClick={() =>
+    onUserClick?.(
+      observation.userID ?? observation.userid
+    )
+  }
+>
+  {observation.username || "Användare"}
+</button>
                     <span>{formatRelativeTime(observation.createdAt)}</span>
                   </div>
                   <p>{observation.description}</p>
