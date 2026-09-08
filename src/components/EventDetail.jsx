@@ -223,6 +223,22 @@ function EventDetail({
   </button>
 )}
 
+{event.username && (
+  <div className="detail-created-by">
+    <span>Skapad av</span>
+    <button
+      type="button"
+      onClick={() =>
+        onUserClick?.(
+          event.userid ?? event.userID
+        )
+      }
+    >
+      {event.username}
+    </button>
+  </div>
+)}
+
         <div className="detail-stat-row">
           <button
             type="button"

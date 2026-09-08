@@ -1417,6 +1417,30 @@
   text-decoration: underline;
 }
 
+.detail-created-by {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: -20px;
+  margin-bottom: 28px;
+  font-size: 14px;
+  color: #888;
+}
+
+.detail-created-by button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: #596f78;
+  cursor: pointer;
+}
+
+.detail-created-by button:hover {
+  text-decoration: underline;
+}
+
 
 /* =========================================================
    HENDR MOCKUP / REDESIGN
