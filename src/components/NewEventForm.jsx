@@ -27,25 +27,74 @@ function NewEventForm({ onCreateEvent }) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [locationStatus, setLocationStatus] = useState("Hämtar din position...");
+  const [locationName, setLocationName] = useState("");
+  const [locationStatus, setLocationStatus] = useState(
+    "Hämtar din position..."
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
+  async function getLocationName(latitude, longitude) {
+    try {
+      const response = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=sv`
+      );
+
+      if (!response.ok) {
+        throw new Error("Kunde inte hämta platsnamn.");
+      }
+
+      const data = await response.json();
+
+      return (
+        data.city ||
+        data.locality ||
+        data.principalSubdivision ||
+        null
+      );
+    } catch (error) {
+      console.error("Kunde inte hämta platsnamn:", error);
+      return null;
+    }
+  }
+
+  async function handlePosition(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    setLatitude(latitude);
+    setLongitude(longitude);
+    setLocationStatus("Hämtar plats...");
+
+    const locationName = await getLocationName(
+      latitude,
+      longitude
+    );
+
+    setLocationName(locationName || "");
+
+    if (locationName) {
+      setLocationStatus(locationName);
+    } else {
+      setLocationStatus("Din nuvarande position");
+    }
+  }
+
   useEffect(() => {
     if (!navigator.geolocation) {
-      setLocationStatus("Platsdelning stöds inte i denna webbläsare.");
+      setLocationStatus(
+        "Platsdelning stöds inte i denna webbläsare."
+      );
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        setLocationStatus("Din nuvarande position");
-      },
+      handlePosition,
       () => {
-        setLocationStatus("Kunde inte hämta din position");
+        setLocationStatus(
+          "Kunde inte hämta din position"
+        );
       },
       {
         enableHighAccuracy: true,
@@ -57,7 +106,9 @@ function NewEventForm({ onCreateEvent }) {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
   }, [previewUrl]);
 
@@ -67,13 +118,11 @@ function NewEventForm({ onCreateEvent }) {
     setLocationStatus("Hämtar din position...");
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        setLocationStatus("Din nuvarande position");
-      },
+      handlePosition,
       () => {
-        setLocationStatus("Kunde inte hämta din position");
+        setLocationStatus(
+          "Kunde inte hämta din position"
+        );
       },
       {
         enableHighAccuracy: true,
@@ -87,7 +136,9 @@ function NewEventForm({ onCreateEvent }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
 
     setImage(file);
     setPreviewUrl(URL.createObjectURL(file));
@@ -108,8 +159,11 @@ function NewEventForm({ onCreateEvent }) {
     }
 
     const token = localStorage.getItem("hendr_token");
+
     if (!token) {
-      setError("Du måste vara inloggad för att publicera.");
+      setError(
+        "Du måste vara inloggad för att publicera."
+      );
       return;
     }
 
@@ -117,35 +171,81 @@ function NewEventForm({ onCreateEvent }) {
 
     try {
       const formData = new FormData();
-      formData.append("title", title.trim());
-      formData.append("description", description.trim());
-      formData.append("category", category);
-      formData.append("status", "Aktiv");
-      formData.append("latitude", latitude === "" ? "" : latitude);
-      formData.append("longitude", longitude === "" ? "" : longitude);
+
+      formData.append(
+        "title",
+        title.trim()
+      );
+
+      formData.append(
+        "description",
+        description.trim()
+      );
+
+      formData.append(
+        "category",
+        category
+      );
+
+      formData.append(
+        "status",
+        "Aktiv"
+      );
+
+      formData.append(
+        "latitude",
+        latitude === "" ? "" : latitude
+      );
+
+      formData.append(
+        "longitude",
+        longitude === "" ? "" : longitude
+      );
+
+      formData.append(
+        "location",
+        locationName || ""
+      );
 
       if (image) {
-        formData.append("image", image);
+        formData.append(
+          "image",
+          image
+        );
       }
 
-      const response = await fetch(`${API_URL}/api/events`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_URL}/api/events`,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Kunde inte publicera händelsen.");
+        throw new Error(
+          data.message ||
+            "Kunde inte publicera händelsen."
+        );
       }
 
       onCreateEvent?.(data);
+
     } catch (error) {
-      console.error("Fel vid skapande av händelse:", error);
+      console.error(
+        "Fel vid skapande av händelse:",
+        error
+      );
+
       setError(error.message);
+
     } finally {
       setLoading(false);
     }
@@ -153,7 +253,10 @@ function NewEventForm({ onCreateEvent }) {
 
   return (
     <main className="new-event-page">
-      <form className="new-event-form" onSubmit={handleSubmit}>
+      <form
+        className="new-event-form"
+        onSubmit={handleSubmit}
+      >
         <div className="new-event-topbar">
           <button
             type="button"
@@ -169,54 +272,95 @@ function NewEventForm({ onCreateEvent }) {
           <p>Dela det du ser med andra.</p>
         </div>
 
-        <section className="category-grid" aria-label="Kategori">
-          {CATEGORIES.map(({ name, Icon }) => (
-            <button
-              key={name}
-              type="button"
-              className={`category-option ${category === name ? "selected" : ""}`}
-              onClick={() => setCategory(name)}
-            >
-              <Icon size={30} strokeWidth={2.2} />
-              <span>{name}</span>
-            </button>
-          ))}
+        <section
+          className="category-grid"
+          aria-label="Kategori"
+        >
+          {CATEGORIES.map(
+            ({ name, Icon }) => (
+              <button
+                key={name}
+                type="button"
+                className={`category-option ${
+                  category === name
+                    ? "selected"
+                    : ""
+                }`}
+                onClick={() =>
+                  setCategory(name)
+                }
+              >
+                <Icon
+                  size={30}
+                  strokeWidth={2.2}
+                />
+                <span>{name}</span>
+              </button>
+            )
+          )}
         </section>
 
-        <label className="form-label" htmlFor="event-description">
+        <label
+          className="form-label"
+          htmlFor="event-description"
+        >
           Beskriv kort vad som händer
         </label>
+
         <textarea
           id="event-description"
           value={description}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={(event) =>
+            setDescription(
+              event.target.value
+            )
+          }
           placeholder="T.ex. rök från en byggnad, köer på E4, konsert i parken..."
           rows={3}
           required
         />
 
-        <label className="form-label" htmlFor="event-title">
+        <label
+          className="form-label"
+          htmlFor="event-title"
+        >
           Rubrik
         </label>
+
         <input
           id="event-title"
           type="text"
           value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(event) =>
+            setTitle(event.target.value)
+          }
           placeholder="T.ex. Brand i byggnad"
           maxLength={100}
           required
         />
 
-        <div className="form-label location-label">Plats</div>
+        <div className="form-label location-label">
+          Plats
+        </div>
+
         <button
           type="button"
-          className={`location-row ${latitude !== "" ? "selected" : ""}`}
+          className={`location-row ${
+            latitude !== ""
+              ? "selected"
+              : ""
+          }`}
           onClick={getCurrentLocation}
         >
           <Navigation size={24} />
-          <span>{locationStatus}</span>
-          <span className="location-change">Ändra</span>
+
+          <span>
+            {locationStatus}
+          </span>
+
+          <span className="location-change">
+            Ändra
+          </span>
         </button>
 
         <input
@@ -230,21 +374,45 @@ function NewEventForm({ onCreateEvent }) {
 
         <button
           type="button"
-          className={`image-upload-row ${previewUrl ? "has-image" : ""}`}
-          onClick={() => fileInputRef.current?.click()}
+          className={`image-upload-row ${
+            previewUrl
+              ? "has-image"
+              : ""
+          }`}
+          onClick={() =>
+            fileInputRef.current?.click()
+          }
         >
           {previewUrl ? (
-            <img src={previewUrl} alt="Förhandsvisning" />
+            <img
+              src={previewUrl}
+              alt="Förhandsvisning"
+            />
           ) : (
             <Camera size={27} />
           )}
-          <span>{previewUrl ? "Byt bild" : "Lägg till bild (valfritt)"}</span>
+
+          <span>
+            {previewUrl
+              ? "Byt bild"
+              : "Lägg till bild (valfritt)"}
+          </span>
         </button>
 
-        {error && <p className="form-error">{error}</p>}
+        {error && (
+          <p className="form-error">
+            {error}
+          </p>
+        )}
 
-        <button className="publish-button" type="submit" disabled={loading}>
-          {loading ? "Publicerar..." : "Publicera"}
+        <button
+          className="publish-button"
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? "Publicerar..."
+            : "Publicera"}
         </button>
       </form>
     </main>

@@ -353,10 +353,8 @@ app.post(
       );
 
 
-      const locationName = await getLocationName(
-  parsedLatitude,
-  parsedLongitude
-);
+      const locationName =
+  req.body.location?.trim() || null;
 
 const result =
   await pool.query(
