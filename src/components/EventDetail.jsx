@@ -265,15 +265,22 @@ function EventDetail({
         </div>
 
         {event.latitude != null && event.longitude != null && (
-          <div className="detail-map-placeholder">
-            <div className="detail-map-grid" />
-            <div className="detail-map-label">
-              <MapPin size={18} />
-              {event.location || "Plats"}
-            </div>
-            <div className="detail-map-pin" />
-          </div>
-        )}
+  <button
+    type="button"
+    className="detail-map-placeholder"
+    onClick={() => onLocationClick?.(event)}
+    aria-label={`Visa ${event.location || "platsen"} på kartan`}
+  >
+    <div className="detail-map-grid" />
+
+    <div className="detail-map-label">
+      <MapPin size={18} />
+      {event.location || "Plats"}
+    </div>
+
+    <div className="detail-map-pin" />
+  </button>
+)}
 
         <div className="latest-observations">
           <div className="latest-observations-heading">

@@ -2550,6 +2550,19 @@ button.detail-stat {
   border: 1px solid var(--hendr-border);
   border-radius: 17px;
   background: #DDE8E8;
+  border: none;
+padding: 0;
+font: inherit;
+text-align: left;
+cursor: pointer;
+}
+
+.detail-map-placeholder:hover {
+  opacity: 0.92;
+}
+
+.detail-map-placeholder:active {
+  transform: scale(0.99);
 }
 
 .detail-map-label {
