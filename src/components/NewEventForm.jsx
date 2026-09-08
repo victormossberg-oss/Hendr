@@ -29,8 +29,8 @@ function NewEventForm({ onCreateEvent }) {
   const [longitude, setLongitude] = useState("");
   const [locationName, setLocationName] = useState("");
   const [locationStatus, setLocationStatus] = useState(
-    "Hämtar din position..."
-  );
+  "Min nuvarande plats"
+);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
@@ -81,28 +81,7 @@ function NewEventForm({ onCreateEvent }) {
     }
   }
 
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocationStatus(
-        "Platsdelning stöds inte i denna webbläsare."
-      );
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      handlePosition,
-      () => {
-        setLocationStatus(
-          "Kunde inte hämta din position"
-        );
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000,
-      }
-    );
-  }, []);
+  
 
   useEffect(() => {
     return () => {
