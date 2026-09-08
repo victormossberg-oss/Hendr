@@ -2960,3 +2960,13 @@ button.detail-stat {
   color: var(--hendr-mustard) !important;
   stroke: var(--hendr-mustard) !important;
 }
+
+.detail-menu-wrap {
+  position: relative;
+  z-index: 1000;
+}
+
+.detail-menu {
+  position: absolute;
+  z-index: 1001;
+}
