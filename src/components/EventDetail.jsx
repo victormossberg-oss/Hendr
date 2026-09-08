@@ -135,16 +135,20 @@ function EventDetail({
   }
 
   const canDelete = (() => {
-    const savedUser = localStorage.getItem("hendr_user");
-    if (!savedUser) return false;
+  const savedUser = localStorage.getItem("hendr_user");
+  if (!savedUser) return false;
 
-    try {
-      const user = JSON.parse(savedUser);
-      return String(user.userid) === String(event.userid);
-    } catch {
-      return false;
-    }
-  })();
+  try {
+    const user = JSON.parse(savedUser);
+
+    return (
+      String(user.userid) === String(event.userid) ||
+      user.role === "Admin"
+    );
+  } catch {
+    return false;
+  }
+})();
 
   return (
     <main className="event-detail-page">
