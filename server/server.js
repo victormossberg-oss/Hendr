@@ -366,7 +366,7 @@ const result =
       latitude,
       longitude,
       userid,
-      locationName
+      location
     )
 
     VALUES
