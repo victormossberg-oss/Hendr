@@ -116,13 +116,15 @@ async function getLocationName(
 
 
     return (
-      address.city ||
-      address.town ||
-      address.village ||
-      address.municipality ||
-      address.county ||
-      null
-    );
+  address.city ||
+  address.town ||
+  address.village ||
+  address.municipality ||
+  address.suburb ||
+  address.city_district ||
+  address.county ||
+  null
+);
 
 
   } catch (error) {
@@ -261,33 +263,7 @@ LEFT JOIN EventConfirmations ec
         );
 
 
-      const eventsWithLocation =
-        await Promise.all(
-
-          result.rows.map(
-            async (event) => {
-
-              const location =
-                await getLocationName(
-                  event.latitude,
-                  event.longitude
-                );
-
-
-              return {
-                ...event,
-                location
-              };
-
-            }
-          )
-
-        );
-
-
-      res.json(
-        eventsWithLocation
-      );
+      res.json(result.rows);
 
 
     } catch (error) {
@@ -372,68 +348,77 @@ app.post(
       );
 
 
-      const result =
-        await pool.query(
-          `
-          INSERT INTO Events
-          (
-            title,
-            description,
-            category,
-            status,
-            image_url,
-            latitude,
-            longitude,
-            userid
-          )
+      const location = await getLocationName(
+  parsedLatitude,
+  parsedLongitude
+);
 
-          VALUES
-          (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6,
-            $7,
-            $8
-          )
+const result =
+  await pool.query(
+    `
+    INSERT INTO Events
+    (
+      title,
+      description,
+      category,
+      status,
+      image_url,
+      latitude,
+      longitude,
+      userid,
+      location
+    )
 
-          RETURNING
+    VALUES
+    (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6,
+      $7,
+      $8,
+      $9
+    )
 
-            eventID AS id,
+    RETURNING
 
-            title,
+      eventID AS id,
 
-            description,
+      title,
 
-            category,
+      description,
 
-            status,
+      category,
 
-            created_at AS "createdAt",
+      status,
 
-            image_url AS "imageUrl",
+      created_at AS "createdAt",
 
-            latitude,
+      image_url AS "imageUrl",
 
-            longitude,
+      latitude,
 
-            userid
-          `,
+      longitude,
 
-          [
-            title,
-            description,
-            category,
-            status,
-            imageUrl,
-            parsedLatitude,
-            parsedLongitude,
-            req.user.userid
-          ]
-        );
+      userid,
 
+      location
+    `,
+
+    [
+      title,
+      description,
+      category,
+      status,
+      imageUrl,
+      parsedLatitude,
+      parsedLongitude,
+      req.user.userid,
+      location
+    ]
+  );
 
             const newEvent = result.rows[0];
 
