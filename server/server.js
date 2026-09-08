@@ -1752,6 +1752,12 @@ app.post(
 
       const user =
         result.rows[0];
+        
+        console.log("Användare från databasen:", {
+  userid: user.userid,
+  username: user.username,
+  role: user.role
+});
 
 
       // =========================
