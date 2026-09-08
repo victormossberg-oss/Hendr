@@ -237,6 +237,8 @@ app.get(
 
   e.userid,
 
+  e.location,
+
   u.username AS username,
 
             COUNT(
