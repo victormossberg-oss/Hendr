@@ -416,21 +416,13 @@ const result =
       parsedLatitude,
       parsedLongitude,
       req.user.userid,
-      location
+      locationName
     ]
   );
 
             const newEvent = result.rows[0];
 
-      const location = await getLocationName(
-        newEvent.latitude,
-        newEvent.longitude
-      );
-
-      res.status(201).json({
-        ...newEvent,
-        location
-      });
+res.status(201).json(newEvent);
 
 
     } catch (error) {
