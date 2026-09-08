@@ -435,9 +435,17 @@ app.post(
         );
 
 
-      res.status(201).json(
-        result.rows[0]
+            const newEvent = result.rows[0];
+
+      const location = await getLocationName(
+        newEvent.latitude,
+        newEvent.longitude
       );
+
+      res.status(201).json({
+        ...newEvent,
+        location
+      });
 
 
     } catch (error) {

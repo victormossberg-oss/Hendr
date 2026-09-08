@@ -1,401 +1,192 @@
 import { useEffect, useState } from "react";
 import {
-  Eye,
-  ShieldCheck
+  CarFront,
+  Check,
+  ChevronRight,
+  Flame,
+  MapPin,
+  MessageCircle,
+  MoreHorizontal,
+  TriangleAlert,
+  Users,
 } from "lucide-react";
-
 import { API_URL } from "../config";
 
-function EventCard({
-  event,
-  onClick,
-  onConfirmationChange
-}) {
+const CATEGORY_ICONS = {
+  Brand: Flame,
+  Trafik: CarFront,
+  Olycka: TriangleAlert,
+  Event: Users,
+  Annat: MoreHorizontal,
+};
 
-  const [confirmed, setConfirmed] =
-    useState(false);
+function getCategoryIcon(category) {
+  return CATEGORY_ICONS[category] || MoreHorizontal;
+}
 
-  const [confirmationCount, setConfirmationCount] =
-    useState(
-      Number(event.confirmationCount) || 0
-    );
+function formatRelativeTime(dateValue) {
+  if (!dateValue) return "";
 
-  const [confirming, setConfirming] =
-    useState(false);
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
 
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
 
-  // =========================
-  // KONTROLLERA BEKRÄFTELSE
-  // =========================
+  if (seconds < 60) return "Just nu";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} min sedan`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)} h sedan`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)} d sedan`;
+
+  return date.toLocaleDateString("sv-SE", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function EventCard({ event, onClick, onConfirmationChange }) {
+  const [confirmed, setConfirmed] = useState(false);
+  const [confirmationCount, setConfirmationCount] = useState(
+    Number(event.confirmationCount) || 0
+  );
+  const [confirming, setConfirming] = useState(false);
+
+  const CategoryIcon = getCategoryIcon(event.category);
 
   useEffect(() => {
+    setConfirmationCount(Number(event.confirmationCount) || 0);
+  }, [event.confirmationCount]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hendr_token");
+    if (!token) return;
 
     async function checkConfirmation() {
-
       try {
-
-        const token =
-          localStorage.getItem(
-            "hendr_token"
-          );
-
-
-        // =========================
-        // INTE INLOGGAD
-        // =========================
-
-        if (!token) {
-
-          setConfirmed(false);
-
-          return;
-
-        }
-
-
-        const response =
-          await fetch(
-            `${API_URL}/api/events/${event.id}/confirmation`,
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
-            }
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Kunde inte kontrollera bekräftelsen"
-          );
-
-        }
-
-
-        const data =
-          await response.json();
-
-
-        setConfirmed(
-          data.confirmed
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Fel vid kontroll av bekräftelse:",
-          error
-        );
-
-      }
-
-    }
-
-
-    checkConfirmation();
-
-  }, [event.id]);
-
-
-  // =========================
-  // BEKRÄFTA / TA BORT
-  // BEKRÄFTELSE
-  // =========================
-
-  async function handleConfirm(e) {
-
-    e.stopPropagation();
-
-
-    if (confirming) {
-      return;
-    }
-
-
-    try {
-
-      const token =
-        localStorage.getItem(
-          "hendr_token"
-        );
-
-
-      // =========================
-      // KONTROLLERA LOGIN
-      // =========================
-
-      if (!token) {
-
-        alert(
-          "Du måste vara inloggad för att bekräfta en händelse."
-        );
-
-        return;
-
-      }
-
-
-      setConfirming(true);
-
-
-      const response =
-        await fetch(
-          `${API_URL}/api/events/${event.id}/confirm`,
+        const response = await fetch(
+          `${API_URL}/api/events/${event.id}/confirmation`,
           {
-            method: "POST",
-
             headers: {
-              Authorization:
-                `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
+        if (!response.ok) return;
 
-      if (!response.ok) {
-
-        const errorData =
-          await response.json()
-            .catch(() => null);
-
-
-        throw new Error(
-          errorData?.message ||
-          "Kunde inte ändra bekräftelsen"
-        );
-
+        const data = await response.json();
+        setConfirmed(Boolean(data.confirmed));
+      } catch (error) {
+        console.error("Fel vid kontroll av bekräftelse:", error);
       }
-
-
-      const data =
-        await response.json();
-
-
-      console.log(
-        "Bekräftelse ändrad:",
-        data
-      );
-
-
-      // =========================
-      // UPPDATERA STATUS
-      // =========================
-
-      setConfirmed(
-        data.confirmed
-      );
-
-
-      // =========================
-      // UPPDATERA RÄKNARE
-      // =========================
-
-      setConfirmationCount(
-        (current) =>
-          data.confirmed
-            ? current + 1
-            : Math.max(
-                0,
-                current - 1
-              )
-      );
-
-
-      // =========================
-      // SYNKA APP.JSX
-      // =========================
-
-      if (onConfirmationChange) {
-
-        onConfirmationChange(
-          event.id,
-          data.confirmed
-        );
-
-      }
-
-
-    } catch (error) {
-
-      console.error(
-        "Fel vid ändring av bekräftelse:",
-        error
-      );
-
-
-    } finally {
-
-      setConfirming(false);
-
     }
 
+    checkConfirmation();
+  }, [event.id]);
+
+  async function handleConfirmation(e) {
+    e.stopPropagation();
+
+    const token = localStorage.getItem("hendr_token");
+
+    if (!token) {
+      alert("Du måste vara inloggad för att bekräfta en händelse.");
+      return;
+    }
+
+    if (confirming) return;
+    setConfirming(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/events/${event.id}/confirm`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Kunde inte ändra bekräftelsen.");
+      }
+
+      const nextConfirmed = Boolean(data.confirmed);
+      setConfirmed(nextConfirmed);
+      setConfirmationCount((current) =>
+        nextConfirmed ? current + 1 : Math.max(0, current - 1)
+      );
+
+      onConfirmationChange?.(event.id, nextConfirmed);
+    } catch (error) {
+      console.error("Fel vid bekräftelse:", error);
+      alert(error.message);
+    } finally {
+      setConfirming(false);
+    }
   }
 
-
   return (
+    <article className="event-card" onClick={onClick}>
+      <div className="event-card-media">
+        {event.imageUrl ? (
+          <img src={event.imageUrl} alt="" />
+        ) : (
+          <div className="event-card-media-placeholder">
+            <CategoryIcon size={30} />
+          </div>
+        )}
 
-    <article
-      className="event-card"
-      onClick={onClick}
-    >
+        <div className={`event-badge event-badge-${event.category?.toLowerCase()}`}>
+          <CategoryIcon size={17} strokeWidth={2.5} />
+          <span>{event.category || "Annat"}</span>
+        </div>
 
-
-      {/* =========================
-          EVENT-IKON
-      ========================= */}
-
-      <div
-        className="event-icon"
-        style={{
-          backgroundColor:
-            `${event.color || "#6c4ce8"}20`,
-
-          color:
-            event.color ||
-            "#6c4ce8"
-        }}
-      >
-        ●
+        <span className="event-time-badge">
+          {formatRelativeTime(event.createdAt)}
+        </span>
       </div>
 
-
-      <div className="event-content">
-
-
-        {/* =========================
-            HEADER
-        ========================= */}
-
-        <div className="event-header">
-
-          <span className="event-category">
-            {event.category}
-          </span>
-
-          <span className="event-time">
-
-            {event.createdAt
-              ? new Date(
-                  event.createdAt
-                ).toLocaleString(
-                  "sv-SE"
-                )
-              : ""}
-
-          </span>
-
+      <div className="event-card-body">
+        <div className="event-card-heading">
+          <div>
+            <h2>{event.title}</h2>
+            <div className="event-location">
+  <MapPin size={15} />
+  <span>{event.location}</span>
+</div>
+          </div>
+          <ChevronRight className="event-card-chevron" size={22} />
         </div>
 
-
-        {/* =========================
-            TITEL
-        ========================= */}
-
-        <h2>
-          {event.title}
-        </h2>
-
-
-        {/* =========================
-            PLATS
-        ========================= */}
-
-        <div className="event-location">
-
-          📍 {event.location || "Okänd plats"}
-
-        </div>
-
-
-        {/* =========================
-            BESKRIVNING
-        ========================= */}
-
-        <p>
-          {event.description}
-        </p>
-
-
-        {/* =========================
-            STATISTIK
-        ========================= */}
+        {event.description && (
+          <p className="event-description">{event.description}</p>
+        )}
 
         <div className="event-stats">
-
-
-          {/* OBSERVATIONER */}
-
-          <span>
-
-            <Eye />
-
-            {event.observationCount}
-
-          </span>
-
-
-          {/* BEKRÄFTELSER */}
-
           <button
-            className={`feed-confirmation ${
-              confirmed
-                ? "confirmed"
-                : ""
-            }`}
-
-            onClick={
-              handleConfirm
-            }
-
-            disabled={
-              confirming
-            }
-
-            title={
-              confirmed
-                ? "Ta bort din bekräftelse"
-                : "Bekräfta händelsen"
-            }
+            type="button"
+            className={`event-confirmation-stat ${confirmed ? "confirmed" : ""}`}
+            onClick={handleConfirmation}
+            disabled={confirming}
           >
-
-            <ShieldCheck />
-
-            {confirmationCount}
-
+            <span className="confirmation-icon">
+              <Check size={15} strokeWidth={3} />
+            </span>
+            <span>{confirmationCount}</span>
+            <span>bekräftelser</span>
           </button>
 
-
+          <span>
+            <MessageCircle size={17} />
+            {Number(event.observationCount) || 0} observationer
+          </span>
         </div>
-
-
       </div>
-
-
-      {/* =========================
-          BILD
-      ========================= */}
-
-      {event.imageUrl && (
-
-        <div className="event-image">
-
-          <img
-            src={event.imageUrl}
-            alt=""
-          />
-
-        </div>
-
-      )}
-
-
     </article>
-
   );
-
 }
 
 export default EventCard;

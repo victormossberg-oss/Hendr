@@ -1,419 +1,253 @@
-import { useState } from "react";
-import { Image } from "lucide-react";
-import LocationPicker from "./LocationPicker";
+import { useEffect, useRef, useState } from "react";
+import {
+  CarFront,
+  Flame,
+  MapPin,
+  Navigation,
+  MoreHorizontal,
+  TriangleAlert,
+  Users,
+  Camera,
+} from "lucide-react";
 import { API_URL } from "../config";
 
+const CATEGORIES = [
+  { name: "Brand", Icon: Flame },
+  { name: "Trafik", Icon: CarFront },
+  { name: "Olycka", Icon: TriangleAlert },
+  { name: "Event", Icon: Users },
+  { name: "Annat", Icon: MoreHorizontal },
+];
+
 function NewEventForm({ onCreateEvent }) {
+  const [category, setCategory] = useState("Brand");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [locationStatus, setLocationStatus] = useState("Hämtar din position...");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
-  const [title, setTitle] =
-    useState("");
-
-  const [category, setCategory] =
-    useState("Evenemang");
-
-  const [description, setDescription] =
-    useState("");
-
-  const [location, setLocation] =
-    useState(null);
-
-  const [image, setImage] =
-    useState(null);
-
-  const [imageFile, setImageFile] =
-    useState(null);
-
-  const [submitting, setSubmitting] =
-    useState(false);
-
-
-  // =========================
-  // BILD
-  // =========================
-
-  function handleImageChange(e) {
-
-    const file =
-      e.target.files[0];
-
-    if (!file) {
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus("Platsdelning stöds inte i denna webbläsare.");
       return;
     }
 
-    const imageUrl =
-      URL.createObjectURL(file);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setLocationStatus("Din nuvarande position");
+      },
+      () => {
+        setLocationStatus("Kunde inte hämta din position");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  }, []);
 
-    setImage(imageUrl);
-    setImageFile(file);
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
+  function getCurrentLocation() {
+    if (!navigator.geolocation) return;
+
+    setLocationStatus("Hämtar din position...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setLocationStatus("Din nuvarande position");
+      },
+      () => {
+        setLocationStatus("Kunde inte hämta din position");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
   }
 
+  function handleImageChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  // =========================
-  // SKAPA HÄNDELSE
-  // =========================
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
 
-  async function handleSubmit(e) {
+    setImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  }
 
-    e.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError("");
 
-    if (submitting) {
+    if (!title.trim()) {
+      setError("Skriv en rubrik för händelsen.");
       return;
     }
+
+    if (!description.trim()) {
+      setError("Beskriv kort vad som händer.");
+      return;
+    }
+
+    const token = localStorage.getItem("hendr_token");
+    if (!token) {
+      setError("Du måste vara inloggad för att publicera.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("description", description.trim());
+      formData.append("category", category);
+      formData.append("status", "Aktiv");
+      formData.append("latitude", latitude === "" ? "" : latitude);
+      formData.append("longitude", longitude === "" ? "" : longitude);
 
-      setSubmitting(true);
-
-      const formData =
-        new FormData();
-
-
-      // =========================
-      // HÄNDELSEDATA
-      // =========================
-
-      formData.append(
-        "title",
-        title
-      );
-
-      formData.append(
-        "description",
-        description
-      );
-
-      formData.append(
-        "category",
-        category
-      );
-
-      formData.append(
-        "status",
-        "Aktiv"
-      );
-
-
-      // =========================
-      // KOORDINATER
-      // =========================
-
-      if (location) {
-
-        formData.append(
-          "latitude",
-          location.latitude
-        );
-
-        formData.append(
-          "longitude",
-          location.longitude
-        );
-
+      if (image) {
+        formData.append("image", image);
       }
 
+      const response = await fetch(`${API_URL}/api/events`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
-      // =========================
-      // BILD
-      // =========================
-
-      if (imageFile) {
-
-        formData.append(
-          "image",
-          imageFile
-        );
-
-      }
-
-
-      // =========================
-      // API
-      // =========================
-
-      const token =
-        localStorage.getItem(
-          "hendr_token"
-        );
-
-
-      const response =
-        await fetch(
-          `${API_URL}/api/events`,
-          {
-            method: "POST",
-
-            headers: {
-
-              Authorization:
-                `Bearer ${token}`
-
-            },
-
-            body: formData
-
-          }
-        );
-
+      const data = await response.json();
 
       if (!response.ok) {
-
-        const errorData =
-          await response.json()
-            .catch(() => null);
-
-        throw new Error(
-          errorData?.message ||
-          "Kunde inte skapa händelsen"
-        );
-
+        throw new Error(data.message || "Kunde inte publicera händelsen.");
       }
 
-
-      const newEvent =
-        await response.json();
-
-
-      console.log(
-        "Ny händelse:",
-        newEvent
-      );
-
-
-      onCreateEvent(
-        newEvent
-      );
-
-
+      onCreateEvent?.(data);
     } catch (error) {
-
-      console.error(
-        "Fel vid skapande av händelse:",
-        error
-      );
-
-      setSubmitting(false);
-
+      console.error("Fel vid skapande av händelse:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-
   }
 
-
   return (
-
-    <main className="observation-page">
-
-      <div className="observation-content">
-
-        <span className="event-category">
-          Ny händelse
-        </span>
-
-
-        <h1>
-          Vad händer?
-        </h1>
-
-
-        <p className="observation-intro">
-          Skapa en ny händelse som andra
-          kan upptäcka.
-        </p>
-
-
-        <form
-          onSubmit={handleSubmit}
-        >
-
-
-          {/* =========================
-              RUBRIK
-          ========================= */}
-
-          <label htmlFor="title">
-            Rubrik
-          </label>
-
-
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) =>
-              setTitle(e.target.value)
-            }
-            placeholder="Ex. Livemusik på Almedalen"
-            required
-            disabled={submitting}
-          />
-
-
-          {/* =========================
-              KATEGORI
-          ========================= */}
-
-          <label htmlFor="category">
-            Kategori
-          </label>
-
-
-          <select
-            id="category"
-            value={category}
-            onChange={(e) =>
-              setCategory(e.target.value)
-            }
-            disabled={submitting}
-          >
-
-            <option value="Evenemang">
-              Evenemang
-            </option>
-
-            <option value="Nöje">
-              Nöje
-            </option>
-
-            <option value="Sport">
-              Sport
-            </option>
-
-            <option value="Trafik">
-              Trafik
-            </option>
-
-            <option value="Natur">
-              Natur
-            </option>
-
-            <option value="Mat & dryck">
-              Mat & dryck
-            </option>
-
-            <option value="Övrigt">
-              Övrigt
-            </option>
-
-          </select>
-
-
-          {/* =========================
-              BESKRIVNING
-          ========================= */}
-
-          <label htmlFor="description">
-            Beskrivning
-          </label>
-
-
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) =>
-              setDescription(
-                e.target.value
-              )
-            }
-            placeholder="Berätta vad som händer..."
-            rows="6"
-            required
-            disabled={submitting}
-          />
-
-
-          {/* =========================
-              BILD
-          ========================= */}
-
-          <label
-            className={`image-upload ${
-              submitting
-                ? "disabled"
-                : ""
-            }`}
-          >
-
-            {image ? (
-
-              <img
-                src={image}
-                alt="Förhandsvisning"
-              />
-
-            ) : (
-
-              <>
-                <Image />
-
-                <span>
-                  Lägg till bild
-                </span>
-              </>
-
-            )}
-
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={
-                handleImageChange
-              }
-              disabled={submitting}
-            />
-
-          </label>
-
-
-          {/* =========================
-              PLATS
-          ========================= */}
-
-          <label>
-            Plats
-          </label>
-
-
-          <LocationPicker
-            onLocationChange={(
-              newLocation
-            ) => {
-
-              if (submitting) {
-                return;
-              }
-
-              setLocation(
-                newLocation
-              );
-
-            }}
-          />
-
-
-          {/* =========================
-              SKAPA
-          ========================= */}
-
+    <main className="new-event-page">
+      <form className="new-event-form" onSubmit={handleSubmit}>
+        <div className="new-event-topbar">
           <button
-            type="submit"
-            className="submit-observation"
-            disabled={submitting}
+            type="button"
+            className="new-event-cancel"
+            onClick={() => window.history.back()}
           >
-
-            {submitting
-              ? "Laddar upp..."
-              : "Skapa händelse"}
-
+            Avbryt
           </button>
+        </div>
 
+        <div className="new-event-heading">
+          <h1>Vad har du sett?</h1>
+          <p>Dela det du ser med andra.</p>
+        </div>
 
-        </form>
+        <section className="category-grid" aria-label="Kategori">
+          {CATEGORIES.map(({ name, Icon }) => (
+            <button
+              key={name}
+              type="button"
+              className={`category-option ${category === name ? "selected" : ""}`}
+              onClick={() => setCategory(name)}
+            >
+              <Icon size={30} strokeWidth={2.2} />
+              <span>{name}</span>
+            </button>
+          ))}
+        </section>
 
-      </div>
+        <label className="form-label" htmlFor="event-description">
+          Beskriv kort vad som händer
+        </label>
+        <textarea
+          id="event-description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          placeholder="T.ex. rök från en byggnad, köer på E4, konsert i parken..."
+          rows={3}
+          required
+        />
 
+        <label className="form-label" htmlFor="event-title">
+          Rubrik
+        </label>
+        <input
+          id="event-title"
+          type="text"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="T.ex. Brand i byggnad"
+          maxLength={100}
+          required
+        />
+
+        <div className="form-label location-label">Plats</div>
+        <button
+          type="button"
+          className={`location-row ${latitude !== "" ? "selected" : ""}`}
+          onClick={getCurrentLocation}
+        >
+          <Navigation size={24} />
+          <span>{locationStatus}</span>
+          <span className="location-change">Ändra</span>
+        </button>
+
+        <input
+          ref={fileInputRef}
+          className="visually-hidden"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={{ display: "none" }}
+        />
+
+        <button
+          type="button"
+          className={`image-upload-row ${previewUrl ? "has-image" : ""}`}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {previewUrl ? (
+            <img src={previewUrl} alt="Förhandsvisning" />
+          ) : (
+            <Camera size={27} />
+          )}
+          <span>{previewUrl ? "Byt bild" : "Lägg till bild (valfritt)"}</span>
+        </button>
+
+        {error && <p className="form-error">{error}</p>}
+
+        <button className="publish-button" type="submit" disabled={loading}>
+          {loading ? "Publicerar..." : "Publicera"}
+        </button>
+      </form>
     </main>
-
   );
 }
 

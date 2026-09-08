@@ -1,612 +1,314 @@
+import { useEffect, useState } from "react";
 import {
-  Eye,
-  ShieldCheck
+  Check,
+  ChevronLeft,
+  MapPin,
+  MessageCircle,
+  MoreHorizontal,
+  Share2,
 } from "lucide-react";
-
-import {
-  useEffect,
-  useState
-} from "react";
-
 import { API_URL } from "../config";
-import LocationDisplay from "./LocationDisplay";
 
+function formatRelativeTime(dateValue) {
+  if (!dateValue) return "";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (seconds < 60) return "Just nu";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} min sedan`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)} h sedan`;
+  return `${Math.floor(seconds / 86400)} d sedan`;
+}
 
 function EventDetail({
   event,
   observations,
   onAddObservation,
   onDelete,
-  onUserClick
+  onUserClick,
+  onBack,
 }) {
-
-  async function handleDelete() {
-
-  const confirmed =
-    window.confirm(
-      "Är du säker på att du vill ta bort denna händelse?"
-    );
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  try {
-
-    const token =
-      localStorage.getItem(
-        "hendr_token"
-      );
-
-
-    if (!token) {
-
-      alert(
-        "Du måste vara inloggad för att ta bort en händelse."
-      );
-
-      return;
-
-    }
-
-
-    const response =
-      await fetch(
-        `${API_URL}/api/events/${event.id}`,
-        {
-          method: "DELETE",
-
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-
-      const errorData =
-        await response.json()
-          .catch(() => null);
-
-      throw new Error(
-        errorData?.message ||
-        "Kunde inte ta bort händelsen"
-      );
-
-    }
-
-
-    onDelete(event.id);
-
-
-  } catch (error) {
-
-    console.error(
-      "Fel vid borttagning av händelse:",
-      error
-    );
-
-    alert(
-      error.message ||
-      "Kunde inte ta bort händelsen."
-    );
-
-  }
-
-}
-  
-
-  // =========================
-  // BEKRÄFTELSE
-  // =========================
-
-  const [confirmed, setConfirmed] =
-    useState(false);
-
-  const [confirmationCount, setConfirmationCount] =
-    useState(
-      Number(event.confirmationCount) || 0
-    );
-
-  const [confirming, setConfirming] =
-    useState(false);
-
-
-  // =========================
-  // KONTROLLERA OM
-  // ANVÄNDAREN HAR BEKRÄFTAT
-  // =========================
+  const [confirmed, setConfirmed] = useState(false);
+  const [confirmationCount, setConfirmationCount] = useState(
+    Number(event.confirmationCount) || 0
+  );
+  const [confirming, setConfirming] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    setConfirmationCount(Number(event.confirmationCount) || 0);
+  }, [event.confirmationCount]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hendr_token");
+    if (!token) return;
 
     async function checkConfirmation() {
-
       try {
-
-        const token =
-  localStorage.getItem(
-    "hendr_token"
-  );
-
-
-if (!token) {
-
-  setConfirmed(false);
-
-  return;
-
-}
-
-
-const response =
-  await fetch(
-    `${API_URL}/api/events/${event.id}/confirmation`,
-    {
-      headers: {
-        Authorization:
-          `Bearer ${token}`
-      }
-    }
-  );
-
-        if (!response.ok) {
-          throw new Error(
-            "Kunde inte kontrollera bekräftelsen"
-          );
-        }
-
-        const data =
-          await response.json();
-
-        setConfirmed(
-          data.confirmed
+        const response = await fetch(
+          `${API_URL}/api/events/${event.id}/confirmation`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
+        if (!response.ok) return;
+        const data = await response.json();
+        setConfirmed(Boolean(data.confirmed));
       } catch (error) {
-
-        console.error(
-          "Fel vid kontroll av bekräftelse:",
-          error
-        );
-
+        console.error("Fel vid kontroll av bekräftelse:", error);
       }
-
     }
 
     checkConfirmation();
-
   }, [event.id]);
 
-
-  // =========================
-  // BEKRÄFTA / TA BORT
-  // BEKRÄFTELSE
-  // =========================
-
   async function handleConfirm() {
+    const token = localStorage.getItem("hendr_token");
 
-    if (confirming) {
+    if (!token) {
+      alert("Du måste vara inloggad för att bekräfta en händelse.");
       return;
     }
 
+    if (confirming) return;
+    setConfirming(true);
+
     try {
-
-      setConfirming(true);
-
-
-      const token =
-  localStorage.getItem(
-    "hendr_token"
-  );
-
-
-if (!token) {
-
-  alert(
-    "Du måste vara inloggad för att bekräfta en händelse."
-  );
-
-  return;
-
-}
-
-
-const response = await fetch(
-  `${API_URL}/api/events/${event.id}/confirm`,
-  {
-    method: "POST",
-
-    headers: {
-      Authorization:
-        `Bearer ${token}`
-    }
-  }
-);
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Kunde inte ändra bekräftelsen"
-        );
-
-      }
-
-
-      const data =
-        await response.json();
-
-
-      // =========================
-      // UPPDATERA LOKAL STATUS
-      // =========================
-
-      setConfirmed(
-        data.confirmed
-      );
-
-
-      // =========================
-      // UPPDATERA ANTAL
-      // =========================
-
-      setConfirmationCount(
-        (current) => {
-
-          if (data.confirmed) {
-
-            return current + 1;
-
-          }
-
-          return Math.max(
-            0,
-            current - 1
-          );
-
+      const response = await fetch(
+        `${API_URL}/api/events/${event.id}/confirm`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Kunde inte ändra bekräftelsen.");
+      }
 
-    } catch (error) {
-
-      console.error(
-        "Fel vid ändring av bekräftelse:",
-        error
+      const nextConfirmed = Boolean(data.confirmed);
+      setConfirmed(nextConfirmed);
+      setConfirmationCount((current) =>
+        nextConfirmed ? current + 1 : Math.max(0, current - 1)
       );
-
+    } catch (error) {
+      console.error("Fel vid bekräftelse:", error);
+      alert(error.message);
     } finally {
-
       setConfirming(false);
-
     }
-
   }
 
+  async function handleShare() {
+    const shareData = {
+      title: event.title,
+      text: event.description || `Händelse på HENDR: ${event.title}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Länken har kopierats.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error("Kunde inte dela händelsen:", error);
+      }
+    }
+  }
+
+  function handleDelete() {
+    setMenuOpen(false);
+
+    if (!window.confirm("Vill du ta bort den här händelsen?")) return;
+    onDelete?.(event.id);
+  }
+
+  const canDelete = (() => {
+    const savedUser = localStorage.getItem("hendr_user");
+    if (!savedUser) return false;
+
+    try {
+      const user = JSON.parse(savedUser);
+      return String(user.userid) === String(event.userid);
+    } catch {
+      return false;
+    }
+  })();
 
   return (
+    <main className="event-detail-page">
+      <div className="detail-topbar">
+        <button
+          type="button"
+          className="detail-back-button"
+          onClick={() => {
+            if (onBack) {
+              onBack();
+              return;
+            }
+            window.history.back();
+          }}
+          aria-label="Tillbaka"
+        >
+          <ChevronLeft size={27} />
+        </button>
 
-    <main className="event-detail">
-
-
-
-     
-
-
-      {/* =========================
-          BILD
-      ========================= */}
-
-      {event.imageUrl && (
-
-        <div className="detail-image">
-
-          <img
-            src={event.imageUrl}
-            alt={event.title}
-          />
-
-        </div>
-
-      )}
-
-
-      <div className="detail-content">
-
-
-        {/* =========================
-            HEADER
-        ========================= */}
-
-        <div className="detail-header">
-
-          <span
-            className="event-category"
-            style={{
-              color:
-                event.color ||
-                "#6c4ce8"
-            }}
-          >
-
-            {event.category}
-
-          </span>
-
-
-          <span className="event-time">
-
-            {event.createdAt
-              ? new Date(
-                  event.createdAt
-                ).toLocaleString(
-                  "sv-SE"
-                )
-              : ""}
-
-          </span>
-
-        </div>
-
-
-        {/* =========================
-            TITEL
-        ========================= */}
-
-        <h1>
-  {event.title}
-</h1>
-
-{event.username && (
-
-  <p className="event-author">
-
-    Skapad av{" "}
-
-    <button
-  className="event-author-button"
-  type="button"
-  onClick={() =>
-    onUserClick(event.userid)
-  }
->
-  {event.username}
-</button>
-
-  </p>
-
-)}
-
-
-        {/* =========================
-            PLATS
-        ========================= */}
-
-        {event.latitude != null &&
-          event.longitude != null && (
-
-          <LocationDisplay
-  latitude={event.latitude}
-  longitude={event.longitude}
-  location={event.location}
-/>
-
-        )}
-
-
-        {/* =========================
-            BESKRIVNING
-        ========================= */}
-
-        <p className="detail-description">
-
-          {event.description}
-
-        </p>
-
-
-        {/* =========================
-            STATISTIK
-        ========================= */}
-
-        <div className="detail-stats">
-
-
-          {/* OBSERVATIONER */}
-
-          <div className="detail-stat">
-
-            <Eye />
-
-            <strong>
-              {observations.length}
-            </strong>
-
-            <span>
-
-              {observations.length === 1
-                ? "observation"
-                : "observationer"}
-
-            </span>
-
-          </div>
-
-
-          {/* BEKRÄFTELSER */}
-
+        <div className="detail-menu-wrap">
           <button
-            className={`detail-stat confirmation-stat ${
-              confirmed
-                ? "confirmed"
-                : ""
-            }`}
-
-            onClick={
-              handleConfirm
-            }
-
-            disabled={
-              confirming
-            }
-
-            title={
-              confirmed
-                ? "Ta bort din bekräftelse"
-                : "Bekräfta händelsen"
-            }
+            type="button"
+            className="detail-menu-button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="Fler alternativ"
           >
-
-            <ShieldCheck />
-
-            <strong>
-              {confirmationCount}
-            </strong>
-
-            <span>
-
-              {confirmationCount === 1
-                ? "bekräftelse"
-                : "bekräftelser"}
-
-            </span>
-
+            <MoreHorizontal size={24} />
           </button>
 
-        </div>
-
-
-        {/* =========================
-            TIDSLINJE
-        ========================= */}
-
-        <section className="timeline">
-
-
-          <h2>
-            Tidslinje
-          </h2>
-
-
-          {observations.length === 0 ? (
-
-            <p className="empty-timeline">
-
-              Inga observationer har
-              rapporterats ännu.
-
-            </p>
-
-          ) : (
-
-            observations.map(
-              (observation) => (
-
-                <div
-                  className="timeline-item"
-                  key={
-                    observation.id
-                  }
-                >
-
-
-                  <div className="timeline-dot"></div>
-
-
-                  <div className="timeline-content">
-
-
-                    <div className="timeline-meta">
-
-  <button
-    type="button"
-    className="event-author-button"
-    onClick={() =>
-      onUserClick(observation.userid)
-    }
-  >
-
-    {observation.username || "Användare"}
-
-  </button>
-
-  <span>
-
-    {observation.createdAt
-      ? new Date(
-          observation.createdAt
-        ).toLocaleString("sv-SE")
-      : ""}
-
-  </span>
-
-</div>
-
-
-                    <p>
-
-                      {
-                        observation.description
-                      }
-
-                    </p>
-
-
-                    {/* =========================
-                        OBSERVATIONENS BILD
-                    ========================= */}
-
-                    {observation.imageUrl && (
-
-                      <img
-                        className="observation-image"
-                        src={observation.imageUrl}
-                        alt="Bild från observation"
-                      />
-
-                    )}
-
-                  </div>
-
-                </div>
-
-              )
-            )
-
+          {menuOpen && (
+            <div className="detail-menu">
+              {canDelete && (
+                <button type="button" onClick={handleDelete}>
+                  Ta bort händelse
+                </button>
+              )}
+            </div>
           )}
-
-        </section>
-
-
-        {/* =========================
-            LÄGG TILL OBSERVATION
-        ========================= */}
-
-        <button
-  className="observation-button"
-  onClick={onAddObservation}
->
-  + Lägg till observation
-</button>
-
-<button
-  className="delete-event-button"
-  onClick={handleDelete}
->
-  Ta bort händelse
-</button>
-
-
+        </div>
       </div>
 
+      <div className="detail-hero">
+        {event.imageUrl ? (
+          <img src={event.imageUrl} alt="" />
+        ) : (
+          <div className="detail-hero-placeholder" />
+        )}
+
+        <div className="detail-category-badge">
+          <span className="detail-category-icon">
+            {event.category === "Brand" ? "🔥" : "•"}
+          </span>
+          {event.category || "Annat"}
+        </div>
+
+        <span className="detail-time-badge">
+          {formatRelativeTime(event.createdAt)}
+        </span>
+      </div>
+
+      <section className="detail-content">
+        <h1>{event.title}</h1>
+
+        {event.location && (
+          <div className="detail-location-row">
+            <MapPin size={20} />
+            <span>{event.location}</span>
+          </div>
+        )}
+
+        <div className="detail-stat-row">
+          <button
+            type="button"
+            className={`detail-stat confirmation-detail-stat ${confirmed ? "confirmed" : ""}`}
+            onClick={handleConfirm}
+            disabled={confirming}
+          >
+            <span className="detail-stat-icon check-icon">
+              <Check size={19} strokeWidth={3} />
+            </span>
+            <strong>{confirmationCount}</strong>
+            <span>bekräftelser</span>
+          </button>
+
+          <div className="detail-stat">
+            <MessageCircle className="detail-stat-symbol" size={28} />
+            <strong>{Number(event.observationCount) || observations?.length || 0}</strong>
+            <span>observationer</span>
+          </div>
+
+          <button type="button" className="detail-stat detail-share" onClick={handleShare}>
+            <Share2 size={28} />
+            <span>Dela</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className={`detail-confirm-button ${confirmed ? "confirmed" : ""}`}
+          onClick={handleConfirm}
+          disabled={confirming}
+        >
+          {confirmed ? "Bekräftad" : "Bekräfta detta"}
+        </button>
+
+        <div className="detail-description-section">
+          <h2>Beskrivning</h2>
+          <p>{event.description}</p>
+        </div>
+
+        {event.latitude != null && event.longitude != null && (
+          <div className="detail-map-placeholder">
+            <div className="detail-map-grid" />
+            <div className="detail-map-label">
+              <MapPin size={18} />
+              {event.location || "Plats"}
+            </div>
+            <div className="detail-map-pin" />
+          </div>
+        )}
+
+        <div className="latest-observations">
+          <div className="latest-observations-heading">
+            <h2>Senaste observationer</h2>
+            {observations?.length > 0 && (
+              <button type="button" onClick={onAddObservation}>
+                Lägg till
+              </button>
+            )}
+          </div>
+
+          {observations?.length ? (
+            <div className="observation-list">
+              {observations.map((observation) => (
+                <article className="observation-item" key={observation.id}>
+                  <div className="observation-item-top">
+                    <button
+                      type="button"
+                      className="observation-user"
+                      onClick={() => onUserClick?.(observation.userID)}
+                    >
+                      {observation.username || "Användare"}
+                    </button>
+                    <span>{formatRelativeTime(observation.createdAt)}</span>
+                  </div>
+                  <p>{observation.description}</p>
+                  {observation.imageUrl && (
+                    <img src={observation.imageUrl} alt="" />
+                  )}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-observations">
+              <p>Inga observationer ännu.</p>
+              <button type="button" onClick={onAddObservation}>
+                Lägg till observation
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
     </main>
-
   );
-
 }
-
 
 export default EventDetail;

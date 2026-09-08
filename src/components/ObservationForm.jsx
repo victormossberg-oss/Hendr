@@ -290,6 +290,7 @@ function ObservationForm({
               onChange={
                 handleImageChange
               }
+              style={{ display: "none" }}
               disabled={submitting}
             />
 

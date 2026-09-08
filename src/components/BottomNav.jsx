@@ -1,8 +1,9 @@
 import {
-  House,
+  Bell,
+  Home,
   Map,
-  Bookmark,
-  UserRound
+  Plus,
+  User,
 } from "lucide-react";
 
 function BottomNav({
@@ -10,113 +11,58 @@ function BottomNav({
   onHome,
   onMap,
   onCreateEvent,
-  onProfile
+  onProfile,
+  onNotifications,
 }) {
-
   return (
-
-    <nav className="bottom-nav">
-
-
-      {/* =========================
-          HEM
-      ========================= */}
-
+    <nav className="bottom-nav" aria-label="Huvudnavigation">
       <button
-  className={`nav-item ${
-    currentPage === "home"
-      ? "active"
-      : ""
-  }`}
-  onClick={onHome}
->
-
-        <House className="nav-icon" />
-
-        <span>
-          Hem
-        </span>
-
+        type="button"
+        className={`nav-item ${currentPage === "home" ? "active" : ""}`}
+        onClick={onHome}
+      >
+        <Home size={22} strokeWidth={2.2} />
+        <span>Hem</span>
       </button>
 
-
-      {/* =========================
-          KARTA
-      ========================= */}
-
       <button
-  className={`nav-item ${
-    currentPage === "map"
-      ? "active"
-      : ""
-  }`}
-  onClick={onMap}
->
-
-        <Map className="nav-icon" />
-
-        <span>
-          Karta
-        </span>
-
+        type="button"
+        className={`nav-item ${currentPage === "map" ? "active" : ""}`}
+        onClick={onMap}
+      >
+        <Map size={22} strokeWidth={2.2} />
+        <span>Karta</span>
       </button>
 
-
-      {/* =========================
-          SKAPA
-      ========================= */}
-
       <button
+        type="button"
         className="report-button"
         onClick={onCreateEvent}
+        aria-label="Rapportera"
       >
-        +
+        <Plus size={31} strokeWidth={2.2} />
+        <span>Rapportera</span>
       </button>
 
+      <button
+        type="button"
+        className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
+        onClick={onNotifications}
+      >
+        <Bell size={22} strokeWidth={2.2} />
+        <span>Notiser</span>
+      </button>
 
-      {/* =========================
-    SPARADE
-========================= */}
-
-<button
-  className="nav-item"
->
-  
-  <Bookmark className="nav-icon" />
-
-  <span>
-    Sparade
-  </span>
-
-</button>
-
-
-      {/* =========================
-    PROFIL
-========================= */}
-
-<button
-  className={`nav-item ${
-    currentPage === "profile"
-      ? "active"
-      : ""
-  }`}
-  onClick={onProfile}
->
-
-  <UserRound className="nav-icon" />
-
-  <span>
-    Profil
-  </span>
-
-</button>
-
-
+      <button
+        type="button"
+        className={`nav-item ${currentPage === "profile" ? "active" : ""}`}
+        onClick={onProfile}
+      >
+        <User size={22} strokeWidth={2.2} />
+        <span>Profil</span>
+      </button>
     </nav>
-
   );
-
 }
 
 export default BottomNav;

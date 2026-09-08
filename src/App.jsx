@@ -10,6 +10,9 @@ import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
+import {
+  Search,
+} from "lucide-react";
 
 import "./App.css";
 
@@ -317,18 +320,32 @@ console.log(
   // SKAPA NY HÄNDELSE
   // =========================
 
-  function handleCreateEvent(
-    newEvent
-  ) {
+  async function handleCreateEvent(newEvent) {
+  try {
+    const response = await fetch(`${API_URL}/api/events`);
 
+    if (!response.ok) {
+      throw new Error("Kunde inte uppdatera händelserna.");
+    }
+
+    const data = await response.json();
+
+    setEvents(data);
+  } catch (error) {
+    console.error(
+      "Fel vid uppdatering av händelser:",
+      error
+    );
+
+    // Om hämtningen misslyckas visar vi ändå det nya eventet
     setEvents((current) => [
       newEvent,
       ...current
     ]);
-
-    setCreatingEvent(false);
-
   }
+
+  setCreatingEvent(false);
+}
 
 
   // =========================
@@ -707,23 +724,18 @@ else if (
       <>
 
         <header className="header">
+  <div className="logo">
+    HENDR
+  </div>
 
-          <div className="logo">
-            HENDR
-          </div>
-
-
-          <div className="search">
-
-            🔍
-
-            <span>
-              Sök efter händelser...
-            </span>
-
-          </div>
-
-        </header>
+  <button
+    type="button"
+    className="header-search-button"
+    aria-label="Sök efter händelser"
+  >
+    <Search size={27} strokeWidth={2} />
+  </button>
+</header>
 
 
         <section className="intro">
