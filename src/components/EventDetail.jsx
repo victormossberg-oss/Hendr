@@ -265,21 +265,27 @@ function EventDetail({
         </div>
 
         {event.latitude != null && event.longitude != null && (
-  <button
-    type="button"
-    className="detail-map-placeholder"
-    onClick={() => onLocationClick?.(event)}
-    aria-label={`Visa ${event.location || "platsen"} på kartan`}
-  >
-    <div className="detail-map-grid" />
+  <div
+  className="detail-map-placeholder"
+  onClick={() => onLocationClick?.(event)}
+  role="button"
+  tabIndex={0}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      onLocationClick?.(event);
+    }
+  }}
+  aria-label={`Visa ${event.location || "platsen"} på kartan`}
+>
+  <div className="detail-map-grid" />
 
-    <div className="detail-map-label">
-      <MapPin size={18} />
-      {event.location || "Plats"}
-    </div>
+  <div className="detail-map-label">
+    <MapPin size={18} />
+    {event.location || "Plats"}
+  </div>
 
-    <div className="detail-map-pin" />
-  </button>
+  <div className="detail-map-pin" />
+</div>
 )}
 
         <div className="latest-observations">
