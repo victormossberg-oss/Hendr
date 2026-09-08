@@ -1805,6 +1805,9 @@ app.post(
 
             email:
               user.email
+
+            role:
+              user.role
           },
 
           process.env.JWT_SECRET,
@@ -1837,6 +1840,9 @@ app.post(
 
           email:
             user.email,
+
+          role:
+            user.role,
 
           created_at:
             user.created_at
