@@ -363,6 +363,13 @@ console.log(
 
   }
 
+  function handleLocationClick(event) {
+  setSelectedEvent(event);
+  setCreatingEvent(false);
+  setShowObservationForm(false);
+  setCurrentPage("map");
+}
+
   // =========================
 // ÖPPNA PUBLIK PROFIL
 // =========================
@@ -598,14 +605,10 @@ else if (
     content = (
 
       <MapPage
-
-        events={events}
-
-        onEventClick={
-          handleEventClick
-        }
-
-      />
+  events={events}
+  selectedEvent={selectedEvent}
+  onEventClick={handleEventClick}
+/>
 
     );
 
@@ -669,6 +672,10 @@ else if (
 
         onUserClick={
           handleUserClick
+        }
+
+        onLocationClick={
+          handleLocationClick
         }
 
 

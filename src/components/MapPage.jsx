@@ -53,24 +53,38 @@ const DEFAULT_POSITION = [
 // =========================
 
 function MapLocationController({
-  userLocation
+  userLocation,
+  selectedEvent
 }) {
-
   const map = useMap();
 
   useEffect(() => {
+    if (selectedEvent) {
+      const latitude = Number(selectedEvent.latitude);
+      const longitude = Number(selectedEvent.longitude);
 
-    if (!userLocation) {
-      return;
+      if (
+        !Number.isNaN(latitude) &&
+        !Number.isNaN(longitude)
+      ) {
+        map.setView(
+          [latitude, longitude],
+          16
+        );
+
+        return;
+      }
     }
 
-    map.setView(
-      userLocation,
-      14
-    );
-
+    if (userLocation) {
+      map.setView(
+        userLocation,
+        14
+      );
+    }
   }, [
     userLocation,
+    selectedEvent,
     map
   ]);
 
@@ -84,7 +98,8 @@ function MapLocationController({
 
 function MapPage({
   events,
-  onEventClick
+  onEventClick,
+  selectedEvent
 }) {
 
   const [userLocation, setUserLocation] =
@@ -234,8 +249,9 @@ function MapPage({
           ========================= */}
 
           <MapLocationController
-            userLocation={userLocation}
-          />
+  userLocation={userLocation}
+  selectedEvent={selectedEvent}
+/>
 
 
           {/* =========================

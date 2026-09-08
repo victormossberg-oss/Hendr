@@ -27,6 +27,7 @@ function EventDetail({
   onAddObservation,
   onDelete,
   onUserClick,
+  onLocationClick,
   onBack,
 }) {
   const [confirmed, setConfirmed] = useState(false);
@@ -213,11 +214,15 @@ function EventDetail({
         <h1>{event.title}</h1>
 
         {event.location && (
-          <div className="detail-location-row">
-            <MapPin size={20} />
-            <span>{event.location}</span>
-          </div>
-        )}
+  <button
+    type="button"
+    className="detail-location-row"
+    onClick={() => onLocationClick?.(event)}
+  >
+    <MapPin size={20} />
+    <span>{event.location}</span>
+  </button>
+)}
 
         <div className="detail-stat-row">
           <button
