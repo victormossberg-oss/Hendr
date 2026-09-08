@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   CarFront,
   Check,
-  ChevronRight,
   Flame,
   MapPin,
   MessageCircle,
@@ -221,11 +220,6 @@ function EventCard({
               </div>
             )}
           </div>
-
-          <ChevronRight
-            className="event-card-chevron"
-            size={22}
-          />
         </div>
 
         {event.description && (

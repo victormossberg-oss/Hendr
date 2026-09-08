@@ -170,6 +170,29 @@ function App() {
 
 }
 
+async function refreshFeed() {
+  try {
+    const response = await fetch(`${API_URL}/api/events`);
+
+    if (!response.ok) {
+      throw new Error("Kunde inte uppdatera händelserna.");
+    }
+
+    const data = await response.json();
+    setEvents(data);
+  } catch (error) {
+    console.error(
+      "Fel vid uppdatering av feeden:",
+      error
+    );
+  }
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}
+
 
   // =========================
   // HÄMTA ALLA HÄNDELSER
@@ -524,10 +547,19 @@ async function handleObservationClick(
     content = (
 
       <NewEventForm
-        onCreateEvent={
-          handleCreateEvent
-        }
-      />
+  onCreateEvent={handleCreateEvent}
+  onBack={() => {
+    setCreatingEvent(false);
+    setSelectedEvent(null);
+    setShowObservationForm(false);
+    setCurrentPage("home");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }}
+/>
 
     );
 
@@ -677,6 +709,11 @@ else if (
         onLocationClick={
           handleLocationClick
         }
+
+        onBack={() => {
+          setSelectedEvent(null);
+          setCurrentPage("home");
+        }}
 
 
         onAddObservation={() => {
@@ -843,81 +880,64 @@ else if (
           GLOBAL NAVBAR
       ========================= */}
 
-      <BottomNav
+      {!creatingEvent && (
+  <BottomNav
 
-        currentPage={
-          currentPage
-        }
+    currentPage={
+      currentPage
+    }
 
+    onHome={() => {
+      setCreatingEvent(false);
+      setSelectedEvent(null);
+      setShowObservationForm(false);
+      setCurrentPage("home");
 
-        onHome={() => {
+      refreshFeed();
+    }}
 
-  setCreatingEvent(false);
-  setSelectedEvent(null);
-  setShowObservationForm(false);
+    onMap={() => {
+      console.log(
+        "KARTA KLICKAD"
+      );
 
-  setCurrentPage("home");
+      setCreatingEvent(false);
+      setSelectedEvent(null);
+      setShowObservationForm(false);
+      setCurrentPage("map");
+    }}
 
-}}
+    onCreateEvent={() => {
+      if (!user) {
+        setLoginReason(
+          "createEvent"
+        );
+        setShowLogin(true);
+        return;
+      }
 
+      setCreatingEvent(true);
+      setSelectedEvent(null);
+      setShowObservationForm(false);
+      setCurrentPage("home");
+    }}
 
-        onMap={() => {
+    onProfile={() => {
+      setCreatingEvent(false);
+      setSelectedEvent(null);
+      setShowObservationForm(false);
 
-          console.log(
-            "KARTA KLICKAD"
-          );
+      if (!user) {
+        setLoginReason("profile");
+        setShowLogin(true);
+        return;
+      }
 
-          setCreatingEvent(false);
-          setSelectedEvent(null);
-          setShowObservationForm(false);
-          setCurrentPage("map");
+      setCurrentPage("profile");
+    }}
 
-        }}
-
-
-        onCreateEvent={() => {
-
-          if (!user) {
-
-            setLoginReason(
-              "createEvent"
-            );
-
-            setShowLogin(true);
-
-            return;
-
-          }
-
-
-          setCreatingEvent(true);
-          setSelectedEvent(null);
-          setShowObservationForm(false);
-          setCurrentPage("home");
-
-        }}
-
-
-        onProfile={() => {
-
-  setCreatingEvent(false);
-  setSelectedEvent(null);
-  setShowObservationForm(false);
-
-  if (!user) {
-
-    setLoginReason("profile");
-    setShowLogin(true);
-
-    return;
-
-  }
-
-  setCurrentPage("profile");
-
-}}
-
-      />
+  />
+)}
 
     </div>
 

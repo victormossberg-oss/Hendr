@@ -6,6 +6,7 @@ import {
   MessageCircle,
   MoreHorizontal,
   Share2,
+  X,
 } from "lucide-react";
 import { API_URL } from "../config";
 
@@ -36,10 +37,37 @@ function EventDetail({
   );
   const [confirming, setConfirming] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [imageOpen, setImageOpen] = useState(false);
 
   useEffect(() => {
     setConfirmationCount(Number(event.confirmationCount) || 0);
   }, [event.confirmationCount]);
+
+  useEffect(() => {
+  if (!imageOpen) return;
+
+  function handleKeyDown(e) {
+    if (e.key === "Escape") {
+      setImageOpen(false);
+    }
+  }
+
+  document.addEventListener(
+    "keydown",
+    handleKeyDown
+  );
+
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.removeEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    document.body.style.overflow = "";
+  };
+}, [imageOpen]);
 
   useEffect(() => {
     const token = localStorage.getItem("hendr_token");
@@ -191,25 +219,80 @@ function EventDetail({
         </div>
       </div>
 
-      <div className="detail-hero">
-        {event.imageUrl ? (
-          <img src={event.imageUrl} alt="" />
-        ) : (
-          <div className="detail-hero-placeholder" />
-        )}
+      <div
+  className={`detail-hero ${event.imageUrl ? "has-image" : ""}`}
+  onClick={() => {
+    if (event.imageUrl) {
+      setImageOpen(true);
+    }
+  }}
+  role={event.imageUrl ? "button" : undefined}
+  tabIndex={event.imageUrl ? 0 : undefined}
+  onKeyDown={(e) => {
+    if (
+      event.imageUrl &&
+      (e.key === "Enter" || e.key === " ")
+    ) {
+      setImageOpen(true);
+    }
+  }}
+  aria-label={
+    event.imageUrl
+      ? "Förstora bilden"
+      : undefined
+  }
+>
+  {event.imageUrl ? (
+    <img src={event.imageUrl} alt="" />
+  ) : (
+    <div className="detail-hero-placeholder" />
+  )}
 
-        <div className="detail-category-badge">
-          <span className="detail-category-icon">
-            {event.category === "Brand" ? "🔥" : "•"}
-          </span>
-          {event.category || "Annat"}
-        </div>
+  
+</div>
+  {imageOpen && event.imageUrl && (
+  <div
+    className="image-lightbox"
+    onClick={() => setImageOpen(false)}
+    role="dialog"
+    aria-modal="true"
+    aria-label="Förstorad bild"
+  >
+    <button
+      type="button"
+      className="image-lightbox-close"
+      onClick={(e) => {
+        e.stopPropagation();
+        setImageOpen(false);
+      }}
+      aria-label="Stäng bild"
+    >
+      <X size={30} />
+    </button>
 
-        <span className="detail-time-badge">
-          {formatRelativeTime(event.createdAt)}
-        </span>
-      </div>
+    <img
+      src={event.imageUrl}
+      alt={event.title || ""}
+      className="image-lightbox-image"
+      onClick={(e) => e.stopPropagation()}
+    />
+  </div>
+  
+)}
+<div className="detail-meta">
+  <span className="detail-category">
+    <span className="detail-category-icon">
+      {event.category === "Brand" ? "🔥" : "•"}
+    </span>
+    {event.category || "Annat"}
+  </span>
 
+  <span className="detail-time">
+    {formatRelativeTime(event.createdAt)}
+  </span>
+</div>
+
+<section className="detail-content"></section>
       <section className="detail-content">
         <h1>{event.title}</h1>
 

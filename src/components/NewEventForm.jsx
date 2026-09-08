@@ -19,7 +19,7 @@ const CATEGORIES = [
   { name: "Annat", Icon: MoreHorizontal },
 ];
 
-function NewEventForm({ onCreateEvent }) {
+function NewEventForm({ onCreateEvent, onBack, }) {
   const [category, setCategory] = useState("Brand");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -240,7 +240,7 @@ function NewEventForm({ onCreateEvent }) {
           <button
             type="button"
             className="new-event-cancel"
-            onClick={() => window.history.back()}
+            onClick={onBack}
           >
             Avbryt
           </button>
