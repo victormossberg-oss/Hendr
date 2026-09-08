@@ -693,18 +693,50 @@ else if (
         }}
 
 
-        onDelete={(eventID) => {
+        onDelete={async (eventID) => {
+  const token = localStorage.getItem("hendr_token");
 
-          setEvents((current) =>
-            current.filter(
-              (event) =>
-                event.id !== eventID
-            )
-          );
+  if (!token) {
+    alert("Du måste vara inloggad.");
+    return;
+  }
 
-          setSelectedEvent(null);
+  try {
+    const response = await fetch(
+      `${API_URL}/api/events/${eventID}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-        }}
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Kunde inte ta bort händelsen."
+      );
+    }
+
+    setEvents((current) =>
+      current.filter(
+        (event) =>
+          String(event.id) !== String(eventID)
+      )
+    );
+
+    setSelectedEvent(null);
+  } catch (error) {
+    console.error(
+      "Fel vid borttagning av händelse:",
+      error
+    );
+
+    alert(error.message);
+  }
+}}
 
       />
 
