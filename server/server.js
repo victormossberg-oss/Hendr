@@ -187,6 +187,11 @@ function authenticateToken(
 
 
       req.user = user;
+      console.log("Inloggad användare:", {
+  userid: user.userid,
+  username: user.username,
+  role: user.role
+});
 
       next();
 
