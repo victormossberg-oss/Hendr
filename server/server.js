@@ -1725,6 +1725,8 @@ app.post(
 
             password_hash,
 
+            role,
+
             created_at
 
           FROM Users
