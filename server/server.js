@@ -348,7 +348,7 @@ app.post(
       );
 
 
-      const location = await getLocationName(
+      const locationName = await getLocationName(
   parsedLatitude,
   parsedLongitude
 );
@@ -366,7 +366,7 @@ const result =
       latitude,
       longitude,
       userid,
-      location
+      locationName
     )
 
     VALUES
