@@ -49,6 +49,16 @@ function App() {
 
   const [eventToEdit, setEventToEdit] = useState(null);
 
+    // =========================
+  // Hantera sök
+  // =========================
+    function handleSearch() {
+  setCreatingEvent(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
+  setCurrentPage("search");
+}
+
 
   // =========================
   // INLOGGAD ANVÄNDARE
@@ -76,15 +86,7 @@ function App() {
 
     setShowLogin(false);
 
-  // =========================
-  // Hantera sök
-  // =========================
-    function handleSearch() {
-  setCreatingEvent(false);
-  setSelectedEvent(null);
-  setShowObservationForm(false);
-  setCurrentPage("search");
-}
+
 
     // =========================
     // LOGIN FRÅN SKAPA HÄNDELSE
