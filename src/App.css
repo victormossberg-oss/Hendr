@@ -3615,3 +3615,69 @@ button {
     overflow: hidden;
   }
 }
+
+/* RAPPORTERA – KOMPAKT MOBILLAYOUT */
+@media (max-width: 600px) {
+  .new-event-page {
+    height: 100svh;
+    min-height: 0;
+    max-height: none;
+    padding: 0 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .new-event-form {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    padding: 2px 0 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .new-event-topbar {
+    min-height: 24px;
+    margin-bottom: 4px;
+  }
+
+  .new-event-heading h1 {
+    margin: 0 0 1px;
+    font-size: 26px;
+    line-height: 1.05;
+  }
+
+  .new-event-heading p {
+    margin: 0 0 8px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .category-grid {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .category-option {
+    min-height: 50px;
+    padding: 7px 9px;
+    box-sizing: border-box;
+  }
+
+  .new-event-form textarea,
+  .new-event-form input[type="text"] {
+    padding: 8px 10px;
+    margin-bottom: 7px;
+    box-sizing: border-box;
+  }
+
+  .new-event-form textarea {
+    min-height: 58px;
+    height: 58px;
+  }
+
+  .publish-button {
+    min-height: 46px;
+    height: 46px;
+  }
+}
