@@ -35,6 +35,64 @@ const defaultIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+const userLocationIcon = L.divIcon({
+  className: "hendr-user-marker",
+  html: '<div class="hendr-user-marker-dot"></div>',
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14]
+});
+
+const eventIcons = {
+  Brand: L.divIcon({
+    className: "hendr-event-marker marker-brand",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  }),
+
+  Trafik: L.divIcon({
+    className: "hendr-event-marker marker-trafik",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  }),
+
+  Olycka: L.divIcon({
+    className: "hendr-event-marker marker-olycka",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  }),
+
+  Brott: L.divIcon({
+    className: "hendr-event-marker marker-brott",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  }),
+
+  Evenemang: L.divIcon({
+    className: "hendr-event-marker marker-evenemang",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  }),
+
+  Annat: L.divIcon({
+    className: "hendr-event-marker marker-annat",
+    html: '<div class="hendr-event-marker-dot"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  })
+};
+
 
 // =========================
 // STANDARDPOSITION
@@ -262,7 +320,7 @@ function MapPage({
 
             <Marker
               position={userLocation}
-              icon={defaultIcon}
+              icon={userLocationIcon}
             >
 
               <Popup>
@@ -346,7 +404,10 @@ function MapPage({
                   longitude
                 ]}
 
-                icon={defaultIcon}
+                icon={
+                  eventIcons[event.category] ||
+                  eventIcons.Annat
+                }
               >
 
                 <Popup>
