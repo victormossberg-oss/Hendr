@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "./config";
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
-import SearchPage from "./components/Search";
+import SearchPage from "./components/SearchPage";
 import EventDetail from "./components/EventDetail";
 import ObservationForm from "./components/ObservationForm";
 import NewEventForm from "./components/NewEventForm";
