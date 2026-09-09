@@ -1,6 +1,6 @@
+import { Analytics } from "@vercel/analytics/react";
 import { useEffect, useState } from "react";
 import { API_URL } from "./config";
-
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
 import EventDetail from "./components/EventDetail";
@@ -964,6 +964,8 @@ else if (
 
   />
 )}
+
+    <Analytics />
 
     </div>
 
