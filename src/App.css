@@ -956,8 +956,8 @@
 
   padding: 8px 10px;
 
-  background: #6c4ce8;
-  color: white;
+  background: var(--hendr-mustard);
+  color: var(--hendr-dark);
 
   font-weight: 600;
   cursor: pointer;
@@ -3772,3 +3772,339 @@ button {
       0 0 0 11px rgba(229, 57, 53, 0);
   }
 }
+
+/* =========================================================
+   OBSERVATION – NYTT HENDR-TEMA
+   ========================================================= */
+
+.observation-page {
+  min-height: calc(100vh - 72px);
+  background: var(--hendr-cream);
+  padding: 0 16px 100px;
+  box-sizing: border-box;
+}
+
+.observation-content {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 24px 0 30px;
+}
+
+.observation-category {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 8px;
+
+  color: var(--hendr-blue);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.observation-content h1 {
+  margin: 0 0 6px;
+
+  color: var(--hendr-dark);
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  font-weight: 800;
+}
+
+.observation-intro {
+  margin: 0 0 24px;
+
+  color: var(--hendr-muted);
+  font-size: 15px;
+}
+
+.observation-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.observation-content form > label:not(.image-upload) {
+  margin-bottom: 7px;
+
+  color: var(--hendr-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.observation-content textarea {
+  width: 100%;
+  min-height: 130px;
+  margin-bottom: 18px;
+  padding: 12px 13px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--hendr-border);
+  border-radius: 12px;
+
+  background: #fffdf7;
+  color: var(--hendr-dark);
+
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+
+  resize: vertical;
+}
+
+.observation-content textarea:focus {
+  outline: none;
+  border-color: var(--hendr-blue);
+}
+
+.observation-content textarea::placeholder {
+  color: #aaa59b;
+}
+
+
+/* BILD */
+
+.image-upload {
+  width: 100%;
+  min-height: 110px;
+  margin-bottom: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  box-sizing: border-box;
+
+  border: 1px dashed var(--hendr-border);
+  border-radius: 12px;
+
+  background: #fffdf7;
+  color: var(--hendr-blue);
+
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.image-upload svg {
+  width: 21px;
+  height: 21px;
+}
+
+.image-upload span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.image-upload img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.image-upload.disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+
+/* PLATS */
+
+.observation-content form > label:not(.image-upload) {
+  color: var(--hendr-dark);
+}
+
+
+/* SKICKA */
+
+.submit-observation {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 22px;
+
+  border: 0;
+  border-radius: 14px;
+
+  background: var(--hendr-mustard);
+  color: var(--hendr-dark);
+
+  font: inherit;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.submit-observation:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+
+/* MOBIL */
+
+@media (max-width: 600px) {
+  .observation-page {
+    min-height: 100svh;
+    padding: 0 16px 90px;
+  }
+
+  .observation-content {
+    padding-top: 18px;
+  }
+
+  .observation-content h1 {
+    font-size: 27px;
+  }
+
+  .observation-intro {
+    margin-bottom: 18px;
+  }
+
+  .observation-content textarea {
+    min-height: 110px;
+    margin-bottom: 14px;
+  }
+
+  .image-upload {
+    min-height: 90px;
+    margin-bottom: 14px;
+  }
+
+  .submit-observation {
+    min-height: 50px;
+    margin-top: 16px;
+  }
+}
+
+/* =========================================================
+   LOCATION PICKER – NYTT HENDR-TEMA
+   ========================================================= */
+
+.location-picker {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+
+/* HÄMTA PLATS */
+
+.location-button {
+  width: 100%;
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 14px;
+
+  border: 1px solid var(--hendr-border);
+  border-radius: 12px;
+
+  background: #fffdf7;
+  color: var(--hendr-blue);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.location-button:hover {
+  border-color: var(--hendr-blue);
+}
+
+.location-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.location-button svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+
+/* HÄMTAD PLATS */
+
+.location-selected {
+  width: 100%;
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 13px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--hendr-border);
+  border-radius: 12px;
+
+  background: #fffdf7;
+}
+
+.location-selected > svg {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+
+  color: var(--hendr-blue);
+}
+
+.location-selected div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.location-selected strong {
+  color: var(--hendr-dark);
+  font-size: 14px;
+}
+
+.location-selected span {
+  color: var(--hendr-muted);
+  font-size: 12px;
+}
+
+
+/* LADDAR */
+
+.location-button .spinner {
+  animation: location-spinner 1s linear infinite;
+}
+
+@keyframes location-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* FEL */
+
+.location-error {
+  margin: 7px 0 0;
+
+  color: #c0392b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+/* MOBIL */
+
+@media (max-width: 600px) {
+  .location-button {
+    min-height: 50px;
+  }
+
+  .location-selected {
+    min-height: 50px;
+  }
+}
+

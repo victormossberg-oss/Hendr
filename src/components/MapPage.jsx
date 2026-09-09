@@ -436,7 +436,7 @@ function MapPage({
 
                     <button
                       type="button"
-
+                      className="map-popup-button"
                       onClick={() =>
                         onEventClick(event)
                       }

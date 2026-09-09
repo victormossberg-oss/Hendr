@@ -203,14 +203,9 @@ function ObservationForm({
       <div className="observation-content">
 
 
-        <span
-          className="event-category"
-          style={{
-            color: event.color
-          }}
-        >
-          Observation
-        </span>
+        <span className="observation-category">
+  Observation
+</span>
 
 
         <h1>
