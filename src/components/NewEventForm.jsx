@@ -328,17 +328,7 @@ function NewEventForm({ onCreateEvent, onBack, }) {
   required
 />
 
-        <input
-          id="event-title"
-          type="text"
-          value={title}
-          onChange={(event) =>
-            setTitle(event.target.value)
-          }
-          placeholder="T.ex. Brand i byggnad"
-          maxLength={100}
-          required
-        />
+        
 
         <div className="form-label location-label">
           Plats
