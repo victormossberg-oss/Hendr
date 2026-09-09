@@ -280,31 +280,42 @@ function NewEventForm({ onCreateEvent, onBack, }) {
         </section>
 
         <label
-          className="form-label"
-          htmlFor="event-description"
-        >
-          Beskriv kort vad som händer
-        </label>
+  className="form-label"
+  htmlFor="event-title"
+>
+  Rubrik
+</label>
 
-        <textarea
-          id="event-description"
-          value={description}
-          onChange={(event) =>
-            setDescription(
-              event.target.value
-            )
-          }
-          placeholder="T.ex. rök från en byggnad, köer på E4, konsert i parken..."
-          rows={3}
-          required
-        />
+<input
+  id="event-title"
+  type="text"
+  value={title}
+  onChange={(event) =>
+    setTitle(event.target.value)
+  }
+  placeholder="T.ex. Brand i byggnad"
+  required
+/>
 
-        <label
-          className="form-label"
-          htmlFor="event-title"
-        >
-          Rubrik
-        </label>
+<label
+  className="form-label"
+  htmlFor="event-description"
+>
+  Beskriv kort vad som händer
+</label>
+
+<textarea
+  id="event-description"
+  value={description}
+  onChange={(event) =>
+    setDescription(
+      event.target.value
+    )
+  }
+  placeholder="T.ex. rök från en byggnad, köer på E4, konsert i parken..."
+  rows={3}
+  required
+/>
 
         <input
           id="event-title"
