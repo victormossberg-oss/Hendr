@@ -279,50 +279,51 @@ function EventDetail({
   </div>
   
 )}
-<div className="detail-meta">
-  <span className="detail-category">
-    <span className="detail-category-icon">
-      {event.category === "Brand" ? "🔥" : "•"}
+<section className="detail-content">
+
+  <div className="detail-meta">
+    <span className="detail-category">
+      <span className="detail-category-icon">
+        {event.category === "Brand" ? "🔥" : "•"}
+      </span>
+      {event.category || "Annat"}
     </span>
-    {event.category || "Annat"}
-  </span>
 
-  <span className="detail-time">
-    {formatRelativeTime(event.createdAt)}
-  </span>
-</div>
+    <span className="detail-time">
+      {formatRelativeTime(event.createdAt)}
+    </span>
+  </div>
 
-<section className="detail-content"></section>
-      <section className="detail-content">
-        <h1>{event.title}</h1>
+  <h1>{event.title}</h1>
 
-        {event.location && (
-  <button
-    type="button"
-    className="detail-location-row"
-    onClick={() => onLocationClick?.(event)}
-  >
-    {event.location}
-  </button>
-)}
-
-{event.username && (
-  <div className="detail-created-by">
-    <span>Skapad av</span>
+  {event.location && (
     <button
       type="button"
-      onClick={() =>
-        onUserClick?.(
-          event.userid ?? event.userID
-        )
-      }
+      className="detail-location-row"
+      onClick={() => onLocationClick?.(event)}
     >
-      {event.username}
+      <MapPin size={20} />
+      <span>{event.location}</span>
     </button>
-  </div>
-)}
+  )}
 
-        <div className="detail-stat-row">
+  {event.username && (
+    <div className="detail-created-by">
+      <span>Skapad av</span>
+      <button
+        type="button"
+        onClick={() =>
+          onUserClick?.(
+            event.userid ?? event.userID
+          )
+        }
+      >
+        {event.username}
+      </button>
+    </div>
+  )}
+
+  <div className="detail-stat-row">
           <button
             type="button"
             className={`detail-stat confirmation-detail-stat ${confirmed ? "confirmed" : ""}`}
@@ -342,20 +343,8 @@ function EventDetail({
             <span>observationer</span>
           </div>
 
-          <button type="button" className="detail-stat detail-share" onClick={handleShare}>
-            <Share2 size={28} />
-            <span>Dela</span>
-          </button>
+          
         </div>
-
-        <button
-          type="button"
-          className={`detail-confirm-button ${confirmed ? "confirmed" : ""}`}
-          onClick={handleConfirm}
-          disabled={confirming}
-        >
-          {confirmed ? "Bekräftad" : "Bekräfta detta"}
-        </button>
 
         <div className="detail-description-section">
           <h2>Beskrivning</h2>

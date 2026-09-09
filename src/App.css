@@ -2381,12 +2381,14 @@
 
 .detail-stat-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
 
-  margin: 0 0 28px;
+  margin: 0 0 30px;
+  padding: 16px 0;
 
-  border: none;
+  border-top: 1px solid var(--hendr-border);
+  border-bottom: 1px solid var(--hendr-border);
 }
 
 .detail-stat {
@@ -2454,8 +2456,7 @@ button.detail-stat {
 
 /* Observationer + dela */
 
-.detail-stat-symbol,
-.detail-share svg {
+.detail-stat-symbol{
   width: 42px;
   height: 42px;
 
@@ -2490,59 +2491,6 @@ button.detail-stat {
   line-height: 1.15;
 }
 
-/* ---------- BEKRÄFTA ---------- */
-
-.detail-confirm-button {
-  width: 100%;
-  min-height: 62px;
-
-  margin-bottom: 30px;
-
-  border: none;
-  border-radius: 16px;
-
-  background: var(--hendr-mustard);
-  color: var(--hendr-dark);
-
-  font: inherit;
-  font-size: 21px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.detail-confirm-button.confirmed {
-  background: var(--hendr-mustard-light);
-}
-
-/* ---------- CONFIRM ---------- */
-
-.detail-confirm-button {
-  width: 100%;
-  min-height: 62px;
-
-  margin-bottom: 30px;
-
-  border: none;
-  border-radius: 16px;
-
-  background: var(--hendr-mustard);
-  color: var(--hendr-dark);
-
-  font: inherit;
-  font-size: 21px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.detail-confirm-button:hover {
-  filter: brightness(0.97);
-}
-
-.detail-confirm-button.confirmed {
-  background: var(--hendr-mustard-light);
-}
 
 /* ---------- DESCRIPTION ---------- */
 
@@ -2654,14 +2602,19 @@ cursor: pointer;
 
 .observation-list {
   display: grid;
-  gap: 10px;
+  gap: 0;
 }
 
 .observation-item {
-  padding: 14px;
-  border: 1px solid var(--hendr-border);
-  border-radius: 14px;
-  background: #FCFBF7;
+  padding: 16px 0;
+  border-top: 1px solid var(--hendr-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.observation-item:first-child {
+  border-top: none;
+  padding-top: 4px;
 }
 
 .observation-item-top {
@@ -2831,7 +2784,7 @@ cursor: pointer;
 
   .detail-stat-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 
     gap: 0;
 
@@ -2881,8 +2834,7 @@ cursor: pointer;
   }
 
   /* Pratbubbla och dela */
-  .detail-stat-symbol,
-  .detail-share svg {
+  .detail-stat-symbol{
     width: 34px;
     height: 34px;
 
@@ -2975,37 +2927,10 @@ cursor: pointer;
    SISTA FINJUSTERINGAR
    ========================================================= */
 
-.detail-share {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.detail-share svg {
-  flex-shrink: 0;
-}
-
 .event-badge,
 .event-time-badge,
 .event-badge span {
   font-weight: 400;
-}
-
-/* Justera "Dela" så att texten hamnar i samma höjd
-   som "bekräftelser" och "observationer" */
-.detail-share {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-}
-
-.detail-share span {
-  margin-top: 25px !important;
-  color: var(--hendr-muted) !important;
-  font-size: 14px !important;
-  line-height: 1.1 !important;
 }
 
 .nav-item.active {
@@ -3294,7 +3219,7 @@ button {
   bottom: 0;
 
   width: 100%;
-  height: 64px;
+  height: 72px;
 
   padding-bottom: env(safe-area-inset-bottom);
 
@@ -3316,7 +3241,7 @@ button {
 
 .nav-item {
   width: 100%;
-  height: 64px;
+  height: 72px;
 
   display: flex;
   flex-direction: column;
@@ -3463,4 +3388,206 @@ button {
   .publish-button {
     min-height: 50px;
   }
+}
+
+/* ---------- EVENT STATISTIK ---------- */
+
+.detail-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+
+  margin: 8px 0 28px;
+  padding: 14px 0;
+
+  border-top: 1px solid var(--hendr-border);
+  border-bottom: 1px solid var(--hendr-border);
+}
+
+.detail-stat {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 3px;
+
+  color: var(--hendr-muted);
+  font-size: 12px;
+}
+
+.detail-stat strong {
+  color: var(--hendr-dark);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.detail-stat span {
+  font-size: 11px;
+  color: var(--hendr-muted);
+}
+
+.detail-stat-icon {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 2px;
+
+  border-radius: 50%;
+  background: #ECEAE4;
+  color: var(--hendr-muted);
+}
+
+.confirmation-detail-stat {
+  width: 100%;
+
+  border: 0;
+  background: transparent;
+
+  font: inherit;
+  cursor: pointer;
+}
+
+.confirmation-detail-stat.confirmed .detail-stat-icon {
+  background: var(--hendr-mustard);
+  color: var(--hendr-dark);
+}
+
+.confirmation-detail-stat.confirmed strong {
+  color: var(--hendr-dark);
+}
+
+
+.detail-stat:active {
+  transform: scale(0.97);
+}
+
+/* =========================================================
+   EVENT DETAIL – NY HEADER
+   ========================================================= */
+
+.detail-content {
+  width: calc(100% - 28px);
+  max-width: 592px;
+  margin: 0 auto;
+  padding-top: 14px;
+}
+
+/* Kategori + tid */
+.detail-meta {
+  width: 100%;
+  margin: 0 0 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: var(--hendr-muted);
+  font-size: 13px;
+}
+
+.detail-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  color: var(--hendr-blue);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.detail-category-icon {
+  font-size: 13px;
+}
+
+.detail-time {
+  color: #99958B;
+  font-size: 12px;
+}
+
+/* Rubrik */
+.detail-content h1 {
+  margin: 0 0 8px;
+
+  color: var(--hendr-dark);
+  font-size: 32px;
+  line-height: 1.08;
+  letter-spacing: -0.7px;
+  font-weight: 800;
+}
+
+/* Plats */
+.detail-location-row {
+  width: auto;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin: 0 0 8px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: var(--hendr-blue);
+  font: inherit;
+  font-size: 17px;
+  line-height: 1.2;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.detail-location-row svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+/* Skapad av */
+.detail-created-by {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  margin: 0 0 22px;
+
+  color: #99958B;
+  font-size: 13px;
+}
+
+.detail-created-by button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: var(--hendr-blue);
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.detail-created-by button:hover {
+  text-decoration: underline;
+}
+.detail-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-stat-icon,
+.detail-stat-symbol {
+  width: 42px;
+  height: 42px;
+  margin: 0 0 7px;
 }
