@@ -19,8 +19,8 @@ import "./App.css";
 
 function App() {
 
-  const [events, setEvents] =
-    useState([]);
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] =
     useState("home");
@@ -201,48 +201,36 @@ async function refreshFeed() {
   // =========================
 
   useEffect(() => {
+  async function loadEvents() {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/events`
+      );
 
-    fetch(`${API_URL}/api/events`)
-      .then((response) => {
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Kunde inte hämta händelser"
-          );
-
-        }
-
-        return response.json();
-
-      })
-
-      .then((data) => {
-
-  console.log(
-  "Första eventet:",
-  data[0]
-);
-
-console.log(
-  "Username:",
-  data[0]?.username
-);
-
-  setEvents(data);
-
-})
-
-      .catch((error) => {
-
-        console.error(
-          "Fel vid hämtning av events:",
-          error
+      if (!response.ok) {
+        throw new Error(
+          "Kunde inte hämta händelserna."
         );
+      }
 
-      });
+      const data = await response.json();
 
-  }, []);
+      console.log("Första eventet:", data[0]);
+      console.log("Username:", data[0]?.username);
+
+      setEvents(data);
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av händelser:",
+        error
+      );
+    } finally {
+      setEventsLoading(false);
+    }
+  }
+
+  loadEvents();
+}, []);
 
 
   // =========================
@@ -869,6 +857,7 @@ else if (
         <Feed
 
           events={events}
+          loading={eventsLoading}
 
           onEventClick={
             handleEventClick
