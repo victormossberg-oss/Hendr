@@ -76,6 +76,15 @@ function App() {
 
     setShowLogin(false);
 
+  // =========================
+  // Hantera sök
+  // =========================
+    function handleSearch() {
+  setCreatingEvent(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
+  setCurrentPage("search");
+}
 
     // =========================
     // LOGIN FRÅN SKAPA HÄNDELSE
@@ -667,7 +676,27 @@ else if (
     );
 
   }
+  // =========================
+// SÖK
+// =========================
 
+else if (
+  currentPage === "search"
+) {
+  content = (
+    <SearchPage
+      onBack={() => {
+        setCurrentPage("home");
+      }}
+
+      onEventClick={handleEventClick}
+
+      onConfirmationChange={
+        handleConfirmationChange
+      }
+    />
+  );
+}
 
   // =========================
   // KARTA
@@ -857,9 +886,7 @@ else if (
   type="button"
   className="header-search-button"
   aria-label="Sök efter händelser"
-  onClick={() => {
-    setCurrentPage("search");
-  }}
+  onClick={handleSearch}
 >
   <Search size={27} strokeWidth={2} />
 </button>
@@ -952,12 +979,13 @@ else if (
           GLOBAL NAVBAR
       ========================= */}
 
-      {!creatingEvent && (
-  <BottomNav
+     {!creatingEvent &&
+  currentPage !== "search" && (
+    <BottomNav
 
-    currentPage={
-      currentPage
-    }
+      currentPage={
+        currentPage
+      }
 
     onHome={() => {
       setCreatingEvent(false);
