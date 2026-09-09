@@ -47,6 +47,8 @@ function NewEventForm({ onCreateEvent, onBack, }) {
 
     const data = await response.json();
 
+    console.log("Reverse geocoding:", data);
+
     const locality = data.locality;
     const city = data.city;
 
