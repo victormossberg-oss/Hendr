@@ -287,6 +287,106 @@ LEFT JOIN EventConfirmations ec
   }
 );
 
+// =========================
+// SÖK HÄNDELSER
+// =========================
+
+app.get(
+  "/api/search",
+  async (req, res) => {
+    try {
+      const query =
+        req.query.q?.trim();
+
+      if (!query) {
+        return res.json([]);
+      }
+
+      const searchTerm = `%${query}%`;
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            e.eventID AS id,
+
+            e.title,
+
+            e.description,
+
+            e.category,
+
+            e.status,
+
+            e.created_at AS "createdAt",
+
+            e.image_url AS "imageUrl",
+
+            e.latitude,
+
+            e.longitude,
+
+            e.userid,
+
+            e.location,
+
+            u.username AS username,
+
+            COUNT(
+              DISTINCT o.observationID
+            ) AS "observationCount",
+
+            COUNT(
+              DISTINCT ec.confirmationID
+            ) AS "confirmationCount"
+
+          FROM Events e
+
+          LEFT JOIN Users u
+            ON u.userid = e.userid
+
+          LEFT JOIN Observations o
+            ON o.eventID = e.eventID
+
+          LEFT JOIN EventConfirmations ec
+            ON ec.eventID = e.eventID
+
+          WHERE
+            e.title ILIKE $1
+            OR e.description ILIKE $1
+            OR e.location ILIKE $1
+            OR e.category ILIKE $1
+
+          GROUP BY
+            e.eventID,
+            u.username
+
+          ORDER BY
+            e.created_at DESC
+          `,
+          [searchTerm]
+        );
+
+      res.json(
+        result.rows
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid sökning:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte söka efter händelser."
+      });
+    }
+  }
+);
+
 
 // =========================
 // SKAPA NY HÄNDELSE

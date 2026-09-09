@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "./config";
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
+import SearchPage from "./components/Search";
 import EventDetail from "./components/EventDetail";
 import ObservationForm from "./components/ObservationForm";
 import NewEventForm from "./components/NewEventForm";
@@ -599,6 +600,16 @@ async function handleObservationClick(
 // =========================
 // PUBLIK PROFIL
 // =========================
+else if (currentPage === "search") {
+  content = (
+    <SearchPage
+      onBack={() => {
+        setCurrentPage("home");
+      }}
+      onEventClick={handleEventClick}
+    />
+  );
+}
 
 else if (
   currentPage === "publicProfile" &&
@@ -843,12 +854,15 @@ else if (
   </div>
 
   <button
-    type="button"
-    className="header-search-button"
-    aria-label="Sök efter händelser"
-  >
-    <Search size={27} strokeWidth={2} />
-  </button>
+  type="button"
+  className="header-search-button"
+  aria-label="Sök efter händelser"
+  onClick={() => {
+    setCurrentPage("search");
+  }}
+>
+  <Search size={27} strokeWidth={2} />
+</button>
 </header>
 
 
