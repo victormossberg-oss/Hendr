@@ -4186,3 +4186,106 @@ button {
     opacity: 0.55;
   }
 }
+
+/* =========================================================
+   HENDR – STARTSKÄRM
+   ========================================================= */
+
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--hendr-cream);
+
+  animation: splash-fade-in 0.35s ease-out;
+}
+
+.app-splash-icon {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+
+  margin-bottom: 20px;
+
+  animation: splash-icon-in 0.5s ease-out;
+}
+
+.app-splash-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--hendr-dark);
+
+  margin-bottom: 5px;
+}
+
+.app-splash-tagline {
+  font-size: 14px;
+  color: var(--hendr-muted);
+}
+
+@keyframes splash-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes splash-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   HENDR – STARTSKÄRM
+   ========================================================= */
+
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--hendr-cream);
+}
+
+.app-splash-icon {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.app-splash-name {
+  color: var(--hendr-dark);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+}
+
+.app-splash-tagline {
+  color: var(--hendr-muted);
+  font-size: 14px;
+}
+

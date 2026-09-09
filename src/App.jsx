@@ -202,6 +202,25 @@ async function refreshFeed() {
 
   useEffect(() => {
   async function loadEvents() {
+    const cachedEvents =
+      localStorage.getItem("hendr_events");
+
+    if (cachedEvents) {
+      try {
+        const parsedEvents = JSON.parse(cachedEvents);
+
+        setEvents(parsedEvents);
+        setEventsLoading(false);
+      } catch (error) {
+        console.error(
+          "Kunde inte läsa sparade händelser:",
+          error
+        );
+
+        localStorage.removeItem("hendr_events");
+      }
+    }
+
     try {
       const response = await fetch(
         `${API_URL}/api/events`
@@ -219,6 +238,11 @@ async function refreshFeed() {
       console.log("Username:", data[0]?.username);
 
       setEvents(data);
+
+      localStorage.setItem(
+        "hendr_events",
+        JSON.stringify(data)
+      );
     } catch (error) {
       console.error(
         "Fel vid hämtning av händelser:",
@@ -883,12 +907,31 @@ else if (
   // =========================
   // APP
   // =========================
-
+  if (eventsLoading) {
   return (
+    <div className="app-splash">
+      <img
+        src="/pwa-512x512.png"
+        alt="HENDR"
+        className="app-splash-icon"
+      />
 
-    <div className="app">
+      <div className="app-splash-name">
+        HENDR
+      </div>
 
-      {content}
+      <div className="app-splash-tagline">
+        Händelser i realtid
+      </div>
+    </div>
+  );
+}
+  
+  return (
+  <div className="app">
+        {content}
+
+   
 
 
       {/* =========================
