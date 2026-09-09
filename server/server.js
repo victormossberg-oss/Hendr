@@ -1447,45 +1447,42 @@ app.get(
       } = req.params;
 
 
-      const result =
-        await pool.query(
-          `
-          SELECT
+      const result = await pool.query(
+  `
+  SELECT
+    e.eventID AS id,
+    e.title,
+    e.description,
+    e.category,
+    e.status,
+    e.created_at AS "createdAt",
+    e.image_url AS "imageUrl",
+    e.latitude,
+    e.longitude,
+    e.userid,
+    e.location,
+    u.username AS username,
 
-            e.eventID AS id,
+    (
+      SELECT COUNT(*)
+      FROM Observations o
+      WHERE o.eventID = e.eventID
+    ) AS "observationCount",
 
-            e.title,
+    (
+      SELECT COUNT(*)
+      FROM EventConfirmations ec
+      WHERE ec.eventID = e.eventID
+    ) AS "confirmationCount"
 
-            e.description,
+  FROM Events e
 
-            e.category,
+  LEFT JOIN Users u
+    ON u.userid = e.userid
 
-            e.status,
-
-            e.created_at AS "createdAt",
-
-            e.image_url AS "imageUrl",
-
-            e.latitude,
-
-            e.longitude,
-
-            e.userid,
-
-            u.username AS username
-
-          FROM Events e
-
-          LEFT JOIN Users u
-            ON u.userid = e.userid
-
-          WHERE e.userid = $1
-
-          ORDER BY
-            e.created_at DESC
-          `,
-          [userid]
-        );
+  ORDER BY e.created_at DESC
+  `
+);
 
 
       res.json(
