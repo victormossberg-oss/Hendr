@@ -36,28 +36,35 @@ function NewEventForm({ onCreateEvent, onBack, }) {
   const fileInputRef = useRef(null);
 
   async function getLocationName(latitude, longitude) {
-    try {
-      const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=sv`
-      );
+  try {
+    const response = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=sv`
+    );
 
-      if (!response.ok) {
-        throw new Error("Kunde inte hämta platsnamn.");
-      }
-
-      const data = await response.json();
-
-      return (
-        data.city ||
-        data.locality ||
-        data.principalSubdivision ||
-        null
-      );
-    } catch (error) {
-      console.error("Kunde inte hämta platsnamn:", error);
-      return null;
+    if (!response.ok) {
+      throw new Error("Kunde inte hämta platsnamn.");
     }
+
+    const data = await response.json();
+
+    const locality = data.locality;
+    const city = data.city;
+
+    if (locality && city && locality !== city) {
+      return `${locality}, ${city}`;
+    }
+
+    return (
+      locality ||
+      city ||
+      data.principalSubdivision ||
+      null
+    );
+  } catch (error) {
+    console.error("Kunde inte hämta platsnamn:", error);
+    return null;
   }
+}
 
   async function handlePosition(position) {
     const latitude = position.coords.latitude;
