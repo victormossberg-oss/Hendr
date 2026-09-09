@@ -3155,15 +3155,12 @@ body:has(.new-event-page) {
 .new-event-page {
   position: fixed;
   inset: 0;
-
   width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
-  max-height: 100dvh;
-
+  height: 100%;
+  min-height: 0;
+  max-height: none;
   box-sizing: border-box;
   overflow: hidden;
-
   padding: 0 16px;
 }
 
@@ -3598,10 +3595,13 @@ button {
 
 @media (max-width: 600px) {
   html:has(.new-event-page),
-  body:has(.new-event-page) {
+  body:has(.new-event-page),
+  #root:has(.new-event-page) {
     height: 100svh;
+    min-height: 0;
     overflow: hidden;
   }
+}
 
   #root:has(.new-event-page) {
     height: 100svh;
