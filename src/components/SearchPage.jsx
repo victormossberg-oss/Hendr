@@ -88,9 +88,10 @@ function SearchPage({
           <input
             type="search"
             value={query}
-            onChange={(event) =>
-              setQuery(event.target.value)
-            }
+            onChange={(event) => {
+  console.log("SKRIVER:", event.target.value);
+  setQuery(event.target.value);
+}}
             placeholder="Sök"
             autoFocus
           />
