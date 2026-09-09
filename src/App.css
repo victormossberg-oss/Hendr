@@ -3419,3 +3419,48 @@ button {
   font-weight: 500;
   line-height: 1;
 }
+
+@media (max-width: 600px) {
+  .new-event-form {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .new-event-topbar {
+    min-height: 28px;
+    margin-bottom: 6px;
+  }
+
+  .new-event-heading h1 {
+    margin-bottom: 2px;
+    font-size: 27px;
+  }
+
+  .new-event-heading p {
+    margin-bottom: 12px;
+  }
+
+  .category-grid {
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .category-option {
+    min-height: 56px;
+    padding: 9px 11px;
+  }
+
+  .new-event-form textarea,
+  .new-event-form input[type="text"] {
+    padding: 9px 11px;
+    margin-bottom: 10px;
+  }
+
+  .new-event-form textarea {
+    min-height: 64px;
+  }
+
+  .publish-button {
+    min-height: 50px;
+  }
+}
