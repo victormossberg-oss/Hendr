@@ -31,6 +31,9 @@ function SearchPage({
           )}`
         );
 
+        console.log("SÖK-URL:", `${API_URL}/api/search?q=${encodeURIComponent(trimmedQuery)}`);
+        console.log("SÖK-STATUS:", response.status);
+
         if (!response.ok) {
           throw new Error(
             "Kunde inte söka efter händelser."
@@ -38,6 +41,8 @@ function SearchPage({
         }
 
         const data = await response.json();
+
+        console.log("SÖK-RESULTAT:", data);
 
         setResults(data);
       } catch (error) {
