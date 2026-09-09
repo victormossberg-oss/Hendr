@@ -36,6 +36,7 @@ function NewEventForm({ onCreateEvent, onBack, }) {
   const fileInputRef = useRef(null);
 
   async function getLocationName(latitude, longitude) {
+    console.log("GET LOCATION NAME KÖRS", latitude, longitude);
   try {
     const response = await fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=sv`
@@ -69,6 +70,7 @@ function NewEventForm({ onCreateEvent, onBack, }) {
 }
 
   async function handlePosition(position) {
+    console.log("HANDLE POSITION KÖRS");
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
 
