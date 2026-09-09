@@ -3591,3 +3591,27 @@ button {
   height: 42px;
   margin: 0 0 7px;
 }
+
+/* =========================================================
+   RAPPORTERA – FUNGERA ÄVEN MED WEBBLÄSARENS VERKTYGSFÄLT
+   ========================================================= */
+
+@media (max-width: 600px) {
+  html:has(.new-event-page),
+  body:has(.new-event-page) {
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  #root:has(.new-event-page) {
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .new-event-page {
+    height: 100svh;
+    min-height: 100svh;
+    max-height: 100svh;
+    overflow: hidden;
+  }
+}
