@@ -19,17 +19,43 @@ const CATEGORIES = [
   { name: "Annat", Icon: MoreHorizontal },
 ];
 
-function NewEventForm({ onCreateEvent, onBack, }) {
-  const [category, setCategory] = useState("Brand");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [locationName, setLocationName] = useState("");
+function NewEventForm({
+  onCreateEvent,
+  onUpdateEvent,
+  onBack,
+  eventToEdit,
+}) {
+  const [category, setCategory] = useState(
+  eventToEdit?.category || "Brand"
+);
+
+const [title, setTitle] = useState(
+  eventToEdit?.title || ""
+);
+
+const [description, setDescription] = useState(
+  eventToEdit?.description || ""
+);
+
+const [image, setImage] = useState(null);
+
+const [previewUrl, setPreviewUrl] = useState(
+  eventToEdit?.imageUrl || ""
+);
+
+const [latitude, setLatitude] = useState(
+  eventToEdit?.latitude ?? ""
+);
+
+const [longitude, setLongitude] = useState(
+  eventToEdit?.longitude ?? ""
+);
+
+const [locationName, setLocationName] = useState(
+  eventToEdit?.location || ""
+);
   const [locationStatus, setLocationStatus] = useState(
-  "Min nuvarande plats"
+  eventToEdit?.location || "Min nuvarande plats"
 );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -205,17 +231,19 @@ function NewEventForm({ onCreateEvent, onBack, }) {
       }
 
       const response = await fetch(
-        `${API_URL}/api/events`,
-        {
-          method: "POST",
+  eventToEdit
+    ? `${API_URL}/api/events/${eventToEdit.id}`
+    : `${API_URL}/api/events`,
+  {
+    method: eventToEdit ? "PUT" : "POST",
 
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
 
-          body: formData,
-        }
-      );
+    body: formData,
+  }
+);
 
       const data = await response.json();
 
@@ -226,7 +254,11 @@ function NewEventForm({ onCreateEvent, onBack, }) {
         );
       }
 
-      onCreateEvent?.(data);
+      if (eventToEdit) {
+  onUpdateEvent?.(data);
+} else {
+  onCreateEvent?.(data);
+}
 
     } catch (error) {
       console.error(
@@ -397,14 +429,18 @@ function NewEventForm({ onCreateEvent, onBack, }) {
         )}
 
         <button
-          className="publish-button"
-          type="submit"
-          disabled={loading}
-        >
-          {loading
-            ? "Publicerar..."
-            : "Publicera"}
-        </button>
+  className="publish-button"
+  type="submit"
+  disabled={loading}
+>
+  {loading
+    ? eventToEdit
+      ? "Sparar..."
+      : "Publicerar..."
+    : eventToEdit
+      ? "Spara ändringar"
+      : "Publicera"}
+</button>
       </form>
     </main>
   );

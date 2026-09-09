@@ -46,6 +46,8 @@ function App() {
   const [selectedUserID, setSelectedUserID] =
   useState(null);
 
+  const [eventToEdit, setEventToEdit] = useState(null);
+
 
   // =========================
   // INLOGGAD ANVÄNDARE
@@ -544,26 +546,44 @@ async function handleObservationClick(
 
   else if (creatingEvent) {
 
-    content = (
+  content = (
 
-      <NewEventForm
-  onCreateEvent={handleCreateEvent}
-  onBack={() => {
-    setCreatingEvent(false);
-    setSelectedEvent(null);
-    setShowObservationForm(false);
-    setCurrentPage("home");
+    <NewEventForm
+      eventToEdit={eventToEdit}
+      onCreateEvent={handleCreateEvent}
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }}
-/>
+      onUpdateEvent={(data) => {
+        setEvents((prev) =>
+          prev.map((item) =>
+            String(item.id) === String(data.id)
+              ? data
+              : item
+          )
+        );
 
-    );
+        setSelectedEvent(data);
+        setCreatingEvent(false);
+        setEventToEdit(null);
+        setCurrentPage("home");
+      }}
 
-  }
+      onBack={() => {
+        setCreatingEvent(false);
+        setEventToEdit(null);
+        setSelectedEvent(null);
+        setShowObservationForm(false);
+        setCurrentPage("home");
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }}
+    />
+
+  );
+
+}
 // =========================
 // PUBLIK PROFIL
 // =========================
@@ -701,6 +721,12 @@ else if (
         observations={
           observations
         }
+
+        onEdit={(event) => {
+          setEventToEdit(event);
+          setSelectedEvent(null);
+          setCreatingEvent(true);
+        }}
 
         onUserClick={
           handleUserClick

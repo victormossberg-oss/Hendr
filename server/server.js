@@ -1029,6 +1029,192 @@ app.delete(
   }
 );
 
+// =========================
+// REDIGERA HÄNDELSE
+// ÄGAREN ELLER ADMIN
+// =========================
+
+app.put(
+  "/api/events/:eventID",
+  authenticateToken,
+  upload.single("image"),
+
+  async (req, res) => {
+    const { eventID } = req.params;
+    const userID = req.user.userid;
+
+    try {
+      // =========================
+      // HÄMTA HÄNDELSEN
+      // =========================
+
+      const eventResult = await pool.query(
+        `
+        SELECT
+          eventID,
+          userid,
+          image_url
+        FROM Events
+        WHERE eventID = $1
+        `,
+        [eventID]
+      );
+
+      if (eventResult.rows.length === 0) {
+        return res.status(404).json({
+          message: "Händelsen hittades inte."
+        });
+      }
+
+      const existingEvent = eventResult.rows[0];
+
+      // =========================
+      // BEHÖRIGHET
+      // ÄGAREN ELLER ADMIN
+      // =========================
+
+      if (
+        existingEvent.userid !== userID &&
+        req.user.role !== "Admin"
+      ) {
+        return res.status(403).json({
+          message:
+            "Du har inte behörighet att redigera denna händelse."
+        });
+      }
+
+      // =========================
+      // HÄMTA DATA
+      // =========================
+
+      const {
+        title,
+        description,
+        category,
+        status,
+        latitude,
+        longitude,
+        location
+      } = req.body;
+
+      // =========================
+      // VALIDERING
+      // =========================
+
+      if (!title?.trim()) {
+        return res.status(400).json({
+          message: "Skriv en rubrik för händelsen."
+        });
+      }
+
+      if (!description?.trim()) {
+        return res.status(400).json({
+          message: "Beskriv kort vad som händer."
+        });
+      }
+
+      if (!location?.trim()) {
+        return res.status(400).json({
+          message: "Du måste ange en plats."
+        });
+      }
+
+      // =========================
+      // BILD
+      // =========================
+
+      let imageUrl = existingEvent.image_url;
+
+      if (req.file) {
+        const uploadedImage =
+          await uploadToCloudinary(
+            req.file,
+            "hendr/events"
+          );
+
+        imageUrl =
+          uploadedImage.secure_url;
+      }
+
+      // =========================
+      // KOORDINATER
+      // =========================
+
+      const parsedLatitude =
+        latitude !== undefined &&
+        latitude !== ""
+          ? Number(latitude)
+          : null;
+
+      const parsedLongitude =
+        longitude !== undefined &&
+        longitude !== ""
+          ? Number(longitude)
+          : null;
+
+      // =========================
+      // UPPDATERA HÄNDELSEN
+      // =========================
+
+      const result = await pool.query(
+        `
+        UPDATE Events
+        SET
+          title = $1,
+          description = $2,
+          category = $3,
+          status = $4,
+          image_url = $5,
+          latitude = $6,
+          longitude = $7,
+          location = $8
+        WHERE eventID = $9
+        RETURNING
+          eventID AS id,
+          title,
+          description,
+          category,
+          status,
+          created_at AS "createdAt",
+          image_url AS "imageUrl",
+          latitude,
+          longitude,
+          userid,
+          location
+        `,
+        [
+          title.trim(),
+          description.trim(),
+          category,
+          status || "Aktiv",
+          imageUrl,
+          parsedLatitude,
+          parsedLongitude,
+          location.trim(),
+          eventID
+        ]
+      );
+
+      // =========================
+      // SVARA
+      // =========================
+
+      res.json(result.rows[0]);
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid redigering av händelse:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte redigera händelsen."
+      });
+    }
+  }
+);
 
 // =========================
 // HÄMTA MINA HÄNDELSER

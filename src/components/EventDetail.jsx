@@ -27,6 +27,7 @@ function EventDetail({
   observations,
   onAddObservation,
   onDelete,
+  onEdit,
   onUserClick,
   onLocationClick,
   onBack,
@@ -156,6 +157,11 @@ function EventDetail({
     }
   }
 
+  function handleEdit() {
+  setMenuOpen(false);
+  onEdit?.(event);
+}
+
   function handleDelete() {
     setMenuOpen(false);
 
@@ -163,7 +169,7 @@ function EventDetail({
     onDelete?.(event.id);
   }
 
-  const canDelete = (() => {
+  const canManageEvent = (() => {
   const savedUser = localStorage.getItem("hendr_user");
   if (!savedUser) return false;
 
@@ -208,14 +214,26 @@ function EventDetail({
           </button>
 
           {menuOpen && (
-            <div className="detail-menu">
-              {canDelete && (
-                <button type="button" onClick={handleDelete}>
-                  Ta bort händelse
-                </button>
-              )}
-            </div>
-          )}
+  <div className="detail-menu">
+    {canManageEvent && (
+      <>
+        <button
+          type="button"
+          onClick={handleEdit}
+        >
+          Redigera händelse
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDelete}
+        >
+          Ta bort händelse
+        </button>
+      </>
+    )}
+  </div>
+)}
         </div>
       </div>
 
