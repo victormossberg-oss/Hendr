@@ -38,7 +38,7 @@ function CreateArticle({ onBack, onPublished }) {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [locationStatus, setLocationStatus] = useState(
-    "Sök plats eller ange adress..."
+    " Ingen plats vald"
   );
 
   const [media, setMedia] = useState([]);
@@ -302,6 +302,18 @@ function CreateArticle({ onBack, onPublished }) {
             const active =
               stepNumber <= step;
 
+              {publishing && (
+  <div className="article-publishing-overlay">
+    <div className="article-publishing-modal">
+      <div className="article-publishing-spinner" />
+
+      <strong>Publicerar artikel...</strong>
+
+      <span>Det här kan ta några sekunder.</span>
+    </div>
+  </div>
+)}
+
             return (
               <div
                 className="article-step-item"
@@ -445,38 +457,17 @@ function CreateArticle({ onBack, onPublished }) {
               Var har det hänt?
             </p>
 
-            <div className="article-location-search">
-              <MapPin size={22} />
-
-              <input
-                type="text"
-                value={
-                  locationName
-                }
-                onChange={(event) => {
-                  setLocationName(
-                    event.target.value
-                  );
-                  setLocationStatus(
-                    event.target.value ||
-                      "Sök plats eller ange adress..."
-                  );
-                }}
-                placeholder="Sök plats eller ange adress..."
-              />
-            </div>
-
             <button
-              type="button"
-              className="article-current-location"
-              onClick={getCurrentLocation}
-            >
-              <Navigation size={20} />
+  type="button"
+  className="article-current-location"
+  onClick={getCurrentLocation}
+>
+  <Navigation size={20} />
 
-              <span>
-                Använd min nuvarande plats
-              </span>
-            </button>
+  <span>
+    Använd min nuvarande plats
+  </span>
+</button>
 
             <div className="article-map-placeholder">
               <div className="article-map-grid" />
@@ -488,24 +479,15 @@ function CreateArticle({ onBack, onPublished }) {
                 />
               </div>
             </div>
-
             <div className="article-selected-location">
-              <div>
-                <MapPin size={20} />
+  <div>
+    <MapPin size={20} />
 
-                <strong>
-                  {locationStatus ||
-                    "Ingen plats vald"}
-                </strong>
-              </div>
-
-              <button
-                type="button"
-                onClick={getCurrentLocation}
-              >
-                Ändra plats
-              </button>
-            </div>
+    <strong>
+      {locationStatus || "Ingen plats vald"}
+    </strong>
+  </div>
+</div>
 
             <h2 className="article-media-heading">
               Bilder
@@ -709,7 +691,19 @@ function CreateArticle({ onBack, onPublished }) {
               {publishing ? "Publicerar..." : "Publicera artikel"}
             </button>
 
-          </section>
+                    </section>
+        )}
+
+        {publishing && (
+          <div className="article-publishing-overlay">
+            <div className="article-publishing-modal">
+              <div className="article-publishing-spinner" />
+
+              <strong>Publicerar artikel...</strong>
+
+              <span>Det här kan ta några sekunder.</span>
+            </div>
+          </div>
         )}
 
       </div>
