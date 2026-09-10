@@ -7,11 +7,13 @@ import SearchPage from "./components/SearchPage";
 import EventDetail from "./components/EventDetail";
 import ObservationForm from "./components/ObservationForm";
 import NewEventForm from "./components/NewEventForm";
+import CreateArticle from "./components/CreateArticle";
 import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import {
+  MapPin,
   Search,
 } from "lucide-react";
 
@@ -33,6 +35,9 @@ function App() {
     useState(false);
 
   const [creatingEvent, setCreatingEvent] =
+    useState(false);
+
+  const [creatingArticle, setCreatingArticle] =
     useState(false);
 
   const [observations, setObservations] =
@@ -96,7 +101,8 @@ function App() {
       loginReason === "createEvent"
     ) {
 
-      setCreatingEvent(true);
+      setCreatingEvent(false);
+      setCreatingArticle(true);
       setShowObservationForm(false);
       setSelectedEvent(null);
       setCurrentPage("home");
@@ -565,6 +571,29 @@ async function handleObservationClick(
 
 
   // =========================
+  // SKAPA ARTIKEL
+  // =========================
+
+  else if (creatingArticle) {
+
+    content = (
+      <CreateArticle
+        onBack={() => {
+          setCreatingArticle(false);
+          setCurrentPage("home");
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
+      />
+    );
+
+  }
+
+
+  // =========================
   // SKAPA HÄNDELSE
   // =========================
 
@@ -796,25 +825,12 @@ else if (
         }}
 
 
-        onAddObservation={() => {
-
-          if (!user) {
-
-            setLoginReason(
-              "observation"
-            );
-
-            setShowLogin(true);
-
-            return;
-
-          }
-
-          setShowObservationForm(
-            true
-          );
-
-        }}
+        onObservationAdded={(observation) => {
+  setObservations((current) => [
+    observation,
+    ...current,
+  ]);
+}}
 
 
         onDelete={async (eventID) => {
@@ -879,46 +895,45 @@ else if (
 
       <>
 
-        <header className="header">
+  <header className="header">
+  <button
+    type="button"
+    className="header-location-button"
+    aria-label="Min plats"
+  >
+    <MapPin size={22} strokeWidth={2} />
+  </button>
+
   <div className="logo">
     HENDR
   </div>
 
   <button
-  type="button"
-  className="header-search-button"
-  aria-label="Sök efter händelser"
-  onClick={handleSearch}
->
-  <Search size={27} strokeWidth={2} />
-</button>
+    type="button"
+    className="header-search-button"
+    aria-label="Sök efter händelser"
+    onClick={handleSearch}
+  >
+    <Search size={27} strokeWidth={2} />
+  </button>
 </header>
 
 
         <section className="intro">
+  <div className="filters">
+    <button className="active">
+      Senaste
+    </button>
 
-          <p>
-            Vad händer nära dig?
-          </p>
+    <button>
+      I närheten
+    </button>
 
-
-          <div className="filters">
-
-            <button className="active">
-              Alla
-            </button>
-
-            <button>
-              Nära dig
-            </button>
-
-            <button>
-              Följer
-            </button>
-
-          </div>
-
-        </section>
+    <button>
+      Mest bekräftat
+    </button>
+  </div>
+</section>
 
 
         <Feed
@@ -982,6 +997,7 @@ else if (
       ========================= */}
 
      {!creatingEvent &&
+  !creatingArticle &&
   currentPage !== "search" && (
     <BottomNav
 
@@ -1018,7 +1034,8 @@ else if (
         return;
       }
 
-      setCreatingEvent(true);
+      setCreatingEvent(false);
+      setCreatingArticle(true);
       setSelectedEvent(null);
       setShowObservationForm(false);
       setCurrentPage("home");

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Bookmark,
   CarFront,
   Check,
   Flame,
@@ -27,17 +28,31 @@ function formatRelativeTime(dateValue) {
   if (!dateValue) return "";
 
   const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "";
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
 
   const seconds = Math.max(
     0,
     Math.floor((Date.now() - date.getTime()) / 1000)
   );
 
-  if (seconds < 60) return "Just nu";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)} min sedan`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)} h sedan`;
-  if (seconds < 604800) return `${Math.floor(seconds / 86400)} d sedan`;
+  if (seconds < 60) {
+    return "Just nu";
+  }
+
+  if (seconds < 3600) {
+    return `${Math.floor(seconds / 60)} min sedan`;
+  }
+
+  if (seconds < 86400) {
+    return `${Math.floor(seconds / 3600)} h sedan`;
+  }
+
+  if (seconds < 604800) {
+    return `${Math.floor(seconds / 86400)} d sedan`;
+  }
 
   return date.toLocaleDateString("sv-SE", {
     day: "numeric",
@@ -47,19 +62,23 @@ function formatRelativeTime(dateValue) {
 
 function EventCard({
   event,
+  isFeatured = false,
   onClick,
   onConfirmationChange,
   onUserClick,
 }) {
   const [confirmed, setConfirmed] = useState(false);
 
-  const [confirmationCount, setConfirmationCount] = useState(
-    Number(event.confirmationCount) || 0
-  );
+  const [confirmationCount, setConfirmationCount] =
+    useState(
+      Number(event.confirmationCount) || 0
+    );
 
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] =
+    useState(false);
 
-  const CategoryIcon = getCategoryIcon(event.category);
+  const CategoryIcon =
+    getCategoryIcon(event.category);
 
   useEffect(() => {
     setConfirmationCount(
@@ -68,7 +87,8 @@ function EventCard({
   }, [event.confirmationCount]);
 
   useEffect(() => {
-    const token = localStorage.getItem("hendr_token");
+    const token =
+      localStorage.getItem("hendr_token");
 
     if (!token) return;
 
@@ -87,7 +107,9 @@ function EventCard({
 
         const data = await response.json();
 
-        setConfirmed(Boolean(data.confirmed));
+        setConfirmed(
+          Boolean(data.confirmed)
+        );
       } catch (error) {
         console.error(
           "Fel vid kontroll av bekräftelse:",
@@ -171,75 +193,95 @@ function EventCard({
 
   return (
     <article
-      className="event-card"
+      className={`news-article ${
+        isFeatured
+          ? "news-article-featured"
+          : "news-article-compact"
+      }`}
       onClick={onClick}
     >
-      <div className="event-card-media">
+      <div className="news-article-image">
         {event.imageUrl ? (
           <img
             src={event.imageUrl}
             alt=""
           />
         ) : (
-          <div className="event-card-media-placeholder">
+          <div className="news-article-image-placeholder">
             <CategoryIcon size={30} />
           </div>
         )}
+      </div>
 
-        <div
-          className={`event-badge event-badge-${event.category?.toLowerCase()}`}
-        >
-          <CategoryIcon
-            size={17}
-            strokeWidth={2.5}
-          />
+      <div className="news-article-content">
 
+        <div className="news-article-category">
+          <CategoryIcon size={14} />
           <span>
             {event.category || "Annat"}
           </span>
         </div>
 
-        <span className="event-time-badge">
-          {formatRelativeTime(
-            event.createdAt
-          )}
-        </span>
-      </div>
-
-      <div className="event-card-body">
-        <div className="event-card-heading">
-          <div>
-            <h2>{event.title}</h2>
-
-            {event.location && (
-              <div className="event-location">
-                <MapPin size={15} />
-                <span>
-                  {event.location}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
+        <h2 className="news-article-title">
+          {event.title}
+        </h2>
 
         {event.description && (
-          <p className="event-description">
+          <p className="news-article-description">
             {event.description}
           </p>
         )}
 
-        <div className="event-stats">
+        <div className="news-article-meta">
+
+          {event.location && (
+            <>
+              <span className="news-article-location">
+                <MapPin size={14} />
+                {event.location}
+              </span>
+
+              <span className="news-meta-dot">
+                ·
+              </span>
+            </>
+          )}
+
+          <span>
+            {formatRelativeTime(event.createdAt)}
+          </span>
+
+          {event.username && (
+            <>
+              <span className="news-meta-dot">
+                ·
+              </span>
+
+              <button
+                type="button"
+                className="news-article-author"
+                onClick={handleUserClick}
+              >
+                Av {event.username}
+              </button>
+            </>
+          )}
+
+        </div>
+
+        <div className="news-article-footer">
+
           <button
             type="button"
-            className={`event-confirmation-stat ${
+            className={`news-confirmation ${
               confirmed ? "confirmed" : ""
             }`}
             onClick={handleConfirmation}
             disabled={confirming}
           >
-            <span className="confirmation-icon">
+            <span className="news-stat-icon">
               <Check
-                size={15}
+                size={14}
                 strokeWidth={3}
               />
             </span>
@@ -253,24 +295,31 @@ function EventCard({
             </span>
           </button>
 
-          <span className="event-observations">
+          <span className="news-stat">
             <MessageCircle size={17} />
 
-            {Number(
-              event.observationCount
-            ) || 0}{" "}
-            observationer
+            <span>
+              {Number(
+                event.observationCount
+              ) || 0}
+            </span>
+
+            <span>
+              uppdateringar
+            </span>
           </span>
 
-          {event.username && (
-            <button
-              type="button"
-              className="event-author"
-              onClick={handleUserClick}
-            >
-              {event.username}
-            </button>
-          )}
+          <button
+            type="button"
+            className="news-bookmark"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+            aria-label="Spara artikel"
+          >
+            <Bookmark size={20} />
+          </button>
+
         </div>
       </div>
     </article>
