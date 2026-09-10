@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { API_URL } from "../config";
 import {
   ArrowLeft,
   ArrowRight,
@@ -26,7 +27,7 @@ const CATEGORIES = [
   { name: "Annat", Icon: MoreHorizontal },
 ];
 
-function CreateArticle({ onBack }) {
+function CreateArticle({ onBack, onPublished }) {
   const [step, setStep] = useState(1);
 
   const [title, setTitle] = useState("");
@@ -42,6 +43,7 @@ function CreateArticle({ onBack }) {
 
   const [media, setMedia] = useState([]);
   const [mediaMenuOpen, setMediaMenuOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const photoInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -183,18 +185,82 @@ function CreateArticle({ onBack }) {
     }
   }
 
-  function handlePublish() {
-    console.log("Artikel redo att publiceras:", {
-      title,
-      lead,
-      category,
-      locationName,
-      latitude,
-      longitude,
-      media,
-    });
+  async function handlePublish() {
+    if (publishing) return;
 
-    // Backend kopplas in här senare.
+    const token = localStorage.getItem("hendr_token");
+
+    if (!token) {
+      alert("Du måste vara inloggad för att publicera en artikel.");
+      return;
+    }
+
+    if (!title.trim() || !lead.trim()) {
+      alert("Fyll i rubrik och ingress innan du publicerar.");
+      setStep(1);
+      return;
+    }
+
+    setPublishing(true);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("title", title.trim());
+      formData.append("description", lead.trim());
+      formData.append("category", category);
+      formData.append("status", "Aktiv");
+
+      if (locationName.trim()) {
+        formData.append("location", locationName.trim());
+      }
+
+      if (latitude !== "" && latitude != null) {
+        formData.append("latitude", latitude);
+      }
+
+      if (longitude !== "" && longitude != null) {
+        formData.append("longitude", longitude);
+      }
+
+      // Events har just nu stöd för en huvudbild.
+      // Vi använder första bilden som artikelns huvudbild.
+      const mainImage = media.find(
+        (item) => item.type === "image" && item.file
+      );
+
+      if (mainImage) {
+        formData.append("image", mainImage.file);
+      }
+
+      const response = await fetch(`${API_URL}/api/events`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Kunde inte publicera artikeln."
+        );
+      }
+
+      // App kan använda detta för att uppdatera feeden direkt.
+      if (onPublished) {
+        onPublished(data);
+      } else {
+        onBack?.();
+      }
+    } catch (error) {
+      console.error("Fel vid publicering av artikel:", error);
+      alert(error.message || "Kunde inte publicera artikeln.");
+    } finally {
+      setPublishing(false);
+    }
   }
 
   return (
@@ -638,8 +704,9 @@ function CreateArticle({ onBack }) {
               type="button"
               className="article-publish-button"
               onClick={handlePublish}
+              disabled={publishing}
             >
-              Publicera artikel
+              {publishing ? "Publicerar..." : "Publicera artikel"}
             </button>
 
           </section>

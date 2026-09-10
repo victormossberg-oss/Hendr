@@ -587,6 +587,17 @@ async function handleObservationClick(
             behavior: "smooth",
           });
         }}
+        onPublished={async () => {
+          await refreshFeed();
+          setCreatingArticle(false);
+          setSelectedEvent(null);
+          setCurrentPage("home");
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
       />
     );
 
