@@ -388,7 +388,7 @@ function CreateArticle({ onBack, onPublished }) {
               className="article-form-label"
               htmlFor="article-lead"
             >
-              Ingress <span>*</span>
+              Innehåll <span>*</span>
             </label>
 
             <textarea

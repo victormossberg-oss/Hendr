@@ -23,6 +23,12 @@ import "./App.css";
 function App() {
 
   const [events, setEvents] = useState([]);
+
+  const [feedFilter, setFeedFilter] = useState("latest");
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationName, setLocationName] = useState("");
+  const [locationLoading, setLocationLoading] = useState(false);
+
   const [eventsLoading, setEventsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] =
@@ -190,6 +196,96 @@ function App() {
 
 }
 
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Jordens radie i kilometer
+
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+function getUserLocation() {
+  if (!navigator.geolocation) {
+    alert("Din webbläsare stödjer inte platsåtkomst.");
+    return;
+  }
+
+  setLocationLoading(true);
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const location = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+
+      console.log("Min position:", location);
+
+      setUserLocation(location);
+
+      fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.latitude}&longitude=${location.longitude}&localityLanguage=sv`
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Kunde inte hitta platsnamn.");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const locality =
+            data.locality ||
+            data.city ||
+            data.principalSubdivision ||
+            "Min plats";
+
+          const region =
+            data.principalSubdivision ||
+            "";
+
+          setLocationName(
+            region && locality !== region
+              ? `${locality}, ${region}`
+              : locality
+          );
+        })
+        .catch((error) => {
+          console.error(
+            "Kunde inte hämta platsnamn:",
+            error
+          );
+          setLocationName("Min plats");
+        })
+        .finally(() => {
+          setLocationLoading(false);
+        });
+    },
+    (error) => {
+      console.error("Kunde inte hämta position:", error);
+
+      setLocationLoading(false);
+
+      alert(
+        "Vi kunde inte få tillgång till din plats. Kontrollera platsbehörigheter i webbläsaren."
+      );
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 300000,
+    }
+  );
+}
+
 async function refreshFeed() {
   try {
     const response = await fetch(`${API_URL}/api/events`);
@@ -212,6 +308,50 @@ async function refreshFeed() {
     behavior: "smooth",
   });
 }
+
+const eventsWithDistance = events.map((event) => {
+  if (
+    !userLocation ||
+    event.latitude == null ||
+    event.longitude == null
+  ) {
+    return {
+      ...event,
+      distance: null,
+    };
+  }
+
+  const distance = calculateDistance(
+    userLocation.latitude,
+    userLocation.longitude,
+    Number(event.latitude),
+    Number(event.longitude)
+  );
+
+  return {
+    ...event,
+    distance,
+  };
+});
+
+const filteredEvents =
+  feedFilter === "nearby" && userLocation
+    ? eventsWithDistance
+        .filter(
+          (event) =>
+            event.distance !== null &&
+            event.distance <= 10
+        )
+        .sort(
+          (a, b) => a.distance - b.distance
+        )
+    : feedFilter === "confirmed"
+      ? [...events].sort(
+          (a, b) =>
+            (Number(b.confirmationCount) || 0) -
+            (Number(a.confirmationCount) || 0)
+        )
+      : events;
 
 
   // =========================
@@ -909,10 +1049,20 @@ else if (
   <header className="header">
   <button
     type="button"
-    className="header-location-button"
-    aria-label="Min plats"
+    className="header-brand"
+    aria-label="HENDR"
+    onClick={() => {
+      setFeedFilter("latest");
+      setSelectedEvent(null);
+      setCurrentPage("home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }}
   >
-    <MapPin size={22} strokeWidth={2} />
+    <img
+      src="/hendr-logo-transparent.png"
+      alt="HENDR"
+      className="header-brand-logo"
+    />
   </button>
 
   <div className="logo">
@@ -931,25 +1081,57 @@ else if (
 
 
         <section className="intro">
+  <button
+    type="button"
+    className="feed-location-status"
+    onClick={getUserLocation}
+    aria-label={
+      userLocation
+        ? `Aktuell plats: ${locationName || "Min plats"}`
+        : "Aktivera min plats"
+    }
+  >
+    <MapPin size={16} strokeWidth={2} />
+    <span>
+      {locationLoading
+        ? "Hämtar din plats..."
+        : userLocation
+        ? locationName || "Min plats"
+        : "Aktivera min plats"}
+    </span>
+  </button>
+
   <div className="filters">
-    <button className="active">
-      Senaste
-    </button>
+  <button
+    className={feedFilter === "latest" ? "active" : ""}
+    onClick={() => setFeedFilter("latest")}
+  >
+    Senaste
+  </button>
 
-    <button>
-      I närheten
-    </button>
+  <button
+  className={feedFilter === "nearby" ? "active" : ""}
+  onClick={() => {
+    setFeedFilter("nearby");
+    getUserLocation();
+  }}
+>
+  I närheten
+</button>
 
-    <button>
-      Mest bekräftat
-    </button>
-  </div>
+  <button
+    className={feedFilter === "confirmed" ? "active" : ""}
+    onClick={() => setFeedFilter("confirmed")}
+  >
+    Mest bekräftat
+  </button>
+</div>
 </section>
 
 
         <Feed
 
-          events={events}
+          events={filteredEvents}
           loading={eventsLoading}
 
           onEventClick={
@@ -980,7 +1162,7 @@ else if (
   return (
     <div className="app-splash">
       <img
-        src="/pwa-512x512.png"
+        src="/hendr-logo-transparent.png"
         alt="HENDR"
         className="app-splash-icon"
       />
