@@ -60,6 +60,34 @@ function App() {
 
   const [eventToEdit, setEventToEdit] = useState(null);
 
+  const [showBottomNav, setShowBottomNav] = useState(true);
+
+useEffect(() => {
+  let lastScrollY = window.scrollY;
+
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY <= 10) {
+      setShowBottomNav(true);
+    } else if (currentScrollY > lastScrollY) {
+      setShowBottomNav(false);
+    } else if (currentScrollY < lastScrollY) {
+      setShowBottomNav(true);
+    }
+
+    lastScrollY = currentScrollY;
+  };
+
+  window.addEventListener("scroll", handleScroll, {
+    passive: true,
+  });
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+}, []);
+
     // =========================
   // Hantera sök
   // =========================
@@ -1190,74 +1218,80 @@ else if (
       ========================= */}
 
      {!creatingEvent &&
-  !creatingArticle &&
-  currentPage !== "search" && (
+ !creatingArticle &&
+ currentPage !== "search" && (
+  <div
+    className={
+      showBottomNav
+        ? "bottom-nav-visible"
+        : "bottom-nav-hidden"
+    }
+  >
     <BottomNav
 
       currentPage={
         currentPage
       }
 
-    onHome={() => {
-      setCreatingEvent(false);
-      setSelectedEvent(null);
-      setShowObservationForm(false);
-      setCurrentPage("home");
+      onHome={() => {
+        setCreatingEvent(false);
+        setSelectedEvent(null);
+        setShowObservationForm(false);
+        setCurrentPage("home");
 
-      refreshFeed();
-    }}
+        refreshFeed();
+      }}
 
-    onMap={() => {
-      console.log(
-        "KARTA KLICKAD"
-      );
-
-      setCreatingEvent(false);
-      setSelectedEvent(null);
-      setShowObservationForm(false);
-      setCurrentPage("map");
-    }}
-
-    onCreateEvent={() => {
-      if (!user) {
-        setLoginReason(
-          "createEvent"
+      onMap={() => {
+        console.log(
+          "KARTA KLICKAD"
         );
-        setShowLogin(true);
-        return;
-      }
 
-      setCreatingEvent(false);
-      setCreatingArticle(true);
-      setSelectedEvent(null);
-      setShowObservationForm(false);
-      setCurrentPage("home");
-    }}
+        setCreatingEvent(false);
+        setSelectedEvent(null);
+        setShowObservationForm(false);
+        setCurrentPage("map");
+      }}
 
-    onProfile={() => {
-      setCreatingEvent(false);
-      setSelectedEvent(null);
-      setShowObservationForm(false);
+      onCreateEvent={() => {
+        if (!user) {
+          setLoginReason(
+            "createEvent"
+          );
+          setShowLogin(true);
+          return;
+        }
 
-      if (!user) {
-        setLoginReason("profile");
-        setShowLogin(true);
-        return;
-      }
+        setCreatingEvent(false);
+        setCreatingArticle(true);
+        setSelectedEvent(null);
+        setShowObservationForm(false);
+        setCurrentPage("home");
+      }}
 
-      setCurrentPage("profile");
-    }}
+      onProfile={() => {
+        setCreatingEvent(false);
+        setSelectedEvent(null);
+        setShowObservationForm(false);
 
-  />
+        if (!user) {
+          setLoginReason("profile");
+          setShowLogin(true);
+          return;
+        }
+
+        setCurrentPage("profile");
+      }}
+
+    />
+  </div>
 )}
 
-    <Analytics />
+<Analytics />
 
-    </div>
+</div>
 
   );
-
 }
-
 
 export default App;
