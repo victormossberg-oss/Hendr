@@ -1394,6 +1394,87 @@ app.get(
   }
 );
 
+// =========================
+// REDIGERA MIN PROFIL
+// =========================
+
+app.put(
+  "/api/users/me/profile",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const userID = req.user.userid;
+
+      const {
+        bio,
+        location
+      } = req.body;
+
+      const cleanBio =
+        bio?.trim() || null;
+
+      const cleanLocation =
+        location?.trim() || null;
+
+      const result =
+        await pool.query(
+          `
+          UPDATE Users
+          SET
+            bio = $1,
+            location = $2
+          WHERE userid = $3
+
+          RETURNING
+            userid,
+            username,
+            email,
+            role,
+            bio,
+            location,
+            created_at AS "createdAt"
+          `,
+          [
+            cleanBio,
+            cleanLocation,
+            userID
+          ]
+        );
+
+      if (
+        result.rows.length === 0
+      ) {
+
+        return res.status(404).json({
+          message:
+            "Användaren kunde inte hittas."
+        });
+
+      }
+
+      res.json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid redigering av profil:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte spara profilen."
+      });
+
+    }
+
+  }
+);
 
 // =========================
 // HÄMTA MINA OBSERVATIONER

@@ -7788,3 +7788,882 @@ body,
     transform: translateX(-50%) translateY(calc(100% + 100px)) !important;
   }
 }
+
+/* =========================================
+   HENDR – PROFIL
+========================================= */
+
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f4f1e8;
+  box-sizing: border-box;
+}
+
+.profile-content {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 18px 110px;
+}
+
+/* =========================================
+   PROFILHEADER
+========================================= */
+
+.profile-header {
+  text-align: center;
+  padding: 32px 10px 24px;
+}
+
+.profile-avatar {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #d6c28a;
+
+  font-family: "Playfair Display", serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: #1d1d1b;
+}
+
+.profile-header h1 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #171717;
+}
+
+
+
+.profile-location {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+  color: #77736a;
+}
+
+.profile-bio {
+  max-width: 330px;
+  margin: 14px auto 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+  color: #55524b;
+}
+
+/* =========================================
+   STATISTIK
+========================================= */
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  margin: 0;
+  padding: 18px 0;
+
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.profile-stat {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 0 8px;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  color: #1d1d1b;
+}
+
+.profile-stat + .profile-stat {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.profile-stat strong {
+  font-family: "Playfair Display", serif;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.profile-stat span {
+  margin-top: 6px;
+
+  font-size: 11px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  color: #77736a;
+}
+
+/* =========================================
+   SKAPA ARTIKEL
+========================================= */
+
+.profile-create-button {
+  width: 100%;
+  min-height: 48px;
+
+  margin: 22px 0 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: #c9ad55;
+  color: #171717;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.profile-create-button:hover {
+  background: #bfa34d;
+}
+
+.profile-create-button:active {
+  transform: scale(0.99);
+}
+
+.profile-create-button > span {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* =========================================
+   MINA SENASTE ARTIKLAR
+========================================= */
+
+.profile-articles {
+  margin-top: 0;
+}
+
+.profile-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+}
+
+.profile-section-heading h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-section-heading button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #8b753d;
+
+  cursor: pointer;
+}
+
+/* =========================================
+   ARTIKELLISTA
+========================================= */
+
+.profile-article-list {
+  border-top: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.profile-article {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 14px;
+
+  padding: 16px 0;
+
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 0;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.profile-article:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.profile-article-image {
+  width: 108px;
+  height: 82px;
+
+  overflow: hidden;
+  border-radius: 2px;
+
+  background: #ddd7c8;
+}
+
+.profile-article-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.profile-article-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  color: #6f613b;
+}
+
+/* =========================================
+   ARTIKELTEXT
+========================================= */
+
+.profile-article-content {
+  min-width: 0;
+}
+
+.profile-article-category {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  color: #927a3e;
+}
+
+.profile-article-content h3 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-article-content p {
+  margin: 5px 0 0;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  color: #66625a;
+}
+
+.profile-article-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-top: 8px;
+
+  font-size: 10px;
+  color: #89857c;
+}
+
+/* =========================================
+   MITT KONTO
+========================================= */
+
+.profile-section {
+  margin-top: 36px;
+  padding-top: 22px;
+
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.profile-section h2 {
+  margin: 0 0 14px;
+
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-info {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  padding: 13px 0;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  font-size: 12px;
+}
+
+.profile-info-row span {
+  color: #77736a;
+}
+
+.profile-info-row strong {
+  max-width: 60%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #33312d;
+}
+
+/* =========================================
+   LOGGA UT
+========================================= */
+
+.logout-button {
+  width: 100%;
+
+  margin-top: 28px;
+  padding: 13px;
+
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 3px;
+
+  background: transparent;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #55524b;
+
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================
+   TOMMA LISTOR
+========================================= */
+
+.profile-empty {
+  padding: 30px 10px;
+
+  text-align: center;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #77736a;
+}
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+@media (min-width: 769px) {
+  .profile-content {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+}
+
+/* =========================================
+   PROFIL – FIXA STATISTIK
+========================================= */
+
+.profile-stats {
+  background: transparent !important;
+}
+
+.profile-stat {
+  background: transparent !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* =========================================
+   PROFIL – ARTIKLAR
+========================================= */
+
+.profile-articles {
+  background: #ffffff;
+  margin-left: -18px;
+  margin-right: -18px;
+  padding: 22px 18px 0;
+}
+
+.profile-article-list {
+  background: #ffffff;
+}
+
+.profile-article {
+  background: #ffffff !important;
+}
+
+/* =========================================
+   PROFIL – INSTÄLLNINGAR
+========================================= */
+
+.profile-header {
+  position: relative;
+}
+
+.profile-settings-button {
+  position: absolute;
+  top: 18px;
+  right: 4px;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #55524b;
+
+  cursor: pointer;
+}
+
+.profile-settings-button:hover {
+  color: #8b753d;
+}
+
+/* =========================================
+   INSTÄLLNINGSPANEL
+========================================= */
+
+.profile-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 70px 18px 20px;
+
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.profile-settings-panel {
+  width: 100%;
+  max-width: 480px;
+
+  background: #ffffff;
+
+  border-radius: 3px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.12);
+
+  overflow: hidden;
+}
+
+.profile-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.profile-settings-header h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-settings-header button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #55524b;
+
+  cursor: pointer;
+}
+
+.profile-settings-item {
+  width: 100%;
+
+  padding: 17px 18px;
+
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  background: #ffffff;
+
+  text-align: left;
+
+  font-size: 14px;
+  color: #33312d;
+
+  cursor: pointer;
+}
+
+.profile-settings-item:hover {
+  background: #f8f6f0;
+}
+
+.profile-settings-logout {
+  color: #8b4b43;
+}
+
+/* =========================================
+   PROFIL – HEADER
+========================================= */
+
+.profile-header {
+  position: relative;
+  text-align: center;
+  padding: 30px 10px 26px;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+
+  width: 96px;
+  height: 96px;
+
+  margin: 0 auto 17px;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  background: #ded6c3;
+
+  font-family: "Playfair Display", serif;
+  font-size: 34px;
+  font-weight: 700;
+
+  color: #1d1d1b;
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-avatar-edit {
+  position: absolute;
+
+  right: -2px;
+  bottom: -2px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 2px solid #f4f1e8;
+  border-radius: 50%;
+
+  background: #c9ad55;
+  color: #171717;
+
+  font-size: 18px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.profile-header h1 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 29px;
+  line-height: 1.15;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-role {
+  margin: 6px 0 0;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #8b753d;
+}
+
+.profile-location {
+  margin: 4px 0 0;
+
+  font-size: 12px;
+
+  color: #77736a;
+}
+
+.profile-bio {
+  max-width: 320px;
+
+  margin: 13px auto 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #5f5b53;
+}
+
+/* =========================================
+   KUGGHJUL
+========================================= */
+
+.profile-settings-button {
+  position: absolute;
+
+  top: 18px;
+  right: 2px;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #4f4c46;
+
+  cursor: pointer;
+}
+
+.profile-settings-button:hover {
+  color: #8b753d;
+}
+
+/* =========================================
+   PROFIL – REDIGERA
+========================================= */
+
+.profile-settings-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.profile-edit-panel {
+  margin: 0 0 26px;
+  padding: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 3px;
+}
+
+.profile-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.profile-edit-header h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 21px;
+  font-weight: 700;
+
+  color: #171717;
+}
+
+.profile-edit-header button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #55524b;
+
+  cursor: pointer;
+}
+
+.profile-edit-label {
+  display: block;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #55524b;
+}
+
+.profile-edit-label textarea {
+  width: 100%;
+  min-height: 105px;
+
+  margin-top: 8px;
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  resize: vertical;
+
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 2px;
+
+  background: #f9f7f1;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: #222;
+
+  outline: none;
+}
+
+.profile-edit-label textarea:focus {
+  border-color: #c9ad55;
+}
+
+.profile-edit-counter {
+  margin-top: 6px;
+
+  text-align: right;
+
+  font-size: 10px;
+
+  color: #89857c;
+}
+
+.profile-save-button {
+  width: 100%;
+
+  margin-top: 16px;
+  padding: 13px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: #c9ad55;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  color: #171717;
+
+  cursor: pointer;
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Edit, Settings, X } from "lucide-react";
 import { API_URL } from "../config";
 
 function Profile({
@@ -22,6 +23,22 @@ function Profile({
 
   const [showObservations, setShowObservations] =
     useState(false);
+
+  const [showSettings, setShowSettings] =
+    useState(false);
+
+  const [editingProfile, setEditingProfile] =
+  useState(false);
+
+const [bio, setBio] =
+  useState(
+    user.bio ||
+    "Rapporterar om vad som händer och håller dig uppdaterad."
+  );
+
+const [location, setLocation] = useState(
+  user.location || ""
+);
 
 
   // =========================
@@ -389,16 +406,28 @@ function Profile({
   }
 
 
-  // =========================
+   // =========================
   // VANLIG PROFIL
   // =========================
 
-  return (
+  const articleCount = events.length;
 
+  const confirmationCount = events.reduce(
+    (total, event) =>
+      total + (Number(event.confirmationCount) || 0),
+    0
+  );
+
+  const updateCount = events.reduce(
+    (total, event) =>
+      total + (Number(event.observationCount) || 0),
+    0
+  );
+
+  return (
     <main className="profile-page">
 
       <div className="profile-content">
-
 
         {/* =========================
             PROFILHEADER
@@ -406,28 +435,193 @@ function Profile({
 
         <section className="profile-header">
 
-          <div className="profile-avatar">
+  <button
+    type="button"
+    className="profile-settings-button"
+    onClick={() => setShowSettings(true)}
+    aria-label="Inställningar"
+  >
+    <Settings size={21} strokeWidth={1.7} />
+  </button>
 
-            {initial}
+  <div className="profile-avatar-wrapper">
 
-          </div>
+    <div className="profile-avatar">
+      {initial}
+    </div>
 
+    <button
+      type="button"
+      className="profile-avatar-edit"
+      aria-label="Ändra profilbild"
+    >
+      +
+    </button>
 
-          <h1>
+  </div>
 
-            {user.username}
+  <h1>
+    {user.username}
+  </h1>
 
-          </h1>
+ 
 
+  {user.location && (
+  <p className="profile-location">
+    {user.location}
+  </p>
+)}
 
-          <p>
+  {bio && (
+  <p className="profile-bio">
+    {bio}
+  </p>
+)}
 
-            {user.email}
+</section>
 
-          </p>
+        {showSettings && (
+  <div className="profile-settings-overlay">
 
-        </section>
+    <div className="profile-settings-panel">
 
+      <div className="profile-settings-header">
+
+        <h2>
+          Inställningar
+        </h2>
+
+        <button
+          type="button"
+          onClick={() => setShowSettings(false)}
+          aria-label="Stäng"
+        >
+          <X size={20} />
+        </button>
+
+      </div>
+
+      <button
+  type="button"
+  className="profile-settings-item"
+  onClick={() => {
+    setShowSettings(false);
+    setEditingProfile(true);
+  }}
+>
+  <Edit size={17} />
+  Redigera profil
+</button>
+
+      <button
+        type="button"
+        className="profile-settings-item profile-settings-logout"
+        onClick={onLogout}
+      >
+        Logga ut
+      </button>
+
+    </div>
+
+  </div>
+)}
+
+{editingProfile && (
+  <section className="profile-edit-panel">
+
+    <div className="profile-edit-header">
+
+      <h2>
+        Redigera profil
+      </h2>
+
+      <button
+        type="button"
+        onClick={() => setEditingProfile(false)}
+        aria-label="Stäng"
+      >
+        <X size={20} />
+      </button>
+
+    </div>
+    <label className="profile-edit-label">
+  Plats
+  <input
+    type="text"
+    value={location}
+    onChange={(e) => setLocation(e.target.value)}
+    maxLength={255}
+    placeholder="Exempelvis Stockholm, Sverige"
+  />
+</label>
+
+    <label className="profile-edit-label">
+      Presentation
+
+      <textarea
+        value={bio}
+        onChange={(e) =>
+          setBio(e.target.value)
+        }
+        maxLength={180}
+        placeholder="Berätta kort om dig själv..."
+        rows={4}
+      />
+    </label>
+
+    <div className="profile-edit-counter">
+      {bio.length}/180
+    </div>
+
+    <button
+  type="button"
+  className="profile-save-button"
+  onClick={async () => {
+    try {
+      const token = localStorage.getItem("hendr_token");
+
+      const response = await fetch(
+        `${API_URL}/api/users/me/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bio,
+            location,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Kunde inte spara profilen."
+        );
+      }
+
+      setEditingProfile(false);
+
+      console.log("Profil sparad:", data);
+
+    } catch (error) {
+      console.error(
+        "Fel vid sparande av profil:",
+        error
+      );
+
+      alert(error.message);
+    }
+  }}
+>
+  Spara profil
+</button>
+
+  </section>
+)}
 
         {/* =========================
             STATISTIK
@@ -435,124 +629,188 @@ function Profile({
 
         <section className="profile-stats">
 
-
-          {/* =========================
-              HÄNDELSER
-          ========================= */}
-
-          <button
-            className="profile-stat"
-            type="button"
-            onClick={() =>
-              setShowEvents(true)
-            }
-          >
-
+          <div className="profile-stat">
             <strong>
-
-              {loading
-                ? "–"
-                : events.length}
-
+              {loading ? "–" : articleCount}
             </strong>
 
-
             <span>
-
-              Händelser
-
+              artiklar
             </span>
+          </div>
 
-          </button>
-
-
-          {/* =========================
-              OBSERVATIONER
-          ========================= */}
-
-          <button
-            className="profile-stat"
-            type="button"
-            onClick={() =>
-              setShowObservations(true)
-            }
-          >
-
+          <div className="profile-stat">
             <strong>
-
-              {loading
-                ? "–"
-                : observations.length}
-
+              {loading ? "–" : confirmationCount}
             </strong>
 
+            <span>
+              bekräftelser
+            </span>
+          </div>
+
+          <div className="profile-stat">
+            <strong>
+              {loading ? "–" : updateCount}
+            </strong>
 
             <span>
-
-              Observationer
-
+              uppdateringar
             </span>
-
-          </button>
-
-
-        </section>
-
-
-        {/* =========================
-            KONTO
-        ========================= */}
-
-        <section className="profile-section">
-
-          <h2>
-
-            Mitt konto
-
-          </h2>
-
-
-          <div className="profile-info">
-
-            <div className="profile-info-row">
-
-              <span>
-
-                Konto skapades
-
-              </span>
-
-
-              <strong>
-
-                {createdDate}
-
-              </strong>
-
-            </div>
-
           </div>
 
         </section>
 
 
         {/* =========================
-            LOGGA UT
+            SKAPA ARTIKEL
         ========================= */}
 
         <button
-          className="logout-button"
           type="button"
-          onClick={onLogout}
+          className="profile-create-button"
+          onClick={() => {
+            // Skapas i nästa steg
+          }}
         >
-          Logga ut
+          <span>
+            +
+          </span>
+
+          Skapa ny artikel
         </button>
+
+
+        {/* =========================
+            MINA SENASTE ARTIKLAR
+        ========================= */}
+
+        <section className="profile-articles">
+
+          <div className="profile-section-heading">
+
+            <h2>
+              Mina senaste artiklar
+            </h2>
+
+            {events.length > 0 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setShowEvents(true)
+                }
+              >
+                Visa alla →
+              </button>
+            )}
+
+          </div>
+
+
+          {loading ? (
+
+            <div className="profile-empty">
+              Hämtar dina artiklar...
+            </div>
+
+          ) : events.length === 0 ? (
+
+            <div className="profile-empty">
+              Du har inte skapat några artiklar ännu.
+            </div>
+
+          ) : (
+
+            <div className="profile-article-list">
+
+              {events.slice(0, 5).map((event) => (
+
+                <button
+                  type="button"
+                  className="profile-article"
+                  key={event.id}
+                  onClick={() =>
+                    onEventClick(event)
+                  }
+                >
+
+                  <div className="profile-article-image">
+
+                    {event.imageUrl ? (
+                      <img
+                        src={event.imageUrl}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="profile-article-placeholder">
+                        {event.category || "Annat"}
+                      </div>
+                    )}
+
+                  </div>
+
+
+                  <div className="profile-article-content">
+
+                    <span className="profile-article-category">
+                      {event.category || "Annat"}
+                    </span>
+
+                    <h3>
+                      {event.title}
+                    </h3>
+
+                    {event.description && (
+                      <p>
+                        {event.description}
+                      </p>
+                    )}
+
+                    <div className="profile-article-meta">
+
+                      <span>
+                        {event.createdAt
+                          ? new Date(
+                              event.createdAt
+                            ).toLocaleDateString(
+                              "sv-SE",
+                              {
+                                day: "numeric",
+                                month: "short"
+                              }
+                            )
+                          : ""}
+                      </span>
+
+                      <span>
+                        ✓ {Number(event.confirmationCount) || 0}
+                      </span>
+
+                      <span>
+                        ○ {Number(event.observationCount) || 0}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </button>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </section>
+
+
+        
 
 
       </div>
 
     </main>
-
   );
 
 }
