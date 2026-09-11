@@ -7752,3 +7752,39 @@ body,
 .news-article {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055) !important;
 }
+
+/* =========================================
+   DESKTOP – HENDR SOM EN CENTRERAD APP
+========================================= */
+
+@media (min-width: 769px) {
+  body {
+    background: #e9e5dc;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 520px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #ffffff;
+    position: relative;
+  }
+
+  .bottom-nav-visible,
+  .bottom-nav-hidden {
+    width: 100%;
+    max-width: 520px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+
+  .bottom-nav-visible {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .bottom-nav-hidden {
+    transform: translateX(-50%) translateY(calc(100% + 100px)) !important;
+  }
+}
