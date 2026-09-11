@@ -1653,8 +1653,10 @@ app.get(
     (
       SELECT COUNT(*)
       FROM EventConfirmations ec
-      WHERE ec.eventID = e.eventID
-    ) AS "confirmationCount"
+      INNER JOIN Events e
+      ON e.eventID = ec.eventID
+      WHERE e.userid = $1
+    ) AS "confirmationCount",
 
   FROM Events e
 
