@@ -6,7 +6,8 @@ function Profile({
   user,
   onEventClick,
   onObservationClick,
-  onLogout
+  onLogout,
+  onCreateArticle
 }) {
 
   const [events, setEvents] =
@@ -742,9 +743,7 @@ const updateCount =
         <button
           type="button"
           className="profile-create-button"
-          onClick={() => {
-            // Skapas i nästa steg
-          }}
+          onClick={onCreateArticle}
         >
           <span>
             +

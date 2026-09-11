@@ -881,6 +881,7 @@ else if (
   onEventClick={handleEventClick}
   onObservationClick={handleObservationClick}
   onLogout={handleLogout}
+  onCreateArticle={() => setCreatingArticle(true)}
 />
 
     );
