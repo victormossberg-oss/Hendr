@@ -15,6 +15,13 @@ function Profile({
   const [observations, setObservations] =
     useState([]);
 
+  const [stats, setStats] =
+    useState({
+    articleCount: 0,
+    confirmationCount: 0,
+    updateCount: 0
+  });
+
   const [loading, setLoading] =
     useState(true);
 
@@ -166,6 +173,38 @@ useEffect(() => {
         setObservations(
           observationsData
         );
+
+        // =========================
+// HÄMTA STATISTIK
+// =========================
+
+const statsResponse =
+  await fetch(
+    `${API_URL}/api/users/me/stats`,
+    {
+      headers
+    }
+  );
+
+if (!statsResponse.ok) {
+  throw new Error(
+    "Kunde inte hämta din statistik"
+  );
+}
+
+const statsData =
+  await statsResponse.json();
+
+setStats({
+  articleCount:
+    Number(statsData.articleCount) || 0,
+
+  confirmationCount:
+    Number(statsData.confirmationCount) || 0,
+
+  updateCount:
+    Number(statsData.updateCount) || 0
+});
 
 
       } catch (error) {
@@ -448,19 +487,14 @@ useEffect(() => {
   // VANLIG PROFIL
   // =========================
 
-  const articleCount = events.length;
+  const articleCount =
+  stats.articleCount;
 
-  const confirmationCount = events.reduce(
-    (total, event) =>
-      total + (Number(event.confirmationCount) || 0),
-    0
-  );
+const confirmationCount =
+  stats.confirmationCount;
 
-  const updateCount = events.reduce(
-    (total, event) =>
-      total + (Number(event.observationCount) || 0),
-    0
-  );
+const updateCount =
+  stats.updateCount;
 
   return (
     <main className="profile-page">
