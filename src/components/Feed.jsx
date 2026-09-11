@@ -4,6 +4,7 @@ function Feed({
   events,
   onEventClick,
   onConfirmationChange,
+  onUserClick,
 }) {
   return (
     <main className="feed">
@@ -14,6 +15,7 @@ function Feed({
           isFeatured={index === 0}
           onClick={() => onEventClick(event)}
           onConfirmationChange={onConfirmationChange}
+          onUserClick={onUserClick}
         />
       ))}
     </main>

@@ -1688,55 +1688,49 @@ app.get(
 
     try {
 
-      const {
-        userid
-      } = req.params;
-
+      const { userid } = req.params;
 
       const result = await pool.query(
-  `
-  SELECT
-    e.eventID AS id,
-    e.title,
-    e.description,
-    e.category,
-    e.status,
-    e.created_at AS "createdAt",
-    e.image_url AS "imageUrl",
-    e.latitude,
-    e.longitude,
-    e.userid,
-    e.location,
-    u.username AS username,
+        `
+        SELECT
+          e.eventID AS id,
+          e.title,
+          e.description,
+          e.category,
+          e.status,
+          e.created_at AS "createdAt",
+          e.image_url AS "imageUrl",
+          e.latitude,
+          e.longitude,
+          e.userid,
+          e.location,
+          u.username AS username,
 
-    (
-      SELECT COUNT(*)
-      FROM Observations o
-      WHERE o.eventID = e.eventID
-    ) AS "observationCount",
+          (
+            SELECT COUNT(*)
+            FROM Observations o
+            WHERE o.eventID = e.eventID
+          ) AS "observationCount",
 
-    (
-      SELECT COUNT(*)
-      FROM EventConfirmations ec
-      INNER JOIN Events e
-      ON e.eventID = ec.eventID
-      WHERE e.userid = $1
-    ) AS "confirmationCount",
+          (
+            SELECT COUNT(*)
+            FROM EventConfirmations ec
+            WHERE ec.eventID = e.eventID
+          ) AS "confirmationCount"
 
-  FROM Events e
+        FROM Events e
 
-  LEFT JOIN Users u
-    ON u.userid = e.userid
+        LEFT JOIN Users u
+          ON u.userid = e.userid
 
-  ORDER BY e.created_at DESC
-  `
-);
+        WHERE e.userid = $1
 
-
-      res.json(
-        result.rows
+        ORDER BY e.created_at DESC
+        `,
+        [userid]
       );
 
+      res.json(result.rows);
 
     } catch (error) {
 
@@ -1744,7 +1738,6 @@ app.get(
         "Fel vid hämtning av användarens händelser:",
         error
       );
-
 
       res.status(500).json({
         message:

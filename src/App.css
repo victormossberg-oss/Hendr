@@ -8667,3 +8667,19 @@ body,
 
   cursor: pointer;
 }
+
+.news-article-title {
+  transition: text-decoration-color 0.15s ease;
+}
+
+.news-article-title:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.news-article-title:hover {
+  text-decoration: underline !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 3px !important;
+}
