@@ -40,6 +40,44 @@ const [location, setLocation] = useState(
   user.location || ""
 );
 
+useEffect(() => {
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem("hendr_token");
+
+      const response = await fetch(
+        `${API_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Kunde inte hämta profilen."
+        );
+      }
+
+      const data = await response.json();
+
+      if (data.user) {
+        setBio(data.user.bio || "");
+        setLocation(data.user.location || "");
+      }
+
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av profil:",
+        error
+      );
+    }
+  };
+
+  fetchCurrentUser();
+}, []);
+
 
   // =========================
   // HÄMTA MINA DATA
