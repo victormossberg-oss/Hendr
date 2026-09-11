@@ -364,7 +364,7 @@ async function handleSubmitUpdate() {
 
     if (
       !window.confirm(
-        "Vill du ta bort den här händelsen?"
+        "Vill du ta bort den här artikeln?"
       )
     ) {
       return;
