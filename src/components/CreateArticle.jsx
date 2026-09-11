@@ -11,6 +11,7 @@ import {
   Shield,
   Cloud,
   CircleAlert,
+  Sparkles,
   MoreHorizontal,
   Plus,
   Camera,
@@ -19,11 +20,8 @@ import {
 } from "lucide-react";
 
 const CATEGORIES = [
-  { name: "Brand", Icon: Flame },
-  { name: "Trafik", Icon: CarFront },
-  { name: "Polis", Icon: Shield },
-  { name: "Väder", Icon: Cloud },
-  { name: "Olycka", Icon: CircleAlert },
+  { name: "Händelser", Icon: CircleAlert },
+  { name: "Nöje", Icon: Sparkles },
   { name: "Annat", Icon: MoreHorizontal },
 ];
 

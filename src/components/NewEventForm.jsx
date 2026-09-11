@@ -7,15 +7,14 @@ import {
   MoreHorizontal,
   TriangleAlert,
   Users,
+  Sparkles,
   Camera,
 } from "lucide-react";
 import { API_URL } from "../config";
 
 const CATEGORIES = [
-  { name: "Brand", Icon: Flame },
-  { name: "Trafik", Icon: CarFront },
-  { name: "Olycka", Icon: TriangleAlert },
-  { name: "Event", Icon: Users },
+  { name: "Händelser", Icon: TriangleAlert },
+  { name: "Nöje", Icon: Sparkles },
   { name: "Annat", Icon: MoreHorizontal },
 ];
 
