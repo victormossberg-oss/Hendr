@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Edit, Settings, X } from "lucide-react";
 import { API_URL } from "../config";
 
@@ -47,6 +47,11 @@ const [bio, setBio] =
 const [location, setLocation] = useState(
   user.location || ""
 );
+
+const [profileImage, setProfileImage] =
+  useState(user.profileImageUrl || "");
+
+const fileInputRef = useRef(null);
 
 useEffect(() => {
   const fetchCurrentUser = async () => {
@@ -521,16 +526,77 @@ const updateCount =
   <div className="profile-avatar-wrapper">
 
     <div className="profile-avatar">
-      {initial}
-    </div>
+  {profileImage ? (
+    <img
+      src={profileImage}
+      alt={`Profilbild för ${user.username}`}
+      className="profile-avatar-image"
+    />
+  ) : (
+    initial
+  )}
+</div>
 
     <button
-      type="button"
-      className="profile-avatar-edit"
-      aria-label="Ändra profilbild"
-    >
-      +
-    </button>
+  type="button"
+  className="profile-avatar-edit"
+  aria-label="Ändra profilbild"
+  onClick={() => fileInputRef.current?.click()}
+>
+  +
+</button>
+
+<input
+  ref={fileInputRef}
+  type="file"
+  accept="image/*"
+  style={{ display: "none" }}
+  onChange={async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+      const token =
+        localStorage.getItem("hendr_token");
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch(
+        `${API_URL}/api/users/me/profile-image`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Kunde inte ladda upp profilbilden."
+        );
+      }
+
+      setProfileImage(data.profileImageUrl);
+
+    } catch (error) {
+      console.error(
+        "Fel vid uppladdning av profilbild:",
+        error
+      );
+
+      alert(error.message);
+    }
+
+    e.target.value = "";
+  }}
+/>
 
   </div>
 

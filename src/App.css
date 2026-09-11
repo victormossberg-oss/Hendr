@@ -849,6 +849,7 @@ button {
 }
 
 .profile-avatar {
+  overflow: hidden;
   width: 88px;
   height: 88px;
 
@@ -863,6 +864,13 @@ button {
 
   font-size: 34px;
   font-weight: 700;
+}
+
+.profile-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .profile-header h1 {

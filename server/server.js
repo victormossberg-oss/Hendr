@@ -1764,9 +1764,10 @@ app.get(
             username,
             bio,
             location,
+            profile_image_url AS "profileImageUrl",
             created_at AS "createdAt"
-          FROM Users
-          WHERE userid = $1
+            FROM Users
+            WHERE userid = $1
           `,
           [userid]
         );
@@ -2441,6 +2442,7 @@ app.get(
             role,
             bio,
             location,
+            profile_image_url AS "profileImageUrl",
             created_at AS "createdAt"
           FROM Users
           WHERE userid = $1
