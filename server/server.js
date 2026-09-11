@@ -2236,19 +2236,63 @@ app.post(
 
 
 // =========================
-// TESTA INLOGGAD ANVÄNDARE
+// HÄMTA AKTUELL ANVÄNDARPROFIL
 // =========================
 
 app.get(
   "/api/auth/me",
   authenticateToken,
 
-  (req, res) => {
+  async (req, res) => {
 
-    res.json({
-      user:
-        req.user
-    });
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            userid,
+            username,
+            email,
+            role,
+            bio,
+            location,
+            created_at AS "createdAt"
+          FROM Users
+          WHERE userid = $1
+          `,
+          [req.user.userid]
+        );
+
+      if (
+        result.rows.length === 0
+      ) {
+
+        return res.status(404).json({
+          message:
+            "Användaren kunde inte hittas."
+        });
+
+      }
+
+      res.json({
+        user:
+          result.rows[0]
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av aktuell användare:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarprofilen."
+      });
+
+    }
 
   }
 );
