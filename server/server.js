@@ -1477,6 +1477,71 @@ app.put(
 );
 
 // =========================
+// HÄMTA MIN STATISTIK
+// =========================
+
+app.get(
+  "/api/users/me/stats",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const userID =
+        req.user.userid;
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            (
+              SELECT COUNT(*)
+              FROM Events
+              WHERE userid = $1
+            ) AS "articleCount",
+
+            (
+              SELECT COUNT(*)
+              FROM EventConfirmations ec
+              INNER JOIN Events e
+                ON e.eventID = ec.eventID
+              WHERE e.userid = $1
+            ) AS "confirmationCount",
+
+            (
+              SELECT COUNT(*)
+              FROM Observations
+              WHERE userID = $1
+            ) AS "updateCount"
+
+          `,
+          [userID]
+        );
+
+      res.json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av användarstatistik:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarstatistik."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // HÄMTA MINA OBSERVATIONER
 // =========================
 

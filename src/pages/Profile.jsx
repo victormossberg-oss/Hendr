@@ -194,6 +194,7 @@ if (!statsResponse.ok) {
 
 const statsData =
   await statsResponse.json();
+  console.log("MIN STATISTIK:", statsData);
 
 setStats({
   articleCount:
