@@ -504,9 +504,9 @@ useEffect(() => {
 
  
 
-  {user.location && (
+ {location && (
   <p className="profile-location">
-    {user.location}
+    {location}
   </p>
 )}
 
