@@ -216,11 +216,10 @@ function EventCard({
       <div className="news-article-content">
 
         <div className="news-article-category">
-          <CategoryIcon size={14} />
-          <span>
-            {event.category || "Annat"}
-          </span>
-        </div>
+  <span>
+    {event.category || "Annat"}
+  </span>
+</div>
 
         <h2 className="news-article-title">
           {event.title}
