@@ -427,8 +427,16 @@ function PublicProfile({
         <section className="profile-header">
 
           <div className="profile-avatar">
-            {initial}
-          </div>
+  {profile.profileImageUrl ? (
+    <img
+      src={profile.profileImageUrl}
+      alt={`Profilbild för ${profile.username}`}
+      className="profile-avatar-image"
+    />
+  ) : (
+    initial
+  )}
+</div>
 
 
           <h1>
