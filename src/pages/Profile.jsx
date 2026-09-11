@@ -76,9 +76,10 @@ useEffect(() => {
       const data = await response.json();
 
       if (data.user) {
-        setBio(data.user.bio || "");
-        setLocation(data.user.location || "");
-      }
+  setBio(data.user.bio || "");
+  setLocation(data.user.location || "");
+  setProfileImage(data.user.profileImageUrl || "");
+}
 
     } catch (error) {
       console.error(
