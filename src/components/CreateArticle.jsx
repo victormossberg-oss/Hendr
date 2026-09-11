@@ -25,19 +25,27 @@ const CATEGORIES = [
   { name: "Annat", Icon: MoreHorizontal },
 ];
 
-function CreateArticle({ onBack, onPublished }) {
+function CreateArticle({ onBack, onPublished, editEvent }) {
   const [step, setStep] = useState(1);
 
-  const [title, setTitle] = useState("");
-  const [lead, setLead] = useState("");
-  const [category, setCategory] = useState("Brand");
+  const [title, setTitle] = useState(editEvent?.title || "");
+const [lead, setLead] = useState(editEvent?.description || "");
+const [category, setCategory] = useState(
+  editEvent?.category || "Händelser"
+);
 
-  const [locationName, setLocationName] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [locationStatus, setLocationStatus] = useState(
-    " Ingen plats vald"
-  );
+  const [locationName, setLocationName] = useState(
+  editEvent?.location || ""
+);
+const [latitude, setLatitude] = useState(
+  editEvent?.latitude ?? ""
+);
+const [longitude, setLongitude] = useState(
+  editEvent?.longitude ?? ""
+);
+const [locationStatus, setLocationStatus] = useState(
+  editEvent?.location || "Ingen plats vald"
+);
 
   const [media, setMedia] = useState([]);
   const [mediaMenuOpen, setMediaMenuOpen] = useState(false);

@@ -46,6 +46,9 @@ function App() {
   const [creatingArticle, setCreatingArticle] =
     useState(false);
 
+  const [editingEvent, setEditingEvent] = 
+    useState(null);
+
   const [observations, setObservations] =
     useState([]);
 
@@ -583,8 +586,16 @@ const filteredEvents =
     setSelectedEvent(event);
 
     setCurrentPage("home");
+    
 
   }
+
+  function handleEditEvent(event) {
+  setSelectedEvent(null);
+  setEditingEvent(event);
+  setCreatingArticle(true);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
   function handleLocationClick(event) {
   setSelectedEvent(event);
@@ -749,7 +760,7 @@ async function handleObservationClick(
         onBack={() => {
           setCreatingArticle(false);
           setCurrentPage("home");
-
+          setEditingEvent(null);
           window.scrollTo({
             top: 0,
             behavior: "smooth",
@@ -984,6 +995,8 @@ else if (
         observations={
           observations
         }
+
+        onEdit={handleEditEvent}
 
         onEdit={(event) => {
           setEventToEdit(event);

@@ -290,7 +290,7 @@ setStats({
 
 
             <h1>
-              Mina händelser
+              Mina artiklar
             </h1>
 
 
@@ -298,7 +298,7 @@ setStats({
 
               <div className="profile-empty">
 
-                Hämtar dina händelser...
+                Hämtar dina artiklar...
 
               </div>
 
@@ -307,7 +307,7 @@ setStats({
               <div className="profile-empty">
 
                 Du har inte skapat några
-                händelser ännu.
+                artiklar ännu.
 
               </div>
 

@@ -185,13 +185,7 @@ function PublicProfile({
 
         <div className="profile-content">
 
-          <button
-            className="back-button"
-            type="button"
-            onClick={onBack}
-          >
-            ← Tillbaka
-          </button>
+          
 
 
           <div className="profile-empty">
@@ -253,17 +247,7 @@ function PublicProfile({
 
           <section className="profile-list-page">
 
-            <button
-              className="back-button"
-              type="button"
-              onClick={() =>
-                setShowEvents(false)
-              }
-            >
-              ← Tillbaka
-            </button>
-
-
+            
             <h1>
               {profile.username}s artiklar
             </h1>
@@ -407,17 +391,7 @@ function PublicProfile({
       <div className="profile-content">
 
 
-        {/* =========================
-            TILLBAKA
-        ========================= */}
-
-        <button
-          className="back-button"
-          type="button"
-          onClick={onBack}
-        >
-          ← Tillbaka
-        </button>
+      
 
 
         {/* =========================

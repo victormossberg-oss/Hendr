@@ -64,6 +64,7 @@ function EventDetail({
   event,
   observations,
   onDelete,
+  onEdit,
   onUserClick,
   onLocationClick,
   onBack,
@@ -457,19 +458,31 @@ async function handleSubmitUpdate() {
               </button>
 
               {menuOpen && (
-                <div className="article-menu">
+  <div className="article-menu">
 
-                  {canDelete && (
-                    <button
-                      type="button"
-                      onClick={handleDelete}
-                    >
-                      Ta bort händelse
-                    </button>
-                  )}
+    {canDelete && (
+      <>
+        <button
+  type="button"
+  onClick={() => {
+    setMenuOpen(false);
+    onEdit?.(event);
+  }}
+>
+  Redigera artikel
+</button>
 
-                </div>
-              )}
+        <button
+          type="button"
+          onClick={handleDelete}
+        >
+          Ta bort artikel
+        </button>
+      </>
+    )}
+
+  </div>
+)}
 
             </div>
 
