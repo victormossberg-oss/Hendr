@@ -1477,6 +1477,75 @@ app.put(
 );
 
 // =========================
+// LÄGG TILL / BYT PROFILBILD
+// =========================
+
+app.put(
+  "/api/users/me/profile-image",
+  authenticateToken,
+  upload.single("image"),
+
+  async (req, res) => {
+    try {
+      const userID = req.user.userid;
+
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Ingen bild valdes."
+        });
+      }
+
+      const uploadedImage =
+        await uploadToCloudinary(
+          req.file,
+          "hendr/profiles"
+        );
+
+      const profileImageUrl =
+        uploadedImage.secure_url;
+
+      const result =
+        await pool.query(
+          `
+          UPDATE Users
+          SET profile_image_url = $1
+          WHERE userid = $2
+
+          RETURNING
+            userid,
+            username,
+            profile_image_url AS "profileImageUrl"
+          `,
+          [
+            profileImageUrl,
+            userID
+          ]
+        );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: "Användaren kunde inte hittas."
+        });
+      }
+
+      res.json(result.rows[0]);
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid uppladdning av profilbild:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte ladda upp profilbilden."
+      });
+    }
+  }
+);
+
+// =========================
 // HÄMTA MIN STATISTIK
 // =========================
 

@@ -121,13 +121,13 @@ function SearchPage({
             />
 
             <h2>
-              Sök efter händelser
+              Sök efter artiklar
             </h2>
 
             <p>
               Sök på till exempel plats,
               kategori eller något som
-              står i en händelse.
+              står i en artikel.
             </p>
           </div>
         )}
