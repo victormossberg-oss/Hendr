@@ -757,27 +757,29 @@ async function handleObservationClick(
 
     content = (
       <CreateArticle
-        onBack={() => {
-          setCreatingArticle(false);
-          setCurrentPage("home");
-          setEditingEvent(null);
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        }}
-        onPublished={async () => {
-          await refreshFeed();
-          setCreatingArticle(false);
-          setSelectedEvent(null);
-          setCurrentPage("home");
+  editEvent={editingEvent}
+  onBack={() => {
+    setCreatingArticle(false);
+    setCurrentPage("home");
+    setEditingEvent(null);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }}
+  onPublished={async () => {
+    await refreshFeed();
+    setCreatingArticle(false);
+    setSelectedEvent(null);
+    setEditingEvent(null);
+    setCurrentPage("home");
 
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        }}
-      />
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }}
+/>
     );
 
   }
@@ -997,12 +999,6 @@ else if (
         }
 
         onEdit={handleEditEvent}
-
-        onEdit={(event) => {
-          setEventToEdit(event);
-          setSelectedEvent(null);
-          setCreatingEvent(true);
-        }}
 
         onUserClick={
           handleUserClick

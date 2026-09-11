@@ -47,7 +47,18 @@ const [locationStatus, setLocationStatus] = useState(
   editEvent?.location || "Ingen plats vald"
 );
 
-  const [media, setMedia] = useState([]);
+  const [media, setMedia] = useState(() => {
+  if (!editEvent?.imageUrl) return [];
+
+  return [
+    {
+      url: editEvent.imageUrl,
+      type: "image",
+      file: null,
+      existing: true,
+    },
+  ];
+});
   const [mediaMenuOpen, setMediaMenuOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
@@ -81,9 +92,9 @@ const [locationStatus, setLocationStatus] = useState(
     setMedia((current) => {
       const item = current[index];
 
-      if (item?.url) {
-        URL.revokeObjectURL(item.url);
-      }
+      if (item?.url?.startsWith("blob:")) {
+  URL.revokeObjectURL(item.url);
+}
 
       return current.filter(
         (_, i) => i !== index
@@ -239,13 +250,18 @@ const [locationStatus, setLocationStatus] = useState(
         formData.append("image", mainImage.file);
       }
 
-      const response = await fetch(`${API_URL}/api/events`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+  editEvent
+    ? `${API_URL}/api/events/${editEvent.id}`
+    : `${API_URL}/api/events`,
+  {
+    method: editEvent ? "PUT" : "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  }
+);
 
       const data = await response.json();
 
@@ -365,7 +381,7 @@ const [locationStatus, setLocationStatus] = useState(
         {step === 1 && (
           <section className="article-step-content">
 
-            <h1>Skriv din artikel</h1>
+            <h1>{editEvent ? "Redigera din artikel" : "Skriv din artikel"}</h1>
 
             <p className="article-step-subtitle">
               Berätta vad som händer. Ju mer tydlig
@@ -689,13 +705,17 @@ const [locationStatus, setLocationStatus] = useState(
             </div>
 
             <button
-              type="button"
-              className="article-publish-button"
-              onClick={handlePublish}
-              disabled={publishing}
-            >
-              {publishing ? "Publicerar..." : "Publicera artikel"}
-            </button>
+  type="button"
+  className="article-publish-button"
+  onClick={handlePublish}
+  disabled={publishing}
+>
+  {publishing
+    ? "Sparar..."
+    : editEvent
+      ? "Spara ändringar"
+      : "Publicera artikel"}
+</button>
 
                     </section>
         )}
@@ -705,7 +725,7 @@ const [locationStatus, setLocationStatus] = useState(
             <div className="article-publishing-modal">
               <div className="article-publishing-spinner" />
 
-              <strong>Publicerar artikel...</strong>
+              <strong>{editEvent ? "Sparar artikel..." : "Publicerar artikel..."}</strong>
 
               <span>Det här kan ta några sekunder.</span>
             </div>
