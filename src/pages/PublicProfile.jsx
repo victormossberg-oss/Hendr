@@ -14,8 +14,12 @@ function PublicProfile({
   const [events, setEvents] =
     useState([]);
 
-  const [observations, setObservations] =
-    useState([]);
+  const [stats, setStats] =
+    useState({
+      articleCount: 0,
+      confirmationCount: 0,
+      updateCount: 0
+    });
 
   const [loading, setLoading] =
     useState(true);
@@ -26,12 +30,9 @@ function PublicProfile({
   const [showEvents, setShowEvents] =
     useState(false);
 
-  const [showObservations, setShowObservations] =
-    useState(false);
-
 
   // =========================
-  // HÄMTA PUBLIK PROFIL
+  // HÄMTA PUBLIK PROFILDATA
   // =========================
 
   useEffect(() => {
@@ -46,7 +47,7 @@ function PublicProfile({
         const [
           profileResponse,
           eventsResponse,
-          observationsResponse
+          statsResponse
         ] = await Promise.all([
 
           fetch(
@@ -58,15 +59,13 @@ function PublicProfile({
           ),
 
           fetch(
-            `${API_URL}/api/users/${userid}/observations`
+            `${API_URL}/api/users/${userid}/stats`
           )
 
         ]);
 
 
-        if (
-          !profileResponse.ok
-        ) {
+        if (!profileResponse.ok) {
 
           throw new Error(
             "Kunde inte hitta användaren."
@@ -77,7 +76,7 @@ function PublicProfile({
 
         if (
           !eventsResponse.ok ||
-          !observationsResponse.ok
+          !statsResponse.ok
         ) {
 
           throw new Error(
@@ -93,8 +92,8 @@ function PublicProfile({
         const eventsData =
           await eventsResponse.json();
 
-        const observationsData =
-          await observationsResponse.json();
+        const statsData =
+          await statsResponse.json();
 
 
         setProfile(
@@ -105,9 +104,24 @@ function PublicProfile({
           eventsData
         );
 
-        setObservations(
-          observationsData
-        );
+        setStats({
+
+          articleCount:
+            Number(
+              statsData.articleCount
+            ) || 0,
+
+          confirmationCount:
+            Number(
+              statsData.confirmationCount
+            ) || 0,
+
+          updateCount:
+            Number(
+              statsData.updateCount
+            ) || 0
+
+        });
 
 
       } catch (error) {
@@ -121,7 +135,6 @@ function PublicProfile({
           error.message
         );
 
-
       } finally {
 
         setLoading(false);
@@ -132,9 +145,7 @@ function PublicProfile({
 
 
     if (userid) {
-
       fetchProfile();
-
     }
 
   }, [userid]);
@@ -147,21 +158,17 @@ function PublicProfile({
   if (loading) {
 
     return (
-
       <main className="profile-page">
 
         <div className="profile-content">
 
           <div className="profile-empty">
-
             Hämtar profil...
-
           </div>
 
         </div>
 
       </main>
-
     );
 
   }
@@ -174,7 +181,6 @@ function PublicProfile({
   if (error || !profile) {
 
     return (
-
       <main className="profile-page">
 
         <div className="profile-content">
@@ -184,9 +190,7 @@ function PublicProfile({
             type="button"
             onClick={onBack}
           >
-
             ← Tillbaka
-
           </button>
 
 
@@ -200,7 +204,6 @@ function PublicProfile({
         </div>
 
       </main>
-
     );
 
   }
@@ -219,13 +222,31 @@ function PublicProfile({
 
 
   // =========================
-  // HÄNDELSER
+  // DATUM
+  // =========================
+
+  const createdDate =
+    profile.createdAt
+      ? new Date(
+          profile.createdAt
+        ).toLocaleDateString(
+          "sv-SE",
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          }
+        )
+      : "Okänt";
+
+
+  // =========================
+  // ALLA ARTIKLAR
   // =========================
 
   if (showEvents) {
 
     return (
-
       <main className="profile-page">
 
         <div className="profile-content">
@@ -239,16 +260,12 @@ function PublicProfile({
                 setShowEvents(false)
               }
             >
-
               ← Tillbaka
-
             </button>
 
 
             <h1>
-
-              {profile.username}s händelser
-
+              {profile.username}s artiklar
             </h1>
 
 
@@ -257,170 +274,113 @@ function PublicProfile({
               <div className="profile-empty">
 
                 {profile.username} har inte
-                skapat några händelser ännu.
+                skapat några artiklar ännu.
 
               </div>
 
             ) : (
 
-              <div className="profile-events">
+              <div className="profile-article-list">
 
-                {events.map(
-                  (event) => (
+                {events.map((event) => (
 
-                    <button
-                      className="profile-event"
-                      key={event.id}
-                      type="button"
-                      onClick={() =>
-                        onEventClick(event)
-                      }
-                    >
+                  <button
+                    type="button"
+                    className="profile-article"
+                    key={event.id}
+                    onClick={() =>
+                      onEventClick(event)
+                    }
+                  >
 
-                      <span className="event-category">
+                    <div className="profile-article-image">
 
-                        {event.category}
+                      {event.imageUrl ? (
+
+                        <img
+                          src={event.imageUrl}
+                          alt=""
+                        />
+
+                      ) : (
+
+                        <div className="profile-article-placeholder">
+
+                          {event.category ||
+                            "Annat"}
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+
+                    <div className="profile-article-content">
+
+                      <span className="profile-article-category">
+
+                        {event.category ||
+                          "Annat"}
 
                       </span>
 
 
                       <h3>
-
                         {event.title}
-
                       </h3>
 
 
-                      <p>
+                      {event.description && (
 
-                        {event.description}
+                        <p>
+                          {event.description}
+                        </p>
 
-                      </p>
-
-
-                      <span className="event-time">
-
-                        {event.createdAt
-                          ? new Date(
-                              event.createdAt
-                            ).toLocaleString(
-                              "sv-SE"
-                            )
-                          : ""}
-
-                      </span>
-
-                    </button>
-
-                  )
-                )}
-
-              </div>
-
-            )}
-
-          </section>
-
-        </div>
-
-      </main>
-
-    );
-
-  }
+                      )}
 
 
-  // =========================
-  // OBSERVATIONER
-  // =========================
+                      <div className="profile-article-meta">
 
-  if (showObservations) {
+                        <span>
 
-    return (
+                          {event.createdAt
+                            ? new Date(
+                                event.createdAt
+                              ).toLocaleDateString(
+                                "sv-SE",
+                                {
+                                  day: "numeric",
+                                  month: "short"
+                                }
+                              )
+                            : ""}
 
-      <main className="profile-page">
-
-        <div className="profile-content">
-
-          <section className="profile-list-page">
-
-            <button
-              className="back-button"
-              type="button"
-              onClick={() =>
-                setShowObservations(false)
-              }
-            >
-
-              ← Tillbaka
-
-            </button>
+                        </span>
 
 
-            <h1>
-
-              {profile.username}s observationer
-
-            </h1>
-
-
-            {observations.length === 0 ? (
-
-              <div className="profile-empty">
-
-                {profile.username} har inte
-                lagt till några observationer ännu.
-
-              </div>
-
-            ) : (
-
-              <div className="profile-events">
-
-                {observations.map(
-                  (observation) => (
-
-                    <button
-                      className="profile-event"
-                      key={observation.id}
-                      type="button"
-                      onClick={() =>
-                        onObservationClick(
-                          observation
-                        )
-                      }
-                    >
-
-                      <span className="event-category">
-
-                        Observation
-
-                      </span>
+                        <span>
+                          ✓{" "}
+                          {Number(
+                            event.confirmationCount
+                          ) || 0}
+                        </span>
 
 
-                      <p>
+                        <span>
+                          ○{" "}
+                          {Number(
+                            event.observationCount
+                          ) || 0}
+                        </span>
 
-                        {observation.description}
+                      </div>
 
-                      </p>
+                    </div>
 
+                  </button>
 
-                      <span className="event-time">
-
-                        {observation.createdAt
-                          ? new Date(
-                              observation.createdAt
-                            ).toLocaleString(
-                              "sv-SE"
-                            )
-                          : ""}
-
-                      </span>
-
-                    </button>
-
-                  )
-                )}
+                ))}
 
               </div>
 
@@ -431,14 +391,13 @@ function PublicProfile({
         </div>
 
       </main>
-
     );
 
   }
 
 
   // =========================
-  // VANLIG PROFIL
+  // VANLIG PUBLIK PROFIL
   // =========================
 
   return (
@@ -457,9 +416,7 @@ function PublicProfile({
           type="button"
           onClick={onBack}
         >
-
           ← Tillbaka
-
         </button>
 
 
@@ -470,37 +427,31 @@ function PublicProfile({
         <section className="profile-header">
 
           <div className="profile-avatar">
-
             {initial}
-
           </div>
 
 
           <h1>
-
             {profile.username}
-
           </h1>
 
 
-          <p>
+          {profile.location && (
 
-            Medlem sedan{" "}
+            <p className="profile-location">
+              {profile.location}
+            </p>
 
-            {profile.createdAt
-              ? new Date(
-                  profile.createdAt
-                ).toLocaleDateString(
-                  "sv-SE",
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric"
-                  }
-                )
-              : "okänt datum"}
+          )}
 
-          </p>
+
+          {profile.bio && (
+
+            <p className="profile-bio">
+              {profile.bio}
+            </p>
+
+          )}
 
         </section>
 
@@ -511,87 +462,214 @@ function PublicProfile({
 
         <section className="profile-stats">
 
-
-          {/* =========================
-              HÄNDELSER
-          ========================= */}
-
-          <button
-            className="profile-stat"
-            type="button"
-            onClick={() => {
-
-              setShowEvents(true);
-              setShowObservations(false);
-
-            }}
-          >
+          <div className="profile-stat">
 
             <strong>
-
-              {events.length}
-
+              {stats.articleCount}
             </strong>
 
-
             <span>
-
-              Händelser
-
+              artiklar
             </span>
 
-          </button>
+          </div>
 
 
-          {/* =========================
-              OBSERVATIONER
-          ========================= */}
-
-          <button
-            className="profile-stat"
-            type="button"
-            onClick={() => {
-
-              setShowObservations(true);
-              setShowEvents(false);
-
-            }}
-          >
+          <div className="profile-stat">
 
             <strong>
-
-              {observations.length}
-
+              {stats.confirmationCount}
             </strong>
 
-
             <span>
-
-              Observationer
-
+              bekräftelser
             </span>
 
-          </button>
+          </div>
+
+
+          <div className="profile-stat">
+
+            <strong>
+              {stats.updateCount}
+            </strong>
+
+            <span>
+              uppdateringar
+            </span>
+
+          </div>
 
         </section>
 
 
         {/* =========================
-            TOM PROFIL
+            SENASTE ARTIKLAR
         ========================= */}
 
-        {events.length === 0 &&
-          observations.length === 0 && (
+        <section className="profile-articles">
+
+          <div className="profile-section-heading">
+
+            <h2>
+              {profile.username}s senaste artiklar
+            </h2>
+
+
+            {events.length > 0 && (
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowEvents(true)
+                }
+              >
+                Visa alla →
+              </button>
+
+            )}
+
+          </div>
+
+
+          {events.length === 0 ? (
 
             <div className="profile-empty">
 
-              {profile.username} har ännu inte
-              skapat några händelser eller
-              observationer.
+              {profile.username} har inte
+              skapat några artiklar ännu.
+
+            </div>
+
+          ) : (
+
+            <div className="profile-article-list">
+
+              {events
+                .slice(0, 5)
+                .map((event) => (
+
+                  <button
+                    type="button"
+                    className="profile-article"
+                    key={event.id}
+                    onClick={() =>
+                      onEventClick(event)
+                    }
+                  >
+
+                    <div className="profile-article-image">
+
+                      {event.imageUrl ? (
+
+                        <img
+                          src={event.imageUrl}
+                          alt=""
+                        />
+
+                      ) : (
+
+                        <div className="profile-article-placeholder">
+
+                          {event.category ||
+                            "Annat"}
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+
+                    <div className="profile-article-content">
+
+                      <span className="profile-article-category">
+
+                        {event.category ||
+                          "Annat"}
+
+                      </span>
+
+
+                      <h3>
+                        {event.title}
+                      </h3>
+
+
+                      {event.description && (
+
+                        <p>
+                          {event.description}
+                        </p>
+
+                      )}
+
+
+                      <div className="profile-article-meta">
+
+                        <span>
+
+                          {event.createdAt
+                            ? new Date(
+                                event.createdAt
+                              ).toLocaleDateString(
+                                "sv-SE",
+                                {
+                                  day: "numeric",
+                                  month: "short"
+                                }
+                              )
+                            : ""}
+
+                        </span>
+
+
+                        <span>
+                          ✓{" "}
+                          {Number(
+                            event.confirmationCount
+                          ) || 0}
+                        </span>
+
+
+                        <span>
+                          ○{" "}
+                          {Number(
+                            event.observationCount
+                          ) || 0}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </button>
+
+                ))}
 
             </div>
 
           )}
+
+        </section>
+
+
+        {/* =========================
+            MEDLEM SEDAN
+        ========================= */}
+
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "28px",
+            marginBottom: "10px",
+            fontSize: "12px",
+            color: "#888"
+          }}
+        >
+          Medlem sedan {createdDate}
+        </p>
+
 
       </div>
 
@@ -600,6 +678,5 @@ function PublicProfile({
   );
 
 }
-
 
 export default PublicProfile;

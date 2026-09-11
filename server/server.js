@@ -1542,6 +1542,68 @@ app.get(
 );
 
 // =========================
+// HÄMTA PUBLIK ANVÄNDARSTATISTIK
+// =========================
+
+app.get(
+  "/api/users/:userid/stats",
+  async (req, res) => {
+
+    try {
+
+      const { userid } = req.params;
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            (
+              SELECT COUNT(*)
+              FROM Events
+              WHERE userid = $1
+            ) AS "articleCount",
+
+            (
+              SELECT COUNT(*)
+              FROM EventConfirmations ec
+              INNER JOIN Events e
+                ON e.eventID = ec.eventID
+              WHERE e.userid = $1
+            ) AS "confirmationCount",
+
+            (
+              SELECT COUNT(*)
+              FROM Observations
+              WHERE userID = $1
+            ) AS "updateCount"
+
+          `,
+          [userid]
+        );
+
+      res.json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av publik användarstatistik:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta användarstatistiken."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // HÄMTA MINA OBSERVATIONER
 // =========================
 
@@ -1623,10 +1685,7 @@ app.get(
 
     try {
 
-      const {
-        userid
-      } = req.params;
-
+      const { userid } = req.params;
 
       const result =
         await pool.query(
@@ -1634,6 +1693,8 @@ app.get(
           SELECT
             userid,
             username,
+            bio,
+            location,
             created_at AS "createdAt"
           FROM Users
           WHERE userid = $1
@@ -1641,10 +1702,7 @@ app.get(
           [userid]
         );
 
-
-      if (
-        result.rows.length === 0
-      ) {
+      if (result.rows.length === 0) {
 
         return res.status(404).json({
           message:
@@ -1653,11 +1711,9 @@ app.get(
 
       }
 
-
       res.json(
         result.rows[0]
       );
-
 
     } catch (error) {
 
@@ -1665,7 +1721,6 @@ app.get(
         "Fel vid hämtning av publik användarprofil:",
         error
       );
-
 
       res.status(500).json({
         message:
