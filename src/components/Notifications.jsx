@@ -8,6 +8,50 @@ function Notifications({
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  function timeAgo(date) {
+  const seconds = Math.floor(
+    (Date.now() - new Date(date).getTime()) / 1000
+  );
+
+  if (seconds < 60) {
+    return "Precis nu";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes} min sedan`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `${hours} h sedan`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days < 7) {
+    return `${days} ${days === 1 ? "dag" : "dagar"} sedan`;
+  }
+
+  const weeks = Math.floor(days / 7);
+
+  if (weeks < 4) {
+    return `${weeks} ${weeks === 1 ? "vecka" : "veckor"} sedan`;
+  }
+
+  const months = Math.floor(days / 30);
+
+  if (months < 12) {
+    return `${months} ${months === 1 ? "månad" : "månader"} sedan`;
+  }
+
+  const years = Math.floor(days / 365);
+
+  return `${years} ${years === 1 ? "år" : "år"} sedan`;
+}
+
   useEffect(() => {
     async function loadNotifications() {
       try {
@@ -180,18 +224,19 @@ onEventClick?.(event);
                 }}
               >
                 <p>
+  <strong>
+    {notification.actorUsername || "Någon"}
+  </strong>{" "}
   {notification.type === "update"
-    ? `${notification.actorUsername || "Någon"} har uppdaterat en artikel du följer.`
+    ? "har uppdaterat en artikel du följer."
     : notification.type === "confirmation"
-      ? `${notification.actorUsername || "Någon"} har bekräftat din artikel.`
+      ? "har bekräftat din artikel."
       : "Du har en ny notis."}
 </p>
 
                 <small>
-                  {new Date(
-                    notification.createdAt
-                  ).toLocaleString("sv-SE")}
-                </small>
+  {timeAgo(notification.createdAt)}
+</small>
               </button>
             )
           )}
