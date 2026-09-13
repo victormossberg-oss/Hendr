@@ -8719,3 +8719,106 @@ body,
 
   box-sizing: border-box;
 }
+
+/* =========================
+   NOTISER
+   ========================= */
+
+.notifications-page {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px 20px 100px;
+  box-sizing: border-box;
+}
+
+.notifications-page h1 {
+  margin: 0 0 20px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notification-item {
+  width: 100%;
+  padding: 14px 16px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+
+  background: #fff;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.notification-item:hover {
+  background: #fafafa;
+  border-color: #d8d8d8;
+}
+
+.notification-item:active {
+  transform: scale(0.99);
+}
+
+.notification-item.unread {
+  position: relative;
+
+  background: #fff9df;
+  border-color: #f1d66a;
+
+  padding-left: 28px;
+}
+
+.notification-item.unread p {
+  font-weight: 600;
+}
+
+.notification-item p {
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.45;
+  color: #222;
+}
+
+
+.notification-item small {
+  display: block;
+
+  margin-top: 7px;
+
+  font-size: 12px;
+  color: #888;
+}
+
+.notification-item.unread::before {
+  content: "";
+
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #e6b800;
+}
+
+.notification-item:not(.unread) {
+  background: #fff;
+  border-color: #e5e5e5;
+}
