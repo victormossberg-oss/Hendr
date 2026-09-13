@@ -151,10 +151,11 @@ function Notifications({
                 }}
               >
                 <p>
-                  {notification.type ===
-                  "update"
-                    ? "En artikel du följer har uppdaterats."
-                    : "Du har en ny notis."}
+                  {notification.type === "update"
+  ? "En artikel du följer har uppdaterats."
+  : notification.type === "confirmation"
+    ? "Någon har bekräftat din artikel."
+    : "Du har en ny notis."}
                 </p>
 
                 <small>

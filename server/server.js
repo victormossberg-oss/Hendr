@@ -1970,6 +1970,75 @@ app.get(
 );
 
 // =========================
+// MARKERA NOTIS SOM LÄST
+// =========================
+
+app.patch(
+  "/api/notifications/:notificationID/read",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const {
+        notificationID
+      } = req.params;
+
+      const userID =
+        req.user.userid;
+
+      const result =
+        await pool.query(
+          `
+            UPDATE Notifications
+
+            SET isRead = TRUE
+
+            WHERE notificationID = $1
+            AND userID = $2
+
+            RETURNING
+              notificationID AS id,
+              isRead
+          `,
+          [
+            notificationID,
+            userID
+          ]
+        );
+
+      if (result.rows.length === 0) {
+
+        return res.status(404).json({
+          message:
+            "Notisen hittades inte."
+        });
+
+      }
+
+      res.json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid markering av notis:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte markera notisen som läst."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // HÄMTA PUBLIK ANVÄNDARPROFIL
 // =========================
 
