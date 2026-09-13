@@ -16,6 +16,9 @@ function Profile({
   const [observations, setObservations] =
     useState([]);
 
+  const [followedEvents, setFollowedEvents] =
+    useState([]);
+
   const [stats, setStats] =
     useState({
     articleCount: 0,
@@ -149,6 +152,31 @@ useEffect(() => {
         setEvents(
           eventsData
         );
+
+        // =========================
+// HÄMTA FÖLJDA ARTIKLAR
+// =========================
+
+const followedResponse =
+  await fetch(
+    `${API_URL}/api/users/me/follows`,
+    {
+      headers
+    }
+  );
+
+if (!followedResponse.ok) {
+  throw new Error(
+    "Kunde inte hämta följda artiklar"
+  );
+}
+
+const followedData =
+  await followedResponse.json();
+
+setFollowedEvents(
+  followedData
+);
 
 
         // =========================
@@ -942,6 +970,47 @@ const updateCount =
           )}
 
         </section>
+
+        <section className="profile-articles">
+  <div className="profile-section-heading">
+    <h2>Följda artiklar</h2>
+  </div>
+
+  {loading ? (
+    <div className="profile-empty">
+      Hämtar följda artiklar...
+    </div>
+  ) : followedEvents.length === 0 ? (
+    <div className="profile-empty">
+      Du följer inga artiklar ännu.
+    </div>
+  ) : (
+    <div className="profile-article-list">
+      {followedEvents.slice(0, 5).map((event) => (
+        <button
+          type="button"
+          className="profile-article"
+          key={event.id}
+          onClick={() => onEventClick(event)}
+        >
+          <div className="profile-article-content">
+            <strong>{event.title}</strong>
+
+            {event.description && (
+              <p>{event.description}</p>
+            )}
+
+            <small>
+              {event.username
+                ? `Av ${event.username}`
+                : ""}
+            </small>
+          </div>
+        </button>
+      ))}
+    </div>
+  )}
+</section>
 
 
         

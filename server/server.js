@@ -1650,6 +1650,70 @@ app.get(
 );
 
 // =========================
+// HÄMTA ARTIKLAR JAG FÖLJER
+// =========================
+
+app.get(
+  "/api/users/me/follows",
+  authenticateToken,
+
+  async (req, res) => {
+    try {
+      const userID =
+        req.user.userid;
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            e.eventID AS id,
+            e.title,
+            e.description,
+            e.category,
+            e.status,
+            e.created_at AS "createdAt",
+            e.placeID,
+            e.image_url AS "imageUrl",
+            e.latitude,
+            e.longitude,
+            e.userid,
+            e.location,
+            u.username
+          FROM "Follows" f
+
+          INNER JOIN Events e
+            ON e.eventID = f."eventID"
+
+          LEFT JOIN Users u
+            ON u.userid = e.userid
+
+          WHERE f."userID" = $1
+
+          ORDER BY
+            f.created_at DESC
+          `,
+          [userID]
+        );
+
+      res.json(
+        result.rows
+      );
+
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av följda artiklar:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta följda artiklar."
+      });
+    }
+  }
+);
+
+// =========================
 // REDIGERA MIN PROFIL
 // =========================
 
