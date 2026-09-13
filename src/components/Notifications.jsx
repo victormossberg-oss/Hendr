@@ -70,12 +70,12 @@ function Notifications({
                 type="button"
                 key={notification.id}
                 className={
-                  `notification-item ${
-                    notification.isread
-                      ? ""
-                      : "unread"
-                  }`
-                }
+  `notification-item ${
+    notification.isRead
+      ? ""
+      : "unread"
+  }`
+}
                 onClick={async () => {
                   console.log(
                     "NOTIS KLICKAD",
