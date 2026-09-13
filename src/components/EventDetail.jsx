@@ -577,34 +577,7 @@ async function handleSubmitUpdate() {
         </div>
       </div>
 
-      <div className="article-confirm-under-image">
-        <button
-          type="button"
-          className={`article-confirm ${
-            confirmed ? "confirmed" : ""
-          }`}
-          onClick={handleConfirm}
-          disabled={confirming}
-          aria-label={
-            confirmed
-              ? "Ta bort din bekräftelse"
-              : "Bekräfta artikeln"
-          }
-        >
-          <ShieldCheck
-            size={21}
-            strokeWidth={2.4}
-          />
-
-          <span>
-            {confirmationCount}{" "}
-            {confirmationCount === 1
-            ? "Bekräftelse"
-             : "Bekräftelser"}
-          </span>
-        </button>
-      </div>
-
+      
        
       {/* =================================
           ARTIKEL
@@ -612,13 +585,41 @@ async function handleSubmitUpdate() {
 
       <article className="article-body">
 
-        <div className="article-category">
-          {event.category || "Annat"}
-        </div>
+  <div className="article-info-top">
+    <div className="article-category">
+      {event.category || "Annat"}
+    </div>
 
-        <h1>
-          {event.title}
-        </h1>
+    <button
+      type="button"
+      className={`article-confirm ${
+        confirmed ? "confirmed" : ""
+      }`}
+      onClick={handleConfirm}
+      disabled={confirming}
+      aria-label={
+        confirmed
+          ? "Ta bort din bekräftelse"
+          : "Bekräfta artikeln"
+      }
+    >
+      <ShieldCheck
+        size={21}
+        strokeWidth={2.4}
+      />
+
+      <span>
+        {confirmationCount}{" "}
+        {confirmationCount === 1
+          ? "Bekräftelse"
+          : "Bekräftelser"}
+      </span>
+    </button>
+  </div>
+
+  <h1>
+    {event.title}
+  </h1>
 
 
         {/* PLATS + FÖRFATTARE */}

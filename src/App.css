@@ -8915,3 +8915,14 @@ body,
   justify-content: center;
   gap: 40px;
 }
+
+.article-info-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+.article-info-top .article-category {
+  margin-bottom: 0;
+}
