@@ -797,10 +797,10 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
 
     const followResult = await pool.query(
       `
-        SELECT followID
-        FROM Follows
-        WHERE userID = $1
-        AND eventID = $2
+        SELECT "followID"
+        FROM "Follows"
+        WHERE "userID" = $1
+        AND "eventID" = $2
       `,
       [userID, eventID]
     );
@@ -808,9 +808,9 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
     if (followResult.rows.length > 0) {
       await pool.query(
         `
-          DELETE FROM Follows
-          WHERE userID = $1
-          AND eventID = $2
+          DELETE FROM "Follows"
+          WHERE "userID" = $1
+          AND "eventID" = $2
         `,
         [userID, eventID]
       );
@@ -822,8 +822,8 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
 
     await pool.query(
       `
-        INSERT INTO Follows
-        (userID, eventID)
+        INSERT INTO "Follows"
+        ("userID", "eventID")
         VALUES
         ($1, $2)
       `,
@@ -850,10 +850,10 @@ app.get("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
       `
-        SELECT followID
-        FROM Follows
-        WHERE userID = $1
-        AND eventID = $2
+        SELECT "followID"
+        FROM "Follows"
+        WHERE "userID" = $1
+        AND "eventID" = $2
       `,
       [userID, eventID]
     );
