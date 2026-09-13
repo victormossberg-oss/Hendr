@@ -35,6 +35,9 @@ function App() {
   const [currentPage, setCurrentPage] =
     useState("home");
 
+  const [unreadNotifications, setUnreadNotifications] =
+  useState(0);
+
   const [selectedEvent, setSelectedEvent] =
     useState(null);
 
@@ -65,6 +68,8 @@ function App() {
   const [eventToEdit, setEventToEdit] = useState(null);
 
   const [showBottomNav, setShowBottomNav] = useState(true);
+
+  
 
 useEffect(() => {
   let lastScrollY = window.scrollY;
@@ -117,6 +122,63 @@ useEffect(() => {
       : null;
 
   });
+
+  useEffect(() => {
+
+  async function loadUnreadNotifications() {
+
+    if (!user) {
+      setUnreadNotifications(0);
+      return;
+    }
+
+    try {
+
+      const token =
+        localStorage.getItem("hendr_token");
+
+      const response =
+        await fetch(
+          `${API_URL}/api/notifications`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          "Kunde inte hämta notiser."
+        );
+      }
+
+      const data =
+        await response.json();
+
+      const unread =
+        data.filter(
+          (notification) =>
+            !notification.isRead
+        ).length;
+
+      setUnreadNotifications(unread);
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av olästa notiser:",
+        error
+      );
+
+    }
+
+  }
+
+  loadUnreadNotifications();
+
+}, [user]);
 
 
   // =========================
@@ -916,6 +978,11 @@ else if (
 
      <Notifications
   onEventClick={handleEventClick}
+  onNotificationRead={() => {
+    setUnreadNotifications((current) =>
+      Math.max(0, current - 1)
+    );
+  }}
 />
 
     );
@@ -1263,6 +1330,8 @@ else if (
       currentPage={
         currentPage
       }
+
+      unreadNotifications={unreadNotifications}
 
       onHome={() => {
         setCreatingEvent(false);

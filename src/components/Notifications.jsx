@@ -3,6 +3,7 @@ import { API_URL } from "../config";
 
 function Notifications({
   onEventClick,
+  onNotificationRead,
 }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -159,6 +160,8 @@ if (!notification.isRead) {
           : item
       )
     );
+
+    onNotificationRead?.();
   } catch (error) {
     console.error(
       "Kunde inte markera notisen som läst:",

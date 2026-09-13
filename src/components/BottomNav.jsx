@@ -13,6 +13,7 @@ function BottomNav({
   onCreateEvent,
   onProfile,
   onNotifications,
+  unreadNotifications,
 }) {
   return (
     <nav className="bottom-nav" aria-label="Huvudnavigation">
@@ -45,13 +46,22 @@ function BottomNav({
       </button>
 
       <button
-        type="button"
-        className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
-        onClick={onNotifications}
-      >
-        <Bell size={22} strokeWidth={2.2} />
-        <span>Notiser</span>
-      </button>
+  type="button"
+  className={`nav-item ${currentPage === "notifications" ? "active" : ""}`}
+  onClick={onNotifications}
+>
+  <span className="notification-bell">
+    <Bell size={22} strokeWidth={2.2} />
+
+    {unreadNotifications > 0 && (
+      <span className="notification-badge">
+        {unreadNotifications}
+      </span>
+    )}
+  </span>
+
+  <span>Notiser</span>
+</button>
 
       <button
         type="button"
