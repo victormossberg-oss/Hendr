@@ -3,10 +3,12 @@ import {
   Bookmark,
   Check,
   ChevronLeft,
+  ChevronRight,
   MapPin,
   MoreHorizontal,
   Send,
   ShieldCheck,
+  MessageCircle,
   X,
   Plus,
   Camera,
@@ -79,6 +81,9 @@ function EventDetail({
     );
 
   const [confirming, setConfirming] =
+    useState(false);
+
+  const [updatesOpen, setUpdatesOpen] =
     useState(false);
 
   const [menuOpen, setMenuOpen] =
@@ -490,7 +495,35 @@ async function handleSubmitUpdate() {
         </div>
       </div>
 
+      <div className="article-confirm-under-image">
+        <button
+          type="button"
+          className={`article-confirm ${
+            confirmed ? "confirmed" : ""
+          }`}
+          onClick={handleConfirm}
+          disabled={confirming}
+          aria-label={
+            confirmed
+              ? "Ta bort din bekräftelse"
+              : "Bekräfta artikeln"
+          }
+        >
+          <ShieldCheck
+            size={21}
+            strokeWidth={2.4}
+          />
 
+          <span>
+            {confirmationCount}{" "}
+            {confirmationCount === 1
+            ? "Bekräftelse"
+             : "Bekräftelser"}
+          </span>
+        </button>
+      </div>
+
+       
       {/* =================================
           ARTIKEL
           ================================= */}
@@ -571,309 +604,290 @@ async function handleSubmitUpdate() {
 
         </div>
 
+        <div className="article-actions">
+          <button
+            type="button"
+            className="article-updates-toggle"
+            onClick={() =>
+              setUpdatesOpen(
+                (open) => !open
+              )
+            }
+            aria-expanded={updatesOpen}
+          >
+            <MessageCircle
+              size={21}
+              strokeWidth={2.2}
+            />
+
+            <span>
+              {observations?.length || 0} Uppdateringar
+            </span>
+          </button>
+        </div>
 
         {/* =================================
-            BEKRÄFTELSE
-            ================================= */}
+            UPPDATERINGAR{/* =================================
+    UPPDATERINGAR
+    ================================= */}
+
+{updatesOpen && (
+  <section className="article-updates">
+
+    {/* LÄGG TILL UPPDATERING */}
+
+    <div
+      className={`article-update-composer ${
+        updateOpen ? "open" : ""
+      }`}
+    >
+
+      {!updateOpen ? (
 
         <button
           type="button"
-          className={`article-confirmation-box ${
-            confirmed ? "confirmed" : ""
-          }`}
-          onClick={handleConfirm}
-          disabled={confirming}
+          className="article-add-update"
+          onClick={openUpdateComposer}
         >
-
-          <span className="article-confirmation-shield">
-            <ShieldCheck
-              size={25}
-              strokeWidth={2.5}
-            />
+          <span className="article-add-update-icon">
+            +
           </span>
 
-          <span className="article-confirmation-text">
-            <strong>
-              {confirmationCount}{" "}
-              {confirmationCount === 1
-                ? "person"
-                : "personer"}{" "}
-              har bekräftat
-            </strong>
-
-            <span>
-              att händelsen pågår
-            </span>
+          <span>
+            Lägg till en uppdatering...
           </span>
-
-          <ChevronLeft
-            className="article-confirmation-arrow"
-            size={25}
-          />
-
         </button>
 
+      ) : (
 
-        {/* =================================
-            UPPDATERINGAR
-            ================================= */}
+        <>
 
-        <section className="article-updates">
+          <div className="article-update-input-row">
 
-          <div className="article-updates-header">
+            <textarea
+              ref={updateInputRef}
+              value={updateText}
+              onChange={(e) =>
+                setUpdateText(e.target.value)
+              }
+              placeholder="Vad händer nu?"
+              rows={1}
+            />
 
-            <h2>
-              Uppdateringar
-            </h2>
-
-            <span className="article-updates-count">
-              {observations?.length || 0}
-            </span>
+            <button
+              type="button"
+              className="article-update-send"
+              onClick={handleSubmitUpdate}
+              disabled={
+                updateSubmitting ||
+                (!updateText.trim() &&
+                  !updateImage)
+              }
+              aria-label="Skicka uppdatering"
+            >
+              <Send size={19} />
+            </button>
 
           </div>
 
 
-          {observations?.length > 0 ? (
-            <div className="article-update-list">
+          {updateImagePreview && (
+            <div className="article-update-image-preview">
 
-              {observations.map(
-                (observation) => (
-                  <article
-                    className="article-update"
-                    key={observation.id}
+              <img
+                src={updateImagePreview}
+                alt=""
+              />
+
+              <button
+                type="button"
+                onClick={removeUpdateImage}
+                aria-label="Ta bort bild"
+              >
+                <X size={17} />
+              </button>
+
+            </div>
+          )}
+
+
+          <div className="article-update-tools">
+
+            <div className="article-photo-wrap">
+
+              <button
+                type="button"
+                className="article-photo-button"
+                onClick={() =>
+                  setPhotoMenuOpen(
+                    (open) => !open
+                  )
+                }
+                aria-label="Lägg till foto"
+              >
+                <Plus size={20} />
+              </button>
+
+
+              {photoMenuOpen && (
+                <div className="article-photo-menu">
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      cameraInputRef.current?.click()
+                    }
                   >
+                    <Camera size={19} />
 
-                    <div className="article-update-avatar">
-                      {getInitials(
-                        observation.username
-                      )}
-                    </div>
+                    <span>
+                      Ta bild
+                    </span>
+                  </button>
 
-                    <div className="article-update-content">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      photoInputRef.current?.click()
+                    }
+                  >
+                    <ImageIcon size={19} />
 
-                      <div className="article-update-meta">
+                    <span>
+                      Välj foto
+                    </span>
+                  </button>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onUserClick?.(
-                              observation.userID ??
-                                observation.userid
-                            )
-                          }
-                        >
-                          {observation.username ||
-                            "Användare"}
-                        </button>
-
-                        <span>
-                          ·
-                        </span>
-
-                        <span>
-                          {formatRelativeTime(
-                            observation.createdAt
-                          )}
-                        </span>
-
-                      </div>
-
-                      <p>
-                        {observation.description}
-                      </p>
-
-                      {observation.imageUrl && (
-                        <img
-                          src={
-                            observation.imageUrl
-                          }
-                          alt=""
-                        />
-                      )}
-
-                    </div>
-
-                  </article>
-                )
+                </div>
               )}
 
             </div>
-          ) : (
-            <p className="article-no-updates">
-              Inga uppdateringar ännu.
-            </p>
-          )}
 
 
-          {/* LÄGG TILL UPPDATERING */}
+            <button
+              type="button"
+              className="article-update-cancel"
+              onClick={() => {
+                setUpdateOpen(false);
+                setUpdateText("");
+                removeUpdateImage();
+                setPhotoMenuOpen(false);
+              }}
+            >
+              Avbryt
+            </button>
 
-<div
-  className={`article-update-composer ${
-    updateOpen ? "open" : ""
-  }`}
->
-
-  {!updateOpen ? (
-
-    <button
-      type="button"
-      className="article-add-update"
-      onClick={openUpdateComposer}
-    >
-      <span className="article-add-update-icon">
-        +
-      </span>
-
-      <span>
-        Lägg till en uppdatering...
-      </span>
-    </button>
-
-  ) : (
-
-    <>
-
-      <div className="article-update-input-row">
-
-        <textarea
-          ref={updateInputRef}
-          value={updateText}
-          onChange={(e) =>
-            setUpdateText(e.target.value)
-          }
-          placeholder="Vad händer nu?"
-          rows={1}
-        />
-
-        <button
-          type="button"
-          className="article-update-send"
-          onClick={handleSubmitUpdate}
-          disabled={
-            updateSubmitting ||
-            (!updateText.trim() &&
-              !updateImage)
-          }
-          aria-label="Skicka uppdatering"
-        >
-          <Send size={19} />
-        </button>
-
-      </div>
+          </div>
 
 
-      {updateImagePreview && (
-        <div className="article-update-image-preview">
-
-          <img
-            src={updateImagePreview}
-            alt=""
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleUpdateImage}
           />
 
-          <button
-            type="button"
-            onClick={removeUpdateImage}
-            aria-label="Ta bort bild"
-          >
-            <X size={17} />
-          </button>
 
-        </div>
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={handleUpdateImage}
+          />
+
+        </>
+
       )}
 
-
-      <div className="article-update-tools">
-
-        <div className="article-photo-wrap">
-
-          <button
-            type="button"
-            className="article-photo-button"
-            onClick={() =>
-              setPhotoMenuOpen(
-                (open) => !open
-              )
-            }
-            aria-label="Lägg till foto"
-          >
-            <Plus size={20} />
-          </button>
+    </div>
 
 
-          {photoMenuOpen && (
-            <div className="article-photo-menu">
+    {/* BEFINTLIGA UPPDATERINGAR */}
 
-              <button
-                type="button"
-                onClick={() =>
-                  cameraInputRef.current?.click()
-                }
-              >
-                <Camera size={19} />
-                <span>
-                  Ta bild
-                </span>
-              </button>
+    {observations?.length > 0 ? (
 
-              <button
-                type="button"
-                onClick={() =>
-                  photoInputRef.current?.click()
-                }
-              >
-                <ImageIcon size={19} />
-                <span>
-                  Välj foto
-                </span>
-              </button>
+      <div className="article-update-list">
 
-            </div>
-          )}
+        {observations.map(
+          (observation) => (
 
-        </div>
+            <article
+              className="article-update"
+              key={observation.id}
+            >
+
+              <div className="article-update-avatar">
+                {getInitials(
+                  observation.username
+                )}
+              </div>
 
 
-        <button
-          type="button"
-          className="article-update-cancel"
-          onClick={() => {
-            setUpdateOpen(false);
-            setUpdateText("");
-            removeUpdateImage();
-            setPhotoMenuOpen(false);
-          }}
-        >
-          Avbryt
-        </button>
+              <div className="article-update-content">
+
+                <div className="article-update-meta">
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUserClick?.(
+                        observation.userID ??
+                          observation.userid
+                      )
+                    }
+                  >
+                    {observation.username ||
+                      "Användare"}
+                  </button>
+
+                  <span>
+                    ·
+                  </span>
+
+                  <span>
+                    {formatRelativeTime(
+                      observation.createdAt
+                    )}
+                  </span>
+
+                </div>
+
+
+                <p>
+                  {observation.description}
+                </p>
+
+
+                {observation.imageUrl && (
+                  <img
+                    src={observation.imageUrl}
+                    alt=""
+                  />
+                )}
+
+              </div>
+
+            </article>
+
+          )
+        )}
 
       </div>
 
+    ) : (
 
-      <input
-        ref={photoInputRef}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={handleUpdateImage}
-      />
+      <p className="article-no-updates">
+        Inga uppdateringar ännu.
+      </p>
 
+    )}
 
-      <input
-        ref={cameraInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        hidden
-        onChange={handleUpdateImage}
-      />
+  </section>
+)}
 
-    </>
-
-  )}
-
-</div>
-
-        </section>
 
       </article>
 

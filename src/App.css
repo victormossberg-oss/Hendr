@@ -6224,95 +6224,6 @@ body {
 }
 
 
-/* =====================================================
-   BEKRÄFTELSE
-   ===================================================== */
-
-.article-confirmation-box {
-  width: 100%;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 13px;
-
-  margin-top: 25px;
-
-  padding:
-    14px 15px;
-
-  border: none;
-
-  border-radius: 15px;
-
-  background:
-    #f8f1dc;
-
-  color:
-    var(--hendr-dark);
-
-  text-align: left;
-
-  cursor: pointer;
-}
-
-.article-confirmation-box.confirmed {
-  background:
-    #f4e9c9;
-}
-
-.article-confirmation-shield {
-  width: 45px;
-  height: 45px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 12px;
-
-  background:
-    var(--hendr-mustard);
-
-  color:
-    #ffffff;
-}
-
-.article-confirmation-text {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 2px;
-
-  flex: 1;
-
-  font-size: 14px;
-
-  line-height: 1.25;
-}
-
-.article-confirmation-text strong {
-  font-size: 15px;
-}
-
-.article-confirmation-text span {
-  color:
-    #666666;
-}
-
-.article-confirmation-arrow {
-  transform:
-    rotate(180deg);
-
-  color:
-    var(--hendr-mustard);
-}
-
 
 /* =====================================================
    UPPDATERINGAR
@@ -6539,6 +6450,43 @@ body {
   line-height: 1;
 }
 
+.article-detail-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hendr-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.article-detail-confirm:disabled {
+  cursor: default;
+}
+
+.article-detail-confirm-icon {
+  width: 23px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--hendr-border);
+  border-radius: 50%;
+}
+
+.article-detail-confirm.confirmed {
+  color: var(--hendr-dark);
+}
+
+.article-detail-confirm.confirmed
+.article-detail-confirm-icon {
+  background: var(--hendr-mustard);
+  border-color: var(--hendr-mustard);
+}
+
 
 /* =====================================================
    MOBIL
@@ -6601,6 +6549,12 @@ body {
     margin-top: 27px;
   }
 
+}
+
+.article-detail-confirm-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 /* =====================================================
@@ -8821,4 +8775,122 @@ body,
 .notification-item:not(.unread) {
   background: #fff;
   border-color: #e5e5e5;
+}
+
+.article-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 18px;
+  padding: 14px 0;
+  border-top: 1px solid var(--hendr-border);
+  border-bottom: 1px solid var(--hendr-border);
+}
+
+.article-confirm,
+.article-updates-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hendr-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.article-confirm:disabled {
+  cursor: default;
+}
+
+.article-confirm.confirmed {
+  color: var(--hendr-dark);
+}
+
+.article-confirm.confirmed svg {
+  fill: var(--hendr-mustard);
+  color: var(--hendr-mustard);
+}
+
+.article-updates-toggle {
+  cursor: pointer;
+}
+
+.article-updates {
+  margin-top: 14px;
+}
+
+.article-update-composer {
+  margin-bottom: 16px;
+}
+
+.article-update-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.article-update {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.article-update-avatar {
+  flex-shrink: 0;
+}
+
+.article-update-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.article-update-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.article-update-content p {
+  margin: 4px 0 0;
+}
+
+.article-no-updates {
+  margin: 0;
+  color: var(--hendr-muted);
+  font-size: 14px;
+}
+
+.article-confirm-under-image {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px 0;
+}
+
+.article-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hendr-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.article-confirm:disabled {
+  cursor: default;
+}
+
+.article-confirm.confirmed {
+  color: var(--hendr-dark);
+}
+
+.article-confirm.confirmed svg {
+  color: var(--hendr-mustard);
+  fill: var(--hendr-mustard);
 }

@@ -286,12 +286,13 @@ function EventCard({
             </span>
 
             <span>
-              {confirmationCount}
-            </span>
+  {confirmationCount}{" "}
+  {confirmationCount === 1
+    ? "Bekräftelse"
+    : "Bekräftelser"}
+</span>
 
-            <span>
-              bekräftelser
-            </span>
+            
           </button>
 
           <span className="news-stat">
