@@ -68,6 +68,8 @@ function EventCard({
   onUserClick,
 }) {
   const [confirmed, setConfirmed] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [following, setFollowing] = useState(false);
 
   const [confirmationCount, setConfirmationCount] =
     useState(
@@ -120,6 +122,93 @@ function EventCard({
 
     checkConfirmation();
   }, [event.id]);
+
+    useEffect(() => {
+    const token =
+      localStorage.getItem("hendr_token");
+
+    if (!token) return;
+
+    async function checkFollow() {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/events/${event.id}/follow`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        setIsFollowing(
+          Boolean(data.following)
+        );
+      } catch (error) {
+        console.error(
+          "Fel vid kontroll av följning:",
+          error
+        );
+      }
+    }
+
+    checkFollow();
+  }, [event.id]);
+
+    async function handleFollow(e) {
+    e.stopPropagation();
+
+    const token =
+      localStorage.getItem("hendr_token");
+
+    if (!token) {
+      alert(
+        "Du måste vara inloggad för att följa en artikel."
+      );
+      return;
+    }
+
+    if (following) return;
+
+    setFollowing(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/events/${event.id}/follow`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Kunde inte ändra följningen."
+        );
+      }
+
+      setIsFollowing(
+        Boolean(data.following)
+      );
+    } catch (error) {
+      console.error(
+        "Fel vid följning:",
+        error
+      );
+
+      alert(error.message);
+    } finally {
+      setFollowing(false);
+    }
+  }
 
   async function handleConfirmation(e) {
     e.stopPropagation();
@@ -310,15 +399,23 @@ function EventCard({
           </span>
 
           <button
-            type="button"
-            className="news-bookmark"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-            aria-label="Spara artikel"
-          >
-            <Bookmark size={20} />
-          </button>
+  type="button"
+  className={`news-bookmark ${
+    isFollowing ? "following" : ""
+  }`}
+  onClick={handleFollow}
+  disabled={following}
+  aria-label={
+    isFollowing
+      ? "Sluta följa artikel"
+      : "Följ artikel"
+  }
+>
+  <Bookmark
+    size={20}
+    fill={isFollowing ? "currentColor" : "none"}
+  />
+</button>
 
         </div>
       </div>

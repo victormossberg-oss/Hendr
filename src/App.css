@@ -4922,20 +4922,26 @@ body {
 }
 
 .news-bookmark {
-  margin-left: auto;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   border: 0;
   background: transparent;
-
-  color: var(--hendr-dark);
-
+  color: var(--hendr-muted);
   cursor: pointer;
+}
+
+.news-bookmark:hover {
+  color: var(--hendr-dark);
+}
+
+.news-bookmark.following {
+  color: var(--hendr-mustard);
+}
+
+.news-bookmark:disabled {
+  cursor: default;
 }
 
 
@@ -8896,9 +8902,10 @@ body,
 }
 
 .article-circle-button.following {
-  color: var(--hendr-dark);
+  color: var(--hendr-mustard);
 }
 
 .article-circle-button.following svg {
-  fill: var(--hendr-dark);
+  color: var(--hendr-mustard);
+  fill: var(--hendr-mustard);
 }
