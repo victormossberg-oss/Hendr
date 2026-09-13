@@ -1932,7 +1932,7 @@ app.get(
 
   u.username AS "actorUsername",
 
-  n.isread,
+  n.isread AS "isRead",
 
   n.created_at AS "createdAt"
 
