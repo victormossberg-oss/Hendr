@@ -71,7 +71,7 @@ function Notifications({
                 key={notification.id}
                 className={
                   `notification-item ${
-                    notification.isRead
+                    notification.isread
                       ? ""
                       : "unread"
                   }`
