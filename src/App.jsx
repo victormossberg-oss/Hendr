@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "./config";
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
+import Notifications from "./components/Notifications";
 import SearchPage from "./components/SearchPage";
 import EventDetail from "./components/EventDetail";
 import ObservationForm from "./components/ObservationForm";
@@ -579,16 +580,14 @@ const filteredEvents =
   // =========================
 
   function handleEventClick(event) {
+  console.log("HANDLE EVENT CLICK", event);
 
-    setCreatingEvent(false);
-    setShowObservationForm(false);
-
-    setSelectedEvent(event);
-
-    setCurrentPage("home");
-    
-
-  }
+  setCreatingEvent(false);
+  setShowObservationForm(false);
+  setSelectedEvent(event);
+  console.log("SETTER SELECTED EVENT", event);
+  setCurrentPage("home");
+}
 
   function handleEditEvent(event) {
   setSelectedEvent(null);
@@ -717,7 +716,10 @@ async function handleObservationClick(
   // =========================
   // INNEHÅLL
   // =========================
-
+console.log("APP RENDER", {
+  currentPage,
+  selectedEvent,
+});
   let content;
 
 
@@ -895,6 +897,25 @@ else if (
   onObservationClick={handleObservationClick}
   onLogout={handleLogout}
   onCreateArticle={() => setCreatingArticle(true)}
+/>
+
+    );
+
+  }
+
+    // =========================
+  // NOTISER
+  // =========================
+
+  else if (
+    currentPage === "notifications" &&
+    user
+  ) {
+
+    content = (
+
+     <Notifications
+  onEventClick={handleEventClick}
 />
 
     );
@@ -1278,6 +1299,22 @@ else if (
         setShowObservationForm(false);
         setCurrentPage("home");
       }}
+
+      onNotifications={() => {
+
+  if (!user) {
+    setLoginReason("notifications");
+    setShowLogin(true);
+    return;
+  }
+
+  setCreatingEvent(false);
+  setCreatingArticle(false);
+  setSelectedEvent(null);
+  setShowObservationForm(false);
+  setCurrentPage("notifications");
+
+}}
 
       onProfile={() => {
         setCreatingEvent(false);
