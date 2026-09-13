@@ -180,12 +180,12 @@ onEventClick?.(event);
                 }}
               >
                 <p>
-                  {notification.type === "update"
-  ? "En artikel du följer har uppdaterats."
-  : notification.type === "confirmation"
-    ? "Någon har bekräftat din artikel."
-    : "Du har en ny notis."}
-                </p>
+  {notification.type === "update"
+    ? `${notification.actorUsername || "Någon"} har uppdaterat en artikel du följer.`
+    : notification.type === "confirmation"
+      ? `${notification.actorUsername || "Någon"} har bekräftat din artikel.`
+      : "Du har en ny notis."}
+</p>
 
                 <small>
                   {new Date(
