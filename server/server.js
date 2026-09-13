@@ -971,6 +971,24 @@ const eventOwnerID =
           ]
         );
 
+              console.log(
+  "SKAPAR BEKRÄFTELSENOTIS",
+  {
+    eventOwnerID,
+    userID,
+    eventID
+  }
+);
+
+if (eventOwnerID !== userID) {
+  await createNotification({
+    userID: eventOwnerID,
+    type: "confirmation",
+    eventID: Number(eventID),
+    actorUserID: userID
+  });
+}
+
 
       res.status(201).json({
 
