@@ -771,6 +771,106 @@ const articleOwnerID =
   }
 );
 
+// =================================
+// FÖLJ / SLUTA FÖLJA ARTIKEL
+// =================================
+
+app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
+  const userID = req.user.userid;
+  const eventID = Number(req.params.eventID);
+
+  try {
+    const eventResult = await pool.query(
+      `
+        SELECT eventID
+        FROM Events
+        WHERE eventID = $1
+      `,
+      [eventID]
+    );
+
+    if (eventResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Artikeln hittades inte."
+      });
+    }
+
+    const followResult = await pool.query(
+      `
+        SELECT followID
+        FROM Follows
+        WHERE userID = $1
+        AND eventID = $2
+      `,
+      [userID, eventID]
+    );
+
+    if (followResult.rows.length > 0) {
+      await pool.query(
+        `
+          DELETE FROM Follows
+          WHERE userID = $1
+          AND eventID = $2
+        `,
+        [userID, eventID]
+      );
+
+      return res.json({
+        following: false
+      });
+    }
+
+    await pool.query(
+      `
+        INSERT INTO Follows
+        (userID, eventID)
+        VALUES
+        ($1, $2)
+      `,
+      [userID, eventID]
+    );
+
+    return res.json({
+      following: true
+    });
+
+  } catch (error) {
+    console.error("FEL VID FÖLJNING AV ARTIKEL:", error);
+
+    return res.status(500).json({
+      message: "Kunde inte ändra följstatus."
+    });
+  }
+});
+
+app.get("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
+  const userID = req.user.userid;
+  const eventID = Number(req.params.eventID);
+
+  try {
+    const result = await pool.query(
+      `
+        SELECT followID
+        FROM Follows
+        WHERE userID = $1
+        AND eventID = $2
+      `,
+      [userID, eventID]
+    );
+
+    return res.json({
+      following: result.rows.length > 0
+    });
+
+  } catch (error) {
+    console.error("FEL VID HÄMTNING AV FÖLJSTATUS:", error);
+
+    return res.status(500).json({
+      message: "Kunde inte hämta följstatus."
+    });
+  }
+});
+
 
 // =========================
 // HÄMTA OBSERVATIONER

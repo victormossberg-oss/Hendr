@@ -8894,3 +8894,11 @@ body,
   color: var(--hendr-mustard);
   fill: var(--hendr-mustard);
 }
+
+.article-circle-button.following {
+  color: var(--hendr-dark);
+}
+
+.article-circle-button.following svg {
+  fill: var(--hendr-dark);
+}

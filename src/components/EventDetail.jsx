@@ -92,6 +92,8 @@ function EventDetail({
   const [imageOpen, setImageOpen] =
     useState(false);
 
+  const [isFollowing, setIsFollowing] = useState(false);
+
 const [updateText, setUpdateText] = useState("");
 const [updateImage, setUpdateImage] = useState(null);
 const [updateImagePreview, setUpdateImagePreview] = useState("");
@@ -144,6 +146,38 @@ const cameraInputRef = useRef(null);
 
     checkConfirmation();
   }, [event.id]);
+
+  useEffect(() => {
+  const token = localStorage.getItem("hendr_token");
+
+  if (!token) return;
+
+  async function loadFollowStatus() {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/events/${event.id}/follow`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+
+      setIsFollowing(Boolean(data.following));
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av följstatus:",
+        error
+      );
+    }
+  }
+
+  loadFollowStatus();
+}, [event.id]);
 
   useEffect(() => {
     if (!imageOpen) return;
@@ -231,6 +265,44 @@ const cameraInputRef = useRef(null);
       setConfirming(false);
     }
   }
+
+  async function handleFollow() {
+  const token = localStorage.getItem("hendr_token");
+
+  if (!token) {
+    alert("Du måste vara inloggad för att följa en artikel.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/events/${event.id}/follow`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Kunde inte ändra följstatus."
+      );
+    }
+
+    setIsFollowing(Boolean(data.following));
+  } catch (error) {
+    console.error(
+      "Fel vid ändring av följstatus:",
+      error
+    );
+
+    alert(error.message);
+  }
+}
 
   function openUpdateComposer() {
   const token =
@@ -440,12 +512,22 @@ async function handleSubmitUpdate() {
           <div className="article-topbar-right">
 
             <button
-              type="button"
-              className="article-circle-button"
-              aria-label="Spara artikel"
-            >
-              <Bookmark size={22} />
-            </button>
+  type="button"
+  className={`article-circle-button ${
+    isFollowing ? "following" : ""
+  }`}
+  onClick={handleFollow}
+  aria-label={
+    isFollowing
+      ? "Sluta följa artikel"
+      : "Följ artikel"
+  }
+>
+  <Bookmark
+    size={22}
+    fill={isFollowing ? "currentColor" : "none"}
+  />
+</button>
 
             <div className="article-menu-wrap">
 
