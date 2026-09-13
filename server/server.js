@@ -1920,21 +1920,31 @@ app.get(
           `
             SELECT
 
-              notificationID AS id,
+  n.notificationID AS id,
 
-              userID,
+  n.userID,
 
-              type,
+  n.type,
 
-              eventID,
+  n.eventID,
 
-              actorUserID,
+  n.actorUserID,
 
-              isRead,
+  u.username AS "actorUsername",
 
-              created_at AS "createdAt"
+  n.isRead,
 
-            FROM Notifications
+  n.created_at AS "createdAt"
+
+FROM Notifications n
+
+LEFT JOIN Users u
+  ON u.userid = n.actorUserID
+
+WHERE n.userID = $1
+
+ORDER BY
+  n.created_at DESC
 
             WHERE userID = $1
 
