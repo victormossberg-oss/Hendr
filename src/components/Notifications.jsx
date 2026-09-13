@@ -129,19 +129,45 @@ function Notifications({
                       );
 
                     if (!event) {
-                      console.error(
-                        "Kunde inte hitta artikeln:",
-                        notification.eventid
-                      );
-                      return;
-                    }
+  console.error(
+    "Kunde inte hitta artikeln:",
+    notification.eventid
+  );
+  return;
+}
 
-                    console.log(
-                      "HITTade ARTIKEL",
-                      event
-                    );
+if (!notification.isRead) {
+  try {
+    await fetch(
+      `${API_URL}/api/notifications/${notification.id}/read`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization:
+            `Bearer ${localStorage.getItem("hendr_token")}`,
+        },
+      }
+    );
 
-                    onEventClick?.(event);
+    setNotifications((current) =>
+      current.map((item) =>
+        item.id === notification.id
+          ? {
+              ...item,
+              isRead: true,
+            }
+          : item
+      )
+    );
+  } catch (error) {
+    console.error(
+      "Kunde inte markera notisen som läst:",
+      error
+    );
+  }
+}
+
+onEventClick?.(event);
                   } catch (error) {
                     console.error(
                       "Fel vid öppning av artikel:",
