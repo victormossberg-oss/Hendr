@@ -981,12 +981,35 @@ const eventOwnerID =
 );
 
 if (eventOwnerID !== userID) {
-  await createNotification({
-    userID: eventOwnerID,
-    type: "confirmation",
-    eventID: Number(eventID),
-    actorUserID: userID
-  });
+
+  try {
+
+    console.log(
+      "FÖRSÖKER SKAPA BEKRÄFTELSENOTIS"
+    );
+
+    const notification =
+      await createNotification({
+        userID: eventOwnerID,
+        type: "confirmation",
+        eventID: Number(eventID),
+        actorUserID: userID
+      });
+
+    console.log(
+      "BEKRÄFTELSENOTIS SKAPAD",
+      notification
+    );
+
+  } catch (error) {
+
+    console.error(
+      "FEL VID SKAPANDE AV BEKRÄFTELSENOTIS:",
+      error
+    );
+
+  }
+
 }
 
 
