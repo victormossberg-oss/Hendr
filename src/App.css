@@ -8909,3 +8909,9 @@ body,
   color: var(--hendr-mustard);
   fill: var(--hendr-mustard);
 }
+
+.profile-article-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}

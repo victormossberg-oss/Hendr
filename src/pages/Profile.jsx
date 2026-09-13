@@ -19,6 +19,8 @@ function Profile({
   const [followedEvents, setFollowedEvents] =
     useState([]);
 
+  const [articleTab, setArticleTab] = useState("mine");
+
   const [stats, setStats] =
     useState({
     articleCount: 0,
@@ -854,133 +856,101 @@ const updateCount =
 
         <section className="profile-articles">
 
-          <div className="profile-section-heading">
+          <div className="filters profile-article-tabs">
+  <button
+    type="button"
+    className={articleTab === "mine" ? "active" : ""}
+    onClick={() => setArticleTab("mine")}
+  >
+    Mina artiklar
+  </button>
 
-            <h2>
-              Mina senaste artiklar
-            </h2>
-
-            {events.length > 0 && (
-              <button
-                type="button"
-                onClick={() =>
-                  setShowEvents(true)
-                }
-              >
-                Visa alla →
-              </button>
-            )}
-
-          </div>
+  <button
+    type="button"
+    className={articleTab === "followed" ? "active" : ""}
+    onClick={() => setArticleTab("followed")}
+  >
+    Följda artiklar
+  </button>
+</div>
 
 
           {loading ? (
-
-            <div className="profile-empty">
-              Hämtar dina artiklar...
-            </div>
-
-          ) : events.length === 0 ? (
-
-            <div className="profile-empty">
-              Du har inte skapat några artiklar ännu.
-            </div>
-
-          ) : (
-
-            <div className="profile-article-list">
-
-              {events.slice(0, 5).map((event) => (
-
-                <button
-                  type="button"
-                  className="profile-article"
-                  key={event.id}
-                  onClick={() =>
-                    onEventClick(event)
-                  }
-                >
-
-                  <div className="profile-article-image">
-
-                    {event.imageUrl ? (
-                      <img
-                        src={event.imageUrl}
-                        alt=""
-                      />
-                    ) : (
-                      <div className="profile-article-placeholder">
-                        {event.category || "Annat"}
-                      </div>
-                    )}
-
-                  </div>
-
-
-                  <div className="profile-article-content">
-
-                    <span className="profile-article-category">
-                      {event.category || "Annat"}
-                    </span>
-
-                    <h3>
-                      {event.title}
-                    </h3>
-
-                    {event.description && (
-                      <p>
-                        {event.description}
-                      </p>
-                    )}
-
-                    <div className="profile-article-meta">
-
-                      <span>
-                        {event.createdAt
-                          ? new Date(
-                              event.createdAt
-                            ).toLocaleDateString(
-                              "sv-SE",
-                              {
-                                day: "numeric",
-                                month: "short"
-                              }
-                            )
-                          : ""}
-                      </span>
-
-                      <span>
-                        ✓ {Number(event.confirmationCount) || 0}
-                      </span>
-
-                      <span>
-                        ○ {Number(event.observationCount) || 0}
-                      </span>
-
-                    </div>
-
-                  </div>
-
-                </button>
-
-              ))}
-
-            </div>
-
-          )}
-
-        </section>
-
-        <section className="profile-articles">
-  <div className="profile-section-heading">
-    <h2>Följda artiklar</h2>
+  <div className="profile-empty">
+    Hämtar artiklar...
   </div>
-
-  {loading ? (
+) : articleTab === "mine" ? (
+  events.length === 0 ? (
     <div className="profile-empty">
-      Hämtar följda artiklar...
+      Du har inte skapat några artiklar ännu.
     </div>
-  ) : followedEvents.length === 0 ? (
+  ) : (
+    <div className="profile-article-list">
+      {events.slice(0, 5).map((event) => (
+        <button
+          type="button"
+          className="profile-article"
+          key={event.id}
+          onClick={() => onEventClick(event)}
+        >
+          <div className="profile-article-image">
+  {event.imageUrl ? (
+    <img
+      src={event.imageUrl}
+      alt=""
+    />
+  ) : (
+    <div className="profile-article-placeholder">
+      {event.category || "Annat"}
+    </div>
+  )}
+</div>
+
+<div className="profile-article-content">
+  <span className="profile-article-category">
+    {event.category || "Annat"}
+  </span>
+
+  <h3>
+    {event.title}
+  </h3>
+
+  {event.description && (
+    <p>
+      {event.description}
+    </p>
+  )}
+
+  <div className="profile-article-meta">
+    <span>
+      {event.createdAt
+        ? new Date(
+            event.createdAt
+          ).toLocaleDateString(
+            "sv-SE",
+            {
+              day: "numeric",
+              month: "short"
+            }
+          )
+        : ""}
+    </span>
+
+    <span>
+      ✓ {Number(event.confirmationCount) || 0}
+    </span>
+
+    <span>
+      ○ {Number(event.observationCount) || 0}
+    </span>
+  </div>
+</div>
+        </button>
+      ))}
+    </div>
+  )
+) : (
+  followedEvents.length === 0 ? (
     <div className="profile-empty">
       Du följer inga artiklar ännu.
     </div>
@@ -993,24 +963,67 @@ const updateCount =
           key={event.id}
           onClick={() => onEventClick(event)}
         >
-          <div className="profile-article-content">
-            <strong>{event.title}</strong>
+          <div className="profile-article-image">
+  {event.imageUrl ? (
+    <img
+      src={event.imageUrl}
+      alt=""
+    />
+  ) : (
+    <div className="profile-article-placeholder">
+      {event.category || "Annat"}
+    </div>
+  )}
+</div>
 
-            {event.description && (
-              <p>{event.description}</p>
-            )}
+<div className="profile-article-content">
+  <span className="profile-article-category">
+    {event.category || "Annat"}
+  </span>
 
-            <small>
-              {event.username
-                ? `Av ${event.username}`
-                : ""}
-            </small>
-          </div>
+  <h3>
+    {event.title}
+  </h3>
+
+  {event.description && (
+    <p>
+      {event.description}
+    </p>
+  )}
+
+  <div className="profile-article-meta">
+    <span>
+      {event.createdAt
+        ? new Date(
+            event.createdAt
+          ).toLocaleDateString(
+            "sv-SE",
+            {
+              day: "numeric",
+              month: "short"
+            }
+          )
+        : ""}
+    </span>
+
+    <span>
+      ✓ {Number(event.confirmationCount) || 0}
+    </span>
+
+    <span>
+      ○ {Number(event.observationCount) || 0}
+    </span>
+  </div>
+</div>
         </button>
       ))}
     </div>
-  )}
-</section>
+  )
+)}
+
+        </section>
+
+        
 
 
         
