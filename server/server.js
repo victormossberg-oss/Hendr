@@ -1745,6 +1745,76 @@ app.get(
 );
 
 // =========================
+// HÄMTA MINA NOTISER
+// =========================
+
+app.get(
+  "/api/notifications",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const userID =
+        req.user.userid;
+
+
+      const result =
+        await pool.query(
+          `
+            SELECT
+
+              notificationID AS id,
+
+              userID,
+
+              type,
+
+              eventID,
+
+              actorUserID,
+
+              isRead,
+
+              created_at AS "createdAt"
+
+            FROM Notifications
+
+            WHERE userID = $1
+
+            ORDER BY
+              created_at DESC
+          `,
+
+          [userID]
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av notiser:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta notiser."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // HÄMTA PUBLIK ANVÄNDARPROFIL
 // =========================
 

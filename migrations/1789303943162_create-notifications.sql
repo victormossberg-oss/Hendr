@@ -1,0 +1,9 @@
+CREATE TABLE Notifications (
+    notificationID SERIAL PRIMARY KEY,
+    userID INTEGER NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    eventID INTEGER,
+    actorUserID INTEGER,
+    isRead BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
