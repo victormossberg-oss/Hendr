@@ -1932,7 +1932,7 @@ app.get(
 
   u.username AS "actorUsername",
 
-  n.isRead,
+  n.isread,
 
   n.created_at AS "createdAt"
 
@@ -1945,11 +1945,6 @@ WHERE n.userID = $1
 
 ORDER BY
   n.created_at DESC
-
-            WHERE userID = $1
-
-            ORDER BY
-              created_at DESC
           `,
 
           [userID]
