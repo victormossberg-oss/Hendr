@@ -200,6 +200,59 @@ function authenticateToken(
 
 }
 
+// =========================
+// SKAPA NOTIS
+// =========================
+
+async function createNotification({
+  userID,
+  type,
+  eventID = null,
+  actorUserID = null
+}) {
+
+  const result =
+    await pool.query(
+      `
+        INSERT INTO Notifications
+        (
+          userID,
+          type,
+          eventID,
+          actorUserID
+        )
+
+        VALUES
+        (
+          $1,
+          $2,
+          $3,
+          $4
+        )
+
+        RETURNING
+          notificationID AS id,
+          userID,
+          type,
+          eventID,
+          actorUserID,
+          isRead,
+          created_at AS "createdAt"
+      `,
+
+      [
+        userID,
+        type,
+        eventID,
+        actorUserID
+      ]
+    );
+
+
+  return result.rows[0];
+
+}
+
 
 // =========================
 // HÄMTA ALLA HÄNDELSER
@@ -573,6 +626,31 @@ app.post(
       const userID =
         req.user.userid;
 
+        const eventResult =
+  await pool.query(
+    `
+      SELECT
+        userid
+      FROM Events
+      WHERE eventID = $1
+    `,
+    [eventID]
+  );
+
+
+if (eventResult.rows.length === 0) {
+
+  return res.status(404).json({
+    message:
+      "Artikeln hittades inte."
+  });
+
+}
+
+
+const articleOwnerID =
+  eventResult.rows[0].userid;
+
 
       let imageUrl = null;
 
@@ -657,6 +735,17 @@ app.post(
             parsedLongitude
           ]
         );
+
+ if (articleOwnerID !== userID) {
+
+  await createNotification({
+    userID: articleOwnerID,
+    type: "update",
+    eventID: eventID,
+    actorUserID: userID
+  });
+
+}
 
 
       res.status(201).json(
@@ -778,6 +867,31 @@ app.post(
 
       const userID =
         req.user.userid;
+
+        const eventResult =
+  await pool.query(
+    `
+      SELECT
+        userid
+      FROM Events
+      WHERE eventID = $1
+    `,
+    [eventID]
+  );
+
+
+if (eventResult.rows.length === 0) {
+
+  return res.status(404).json({
+    message:
+      "Händelsen hittades inte."
+  });
+
+}
+
+
+const eventOwnerID =
+  eventResult.rows[0].userid;
 
 
       const existing =
