@@ -60,6 +60,20 @@ function formatRelativeTime(dateValue) {
   });
 }
 
+function getArticleTime(event) {
+  if (
+    event.updatedAt &&
+    new Date(event.updatedAt).getTime() >
+      new Date(event.createdAt).getTime()
+  ) {
+    return `Uppdaterad ${formatRelativeTime(
+      event.updatedAt
+    )}`;
+  }
+
+  return formatRelativeTime(event.createdAt);
+}
+
 function EventCard({
   event,
   isFeatured = false,
@@ -336,8 +350,8 @@ function EventCard({
           )}
 
           <span>
-            {formatRelativeTime(event.createdAt)}
-          </span>
+  {getArticleTime(event)}
+</span>
 
           {event.username && (
             <>
