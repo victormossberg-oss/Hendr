@@ -347,7 +347,7 @@ function EventCard({
       new Date(event.updatedAt).getTime() >
         new Date(event.createdAt).getTime() && (
       <span className="news-article-updated">
-        Uppdaterad {formatRelativeTime(event.updatedAt)}
+        · Uppdaterad {formatRelativeTime(event.updatedAt)}
       </span>
     )}
   </div>

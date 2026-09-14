@@ -5623,7 +5623,7 @@ body {
   height: 12px;
 }
 
-.news-article-compact
+
 .news-bookmark {
   margin-left: auto;
 }
@@ -8954,18 +8954,21 @@ body,
 }
 
 .news-article-updated {
-  margin-left: auto;
   font-size: 10px;
   color: #89857c;
   white-space: nowrap;
 }
 
+.news-article-featured .news-article-updated {
+  margin-left: auto;
+}
+
 .news-article-category-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 5px;
   width: 100%;
 }
 .news-article-featured .news-article-content {
-  margin-top: -8px;
+  margin-top: -10px;
 }
