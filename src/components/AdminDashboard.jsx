@@ -15,6 +15,10 @@ function AdminDashboard() {
   localStorage.getItem("hendr_token");
 
 console.log("ADMIN TOKEN:", token);
+console.log(
+  "ADMIN API URL:",
+  `${API_URL}/api/admin/stats`
+);
 
         const response = await fetch(
           `${API_URL}/api/admin/stats`,
@@ -24,6 +28,8 @@ console.log("ADMIN TOKEN:", token);
             },
           }
         );
+
+        console.log("ADMIN RESPONSE STATUS:", response.status);
 
         if (!response.ok) {
           throw new Error(

@@ -1447,9 +1447,13 @@ app.delete(
 // =========================
 // ADMIN – STATISTIK
 // =========================
-
+console.log("ADMIN STATS ROUTE REGISTRERAS");
 app.get(
   "/api/admin/stats",
+  (req, res, next) => {
+    console.log("ADMIN ROUTE TRÄFFAD");
+    next();
+  },
   authenticateToken,
   async (req, res) => {
 
