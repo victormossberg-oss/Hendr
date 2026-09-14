@@ -14,10 +14,10 @@ function AdminDashboard() {
         const token =
   localStorage.getItem("hendr_token");
 
-console.log("ADMIN TOKEN:", token);
+console.log("ADMIN TOKEN LENGTH:", token?.length);
 console.log(
-  "ADMIN API URL:",
-  `${API_URL}/api/admin/stats`
+  "ADMIN TOKEN START:",
+  token?.substring(0, 20)
 );
 
         const response = await fetch(

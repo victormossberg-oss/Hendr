@@ -289,6 +289,8 @@ app.get(
 
   e.created_at AS "createdAt",
 
+  e.updated_at AS "updatedAt",
+
   e.image_url AS "imageUrl",
 
   e.latitude,
@@ -380,6 +382,8 @@ app.get(
             e.status,
 
             e.created_at AS "createdAt",
+
+            e.updated_at AS "updatedAt",
 
             e.image_url AS "imageUrl",
 
@@ -1624,14 +1628,15 @@ app.put(
         `
         UPDATE Events
         SET
-          title = $1,
-          description = $2,
-          category = $3,
-          status = $4,
-          image_url = $5,
-          latitude = $6,
-          longitude = $7,
-          location = $8
+        title = $1,
+        description = $2,
+        category = $3,
+        status = $4,
+        image_url = $5,
+        latitude = $6,
+        longitude = $7,
+        location = $8,
+        updated_at = CURRENT_TIMESTAMP
         WHERE eventID = $9
         RETURNING
           eventID AS id,
@@ -1640,6 +1645,7 @@ app.put(
           category,
           status,
           created_at AS "createdAt",
+          updated_at AS "updatedAt",
           image_url AS "imageUrl",
           latitude,
           longitude,
@@ -1712,6 +1718,8 @@ app.get(
             status,
 
             created_at AS "createdAt",
+
+            updated_at AS "updatedAt",
 
             placeID,
 
@@ -2396,6 +2404,7 @@ app.get(
           e.category,
           e.status,
           e.created_at AS "createdAt",
+          updated_at AS "updatedAt",
           e.image_url AS "imageUrl",
           e.latitude,
           e.longitude,
