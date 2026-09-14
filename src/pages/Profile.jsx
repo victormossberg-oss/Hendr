@@ -684,6 +684,20 @@ const updateCount =
   Redigera profil
 </button>
 
+{user?.role === "Admin" && (
+  <button
+    type="button"
+    className="profile-settings-item"
+    onClick={() => {
+      setShowSettings(false);
+      setCurrentPage("admin");
+    }}
+  >
+    <ShieldCheck size={17} />
+    Admin
+  </button>
+)}
+
       <button
         type="button"
         className="profile-settings-item profile-settings-logout"

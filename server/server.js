@@ -1437,6 +1437,45 @@ app.delete(
 );
 
 // =========================
+// ADMIN – STATISTIK
+// =========================
+
+app.get(
+  "/api/admin/stats",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      if (req.user.role !== "Admin") {
+        return res.status(403).json({
+          message: "Du har inte behörighet."
+        });
+      }
+
+      const result = await pool.query(`
+        SELECT
+          (SELECT COUNT(*) FROM Users) AS "userCount",
+          (SELECT COUNT(*) FROM Events) AS "eventCount",
+          (SELECT COUNT(*) FROM Observations) AS "observationCount",
+          (SELECT COUNT(*) FROM EventConfirmations) AS "confirmationCount",
+          (SELECT COUNT(*) FROM "Follows") AS "followCount"
+      `);
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av admin-statistik:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta statistik."
+      });
+    }
+  }
+);
+
+// =========================
 // REDIGERA HÄNDELSE
 // ÄGAREN ELLER ADMIN
 // =========================
