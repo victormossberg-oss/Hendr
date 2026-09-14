@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Edit, Settings, X } from "lucide-react";
+import { Edit, Settings, X, ShieldCheck } from "lucide-react";
 import { API_URL } from "../config";
 
 function Profile({
@@ -7,7 +7,8 @@ function Profile({
   onEventClick,
   onObservationClick,
   onLogout,
-  onCreateArticle
+  onCreateArticle,
+  onAdminClick,
 }) {
 
   const [events, setEvents] =
@@ -690,7 +691,7 @@ const updateCount =
     className="profile-settings-item"
     onClick={() => {
       setShowSettings(false);
-      setCurrentPage("admin");
+      onAdminClick();
     }}
   >
     <ShieldCheck size={17} />

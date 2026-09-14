@@ -958,6 +958,7 @@ else if (
   onObservationClick={handleObservationClick}
   onLogout={handleLogout}
   onCreateArticle={() => setCreatingArticle(true)}
+  onAdminClick={() => setCurrentPage("admin")}
 />
 
     );
