@@ -8942,3 +8942,27 @@ body,
 .article-update-delete:hover {
   color: #171717;
 }
+
+.news-article-image-meta {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+  margin-top: 6px;
+  padding-right: 4px;
+  box-sizing: border-box;
+}
+
+.news-article-updated {
+  margin-left: auto;
+  font-size: 10px;
+  color: #89857c;
+  white-space: nowrap;
+}
+
+.news-article-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}

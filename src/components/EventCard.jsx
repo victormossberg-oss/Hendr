@@ -303,26 +303,56 @@ function EventCard({
       }`}
       onClick={onClick}
     >
-      <div className="news-article-image">
-        {event.imageUrl ? (
-          <img
-            src={event.imageUrl}
-            alt=""
-          />
-        ) : (
-          <div className="news-article-image-placeholder">
-            <CategoryIcon size={30} />
-          </div>
-        )}
+      <div className="news-article-media">
+  <div className="news-article-image">
+    {event.imageUrl ? (
+      <img
+        src={event.imageUrl}
+        alt=""
+      />
+    ) : (
+      <div className="news-article-image-placeholder">
+        <CategoryIcon size={30} />
       </div>
+    )}
+  </div>
+
+  <div className="news-article-image-meta">
+  {isFeatured && (
+    <>
+      <span className="news-article-category">
+        {event.category || "Annat"}
+      </span>
+
+      {event.updatedAt &&
+        new Date(event.updatedAt).getTime() >
+          new Date(event.createdAt).getTime() && (
+        <span className="news-article-updated">
+          Uppdaterad {formatRelativeTime(event.updatedAt)}
+        </span>
+      )}
+    </>
+  )}
+</div>
+</div>
 
       <div className="news-article-content">
+        {!isFeatured && (
+  <div className="news-article-category-row">
+    <span className="news-article-category">
+      {event.category || "Annat"}
+    </span>
 
-        <div className="news-article-category">
-  <span>
-    {event.category || "Annat"}
-  </span>
-</div>
+    {event.updatedAt &&
+      new Date(event.updatedAt).getTime() >
+        new Date(event.createdAt).getTime() && (
+      <span className="news-article-updated">
+        Uppdaterad {formatRelativeTime(event.updatedAt)}
+      </span>
+    )}
+  </div>
+)}
+
 
         <h2 className="news-article-title">
           {event.title}
@@ -350,8 +380,8 @@ function EventCard({
           )}
 
           <span>
-  {getArticleTime(event)}
-</span>
+            {formatRelativeTime(event.createdAt)}
+          </span>
 
           {event.username && (
             <>
