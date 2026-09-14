@@ -8926,3 +8926,19 @@ body,
 .article-info-top .article-category {
   margin-bottom: 0;
 }
+
+.article-update-delete {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.article-update-delete:hover {
+  color: #171717;
+}

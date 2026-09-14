@@ -946,6 +946,54 @@ app.get(
   }
 );
 
+// =========================
+// TA BORT UPPDATERING
+// ENDAST SKAPAREN
+// =========================
+
+app.delete(
+  "/api/observations/:observationID",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { observationID } = req.params;
+      const userID = req.user.userid;
+
+      const result = await pool.query(
+        `
+        DELETE FROM Observations
+        WHERE observationID = $1
+        AND userID = $2
+        RETURNING observationID
+        `,
+        [observationID, userID]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message:
+            "Uppdateringen hittades inte eller så har du inte behörighet att ta bort den."
+        });
+      }
+
+      res.json({
+        message: "Uppdateringen har tagits bort.",
+        observationID: Number(observationID)
+      });
+    } catch (error) {
+      console.error(
+        "Fel vid borttagning av uppdatering:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte ta bort uppdateringen."
+      });
+    }
+  }
+);
+
 
 // =========================
 // BEKRÄFTA / TA BORT

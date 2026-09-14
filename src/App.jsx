@@ -1105,6 +1105,16 @@ else if (
   ]);
 }}
 
+onObservationDeleted={(observationID) => {
+  setObservations((current) =>
+    current.filter(
+      (observation) =>
+        String(observation.id) !==
+        String(observationID)
+    )
+  );
+}}
+
 
         onDelete={async (eventID) => {
   const token = localStorage.getItem("hendr_token");

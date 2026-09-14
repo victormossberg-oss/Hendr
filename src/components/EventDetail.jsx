@@ -436,6 +436,53 @@ async function handleSubmitUpdate() {
   }
 }
 
+async function handleDeleteUpdate(observationID) {
+  const token = localStorage.getItem("hendr_token");
+
+  if (!token) {
+    alert("Du måste vara inloggad.");
+    return;
+  }
+
+  if (
+    !window.confirm(
+      "Vill du ta bort den här uppdateringen?"
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/observations/${observationID}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          "Kunde inte ta bort uppdateringen."
+      );
+    }
+
+    onObservationDeleted?.(observationID);
+  } catch (error) {
+    console.error(
+      "Fel vid borttagning av uppdatering:",
+      error
+    );
+
+    alert(error.message);
+  }
+}
+
   function handleDelete() {
     setMenuOpen(false);
 
@@ -912,31 +959,68 @@ async function handleSubmitUpdate() {
               <div className="article-update-content">
 
                 <div className="article-update-meta">
+  <button
+    type="button"
+    onClick={() =>
+      onUserClick?.(
+        observation.userID ??
+          observation.userid
+      )
+    }
+  >
+    {observation.username ||
+      "Användare"}
+  </button>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onUserClick?.(
-                        observation.userID ??
-                          observation.userid
-                      )
-                    }
-                  >
-                    {observation.username ||
-                      "Användare"}
-                  </button>
+  <span>
+    ·
+  </span>
 
-                  <span>
-                    ·
-                  </span>
+  <span>
+    {formatRelativeTime(
+      observation.createdAt
+    )}
+  </span>
 
-                  <span>
-                    {formatRelativeTime(
-                      observation.createdAt
-                    )}
-                  </span>
+  {(() => {
+    const savedUser =
+      localStorage.getItem("hendr_user");
 
-                </div>
+    if (!savedUser) return null;
+
+    try {
+      const user =
+        JSON.parse(savedUser);
+
+      if (
+        String(user.userid) !==
+        String(
+          observation.userID ??
+            observation.userid
+        )
+      ) {
+        return null;
+      }
+
+      return (
+        <button
+          type="button"
+          className="article-update-delete"
+          onClick={() =>
+            handleDeleteUpdate(
+              observation.id
+            )
+          }
+          aria-label="Ta bort uppdatering"
+        >
+          <X size={14} />
+        </button>
+      );
+    } catch {
+      return null;
+    }
+  })()}
+</div>
 
 
                 <p>
