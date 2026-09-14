@@ -42,7 +42,7 @@ function BottomNav({
         aria-label="Rapportera"
       >
         <Plus size={31} strokeWidth={2.2} />
-        <span>Skapa</span>
+        <span>Rapportera</span>
       </button>
 
       <button
