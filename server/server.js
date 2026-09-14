@@ -962,11 +962,15 @@ app.delete(
       const result = await pool.query(
         `
         DELETE FROM Observations
-        WHERE observationID = $1
-        AND userID = $2
+
+WHERE observationID = $1
+AND (
+  userID = $2
+  OR $3 = 'Admin'
+)
         RETURNING observationID
         `,
-        [observationID, userID]
+        [observationID, userID, req.user.role]
       );
 
       if (result.rows.length === 0) {

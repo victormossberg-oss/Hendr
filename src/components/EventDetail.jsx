@@ -65,12 +65,13 @@ function getInitials(username) {
 function EventDetail({
   event,
   observations,
-  onDelete,
   onEdit,
   onUserClick,
   onLocationClick,
   onBack,
   onObservationAdded,
+  onObservationDeleted,
+  onDelete,
 }) {
   const [confirmed, setConfirmed] =
     useState(false);
@@ -993,14 +994,15 @@ async function handleDeleteUpdate(observationID) {
         JSON.parse(savedUser);
 
       if (
-        String(user.userid) !==
-        String(
-          observation.userID ??
-            observation.userid
-        )
-      ) {
-        return null;
-      }
+  user.role !== "Admin" &&
+  String(user.userid) !==
+    String(
+      observation.userID ??
+        observation.userid
+    )
+) {
+  return null;
+}
 
       return (
         <button
