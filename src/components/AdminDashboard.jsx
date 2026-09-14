@@ -12,7 +12,9 @@ function AdminDashboard() {
     async function loadStats() {
       try {
         const token =
-          localStorage.getItem("hendr_token");
+  localStorage.getItem("hendr_token");
+
+console.log("ADMIN TOKEN:", token);
 
         const response = await fetch(
           `${API_URL}/api/admin/stats`,

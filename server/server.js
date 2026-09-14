@@ -1452,6 +1452,13 @@ app.get(
   "/api/admin/stats",
   authenticateToken,
   async (req, res) => {
+
+    console.log("ADMIN STATS REQUEST:", {
+      userid: req.user.userid,
+      username: req.user.username,
+      role: req.user.role
+    });
+
     try {
       if (req.user.role !== "Admin") {
         return res.status(403).json({
