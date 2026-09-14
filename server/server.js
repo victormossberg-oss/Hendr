@@ -185,13 +185,12 @@ function authenticateToken(
     (error, user) => {
 
       if (error) {
+  console.log("JWT FEL:", error.message);
 
-        return res.status(403).json({
-          message:
-            "Ogiltig eller utgången token."
-        });
-
-      }
+  return res.status(403).json({
+    message: "Ogiltig eller utgången token."
+  });
+}
 
 
       req.user = user;
