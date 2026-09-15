@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config";
 
-const API_URL = import.meta.env.VITE_API_URL;
+
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -72,9 +73,15 @@ setUsers(usersData);
   }
 
   return (
-    <div className="admin-dashboard">
+  <div className="admin-dashboard">
 
+    <div className="admin-header">
       <h1>Admin Dashboard</h1>
+      <p>Översikt över HENDR</p>
+    </div>
+
+    <section className="admin-overview">
+      <h2>Översikt</h2>
 
       <div className="admin-stats">
 
@@ -104,47 +111,41 @@ setUsers(usersData);
         </div>
 
       </div>
-            <div className="admin-users">
+    </section>
 
-        <h2>Användare</h2>
+    <section className="admin-users">
+      <h2>Användare</h2>
 
-        <div className="admin-users-table">
+      <div className="admin-users-table">
 
-          <div className="admin-users-header">
-            <span>Användare</span>
-            <span>Roll</span>
-            <span>Level</span>
-            <span>XP</span>
-            <span>Skapad</span>
-          </div>
-
-          {users.map((user) => (
-            <div
-              className="admin-user-row"
-              key={user.userid}
-            >
-              <span>{user.username}</span>
-
-              <span>{user.role}</span>
-
-              <span>{user.level}</span>
-
-              <span>{user.xp}</span>
-
-              <span>
-                {new Date(
-                  user.createdAt
-                ).toLocaleDateString("sv-SE")}
-              </span>
-            </div>
-          ))}
-
+        <div className="admin-users-header">
+          <span>Användare</span>
+          <span>Roll</span>
+          <span>Level</span>
+          <span>XP</span>
+          <span>Skapad</span>
         </div>
 
-      </div>
+        {users.map((user) => (
+          <div
+            className="admin-user-row"
+            key={user.userid}
+          >
+            <span>{user.username}</span>
+            <span>{user.role}</span>
+            <span>{user.level}</span>
+            <span>{user.xp}</span>
+            <span>
+              {new Date(user.createdAt).toLocaleDateString("sv-SE")}
+            </span>
+          </div>
+        ))}
 
-    </div>
-  );
+      </div>
+    </section>
+
+  </div>
+);
 
   
 }

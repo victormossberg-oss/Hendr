@@ -8406,3 +8406,121 @@ body,
   font-weight: 600;
   color: var(--hendr-dark);
 }
+
+/* =========================
+   ADMIN DASHBOARD
+   ========================= */
+
+.admin-dashboard {
+  padding: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  margin-bottom: 32px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.admin-header p {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: #777;
+}
+
+/* Översikt */
+
+.admin-overview h2,
+.admin-users h2 {
+  margin: 0 0 18px;
+  font-size: 24px;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-stat-card span {
+  font-size: 15px;
+  color: #777;
+}
+
+.admin-stat-card strong {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+/* Användare */
+
+.admin-users-table {
+  border: 1px solid #e2e2e2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.admin-users-header,
+.admin-user-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 0.8fr 1.2fr;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.admin-users-header {
+  background: #f5f5f5;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.admin-user-row {
+  border-top: 1px solid #e8e8e8;
+  font-size: 15px;
+}
+
+.admin-user-row:hover {
+  background: #fafafa;
+}
+
+/* Mobil */
+
+@media (max-width: 600px) {
+  .admin-dashboard {
+    padding: 24px 16px;
+  }
+
+  .admin-header h1 {
+    font-size: 30px;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-users-table {
+    overflow-x: auto;
+  }
+
+  .admin-users-header,
+  .admin-user-row {
+    min-width: 600px;
+  }
+}
