@@ -1585,6 +1585,46 @@ app.get(
 );
 
 // =========================
+// ADMIN – ANVÄNDARE
+// =========================
+app.get(
+  "/api/admin/users",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      if (req.user.role !== "Admin") {
+        return res.status(403).json({
+          message: "Du har inte behörighet."
+        });
+      }
+
+      const result = await pool.query(`
+        SELECT
+          userid,
+          username,
+          role,
+          xp,
+          level,
+          created_at AS "createdAt"
+        FROM Users
+        ORDER BY created_at DESC
+      `);
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av admin-användare:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Kunde inte hämta användare."
+      });
+    }
+  }
+);
+
+// =========================
 // REDIGERA HÄNDELSE
 // ÄGAREN ELLER ADMIN
 // =========================
