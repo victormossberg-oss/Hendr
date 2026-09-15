@@ -8282,3 +8282,71 @@ body,
 .news-article-compact .news-article-footer {
   margin-top: 10px;
 }
+
+/* =========================
+   PROFIL – XP / LEVEL
+   ========================= */
+
+.profile-xp {
+  width: 100%;
+  margin-bottom: 22px;
+}
+
+.profile-xp-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-xp-level {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--hendr-dark);
+}
+
+.profile-xp-title {
+  font-size: 16px;
+  color: var(--hendr-dark);
+}
+
+.profile-xp-value {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #77736b;
+}
+
+.profile-xp-bar {
+  width: 100%;
+  height: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3dfd4;
+}
+
+.profile-xp-progress {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--hendr-mustard);
+  transition: width 0.3s ease;
+}
+
+.profile-xp-bar {
+  display: block !important;
+  width: 100% !important;
+  height: 6px !important;
+  margin-top: 10px !important;
+  background: #e3dfd4 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
+
+.profile-xp-progress {
+  display: block !important;
+  height: 100% !important;
+  background: var(--hendr-mustard) !important;
+  border-radius: 999px !important;
+  transition: width 0.3s ease;
+}

@@ -48,20 +48,29 @@ const LEVELS = [
 ];
 
 function getLevelInfo(level, xp) {
+
+  const numericLevel = Number(level);
+
   const currentLevel =
-    LEVELS.find((item) => item.level === level) ||
-    LEVELS[0];
+    LEVELS.find(
+      (item) => item.level === numericLevel
+    ) || LEVELS[0];
 
   const nextLevel =
     LEVELS.find(
-      (item) => item.level === level + 1
+      (item) => item.level === numericLevel + 1
     );
 
   return {
+
     ...currentLevel,
-    currentXp: xp,
+
+    currentXp: Number(xp) || 0,
+
     nextXp: nextLevel?.xp ?? null,
+
   };
+
 }
 
 function Profile({
@@ -124,6 +133,7 @@ const [profileImage, setProfileImage] =
   stats.level,
   Number(stats.xp) || 0
 );
+console.log("LEVEL INFO:", levelInfo);
 
 const fileInputRef = useRef(null);
 
@@ -881,9 +891,7 @@ const updateCount =
             STATISTIK
         ========================= */}
 
-        <section className="profile-stats">
-
-          <div className="profile-xp">
+        <div className="profile-xp">
   <div className="profile-xp-header">
     <div>
       <span className="profile-xp-level">
@@ -924,6 +932,10 @@ const updateCount =
     </div>
   )}
 </div>
+
+        <section className="profile-stats">
+
+          
 
           <div className="profile-stat">
             <strong>
