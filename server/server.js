@@ -177,6 +177,11 @@ function authenticateToken(
 
   }
 
+  console.log(
+  "VERIFY JWT SECRET:",
+  process.env.JWT_SECRET ? "FINNS" : "SAKNAS"
+);
+
 
   jwt.verify(
     token,
@@ -3054,7 +3059,10 @@ app.post(
 
       }
 
-
+console.log(
+  "LOGIN JWT SECRET:",
+  process.env.JWT_SECRET ? "FINNS" : "SAKNAS"
+);
       // =========================
       // SKAPA JWT
       // =========================
