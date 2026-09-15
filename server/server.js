@@ -811,7 +811,7 @@ if (articleOwnerID !== userID) {
   await addXP(
     userID,
     "update_created",
-    observationID,
+    result.rows[0].id,
     3
   );
 }
