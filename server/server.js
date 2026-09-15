@@ -264,7 +264,17 @@ async function addXP(userID, amount) {
   const result = await pool.query(
     `
       UPDATE Users
-      SET xp = xp + $1
+      SET
+        xp = xp + $1,
+        level = CASE
+          WHEN xp + $1 >= 3000 THEN 7
+          WHEN xp + $1 >= 1500 THEN 6
+          WHEN xp + $1 >= 700 THEN 5
+          WHEN xp + $1 >= 350 THEN 4
+          WHEN xp + $1 >= 150 THEN 3
+          WHEN xp + $1 >= 50 THEN 2
+          ELSE 1
+        END
       WHERE userid = $2
       RETURNING xp, level
     `,
