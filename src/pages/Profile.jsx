@@ -59,8 +59,8 @@ function getLevelInfo(level, xp) {
 
   return {
     ...currentLevel,
+    currentXp: xp,
     nextXp: nextLevel?.xp ?? null,
-    xp,
   };
 }
 
@@ -119,6 +119,11 @@ const [location, setLocation] = useState(
 
 const [profileImage, setProfileImage] =
   useState(user.profileImageUrl || "");
+
+  const levelInfo = getLevelInfo(
+  stats.level,
+  Number(stats.xp) || 0
+);
 
 const fileInputRef = useRef(null);
 
@@ -877,6 +882,48 @@ const updateCount =
         ========================= */}
 
         <section className="profile-stats">
+
+          <div className="profile-xp">
+  <div className="profile-xp-header">
+    <div>
+      <span className="profile-xp-level">
+        Level {levelInfo.level}
+      </span>
+
+      <span className="profile-xp-title">
+        · {levelInfo.title}
+      </span>
+    </div>
+
+    <span className="profile-xp-value">
+      {levelInfo.currentXp}
+      {levelInfo.nextXp !== null
+        ? ` / ${levelInfo.nextXp} XP`
+        : " XP"}
+    </span>
+  </div>
+
+  {levelInfo.nextXp !== null && (
+    <div className="profile-xp-bar">
+      <div
+        className="profile-xp-progress"
+        style={{
+          width: `${Math.min(
+            100,
+            Math.max(
+              0,
+              ((levelInfo.currentXp -
+                levelInfo.xp) /
+                (levelInfo.nextXp -
+                  levelInfo.xp)) *
+                100
+            )
+          )}%`,
+        }}
+      />
+    </div>
+  )}
+</div>
 
           <div className="profile-stat">
             <strong>
