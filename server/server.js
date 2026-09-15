@@ -859,6 +859,8 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
       [userID, eventID]
     );
 
+    await addXP(userID, 1);
+
     return res.json({
       following: true
     });
