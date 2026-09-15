@@ -133,7 +133,6 @@ const [profileImage, setProfileImage] =
   stats.level,
   Number(stats.xp) || 0
 );
-console.log("LEVEL INFO:", levelInfo);
 
 const fileInputRef = useRef(null);
 
