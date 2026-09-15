@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -28,6 +29,23 @@ function AdminDashboard() {
         const data = await response.json();
 
         setStats(data);
+
+        const usersResponse = await fetch(
+  `${API_URL}/api/admin/users`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+if (!usersResponse.ok) {
+  throw new Error("Kunde inte hämta användare.");
+}
+
+const usersData = await usersResponse.json();
+
+setUsers(usersData);
       } catch (error) {
         console.error(
           "Fel vid hämtning av admin-statistik:",
