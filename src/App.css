@@ -8350,3 +8350,34 @@ body,
   border-radius: 999px !important;
   transition: width 0.3s ease;
 }
+
+.profile-xp-info {
+  margin-top: 12px;
+  margin-bottom: 22px;
+  font-size: 12px;
+  color: #77736b;
+}
+
+.profile-xp-info-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #99958c;
+}
+
+.profile-xp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.profile-xp-actions span {
+  white-space: nowrap;
+}
+
+.profile-xp-actions strong {
+  font-weight: 600;
+  color: var(--hendr-dark);
+}

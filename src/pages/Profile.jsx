@@ -909,10 +909,9 @@ const updateCount =
     </div>
 
     <span className="profile-xp-value">
-      {levelInfo.currentXp}
       {levelInfo.nextXp !== null
-        ? ` / ${levelInfo.nextXp} XP`
-        : " XP"}
+  ? `${levelInfo.currentXp} / ${levelInfo.nextXp} XP`
+  : `${levelInfo.currentXp} XP · Maxnivå`}
     </span>
   </div>
 
@@ -936,6 +935,17 @@ const updateCount =
       />
     </div>
   )}
+</div>
+
+<div className="profile-xp-info">
+  <span className="profile-xp-info-label">Så tjänar du XP</span>
+
+  <div className="profile-xp-actions">
+    <span><strong>+10</strong> artikel</span>
+    <span><strong>+5</strong> bekräftelse</span>
+    <span><strong>+3</strong> uppdatering</span>
+    <span><strong>+1</strong> följ</span>
+  </div>
 </div>
 
         <section className="profile-stats">
