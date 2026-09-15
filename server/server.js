@@ -712,24 +712,60 @@ const articleOwnerID =
 
 
             const result =
-        await pool.query(
-          `
-          INSERT INTO Observations
-          ...
-          `,
-          [
-            userID,
-            eventID,
-            description,
-            imageUrl,
-            parsedLatitude,
-            parsedLongitude
-          ]
-        );
+  await pool.query(
+    `
+    INSERT INTO Observations
+    (
+      userID,
+      eventID,
+      description,
+      image_url,
+      latitude,
+      longitude
+    )
 
-      await addXP(userID, 3);
+    VALUES
+    (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6
+    )
 
-      if (articleOwnerID !== userID) {
+    RETURNING
+
+      observationID AS id,
+
+      userID,
+
+      eventID,
+
+      description,
+
+      image_url AS "imageUrl",
+
+      created_at AS "createdAt",
+
+      latitude,
+
+      longitude
+    `,
+
+    [
+      userID,
+      eventID,
+      description,
+      imageUrl,
+      parsedLatitude,
+      parsedLongitude
+    ]
+  );
+
+await addXP(userID, 3);
+
+if (articleOwnerID !== userID) {
 
   await createNotification({
     userID: articleOwnerID,
