@@ -2,6 +2,68 @@ import { useEffect, useRef, useState } from "react";
 import { Edit, Settings, X, ShieldCheck } from "lucide-react";
 import { API_URL } from "../config";
 
+const LEVELS = [
+  {
+    level: 1,
+    title: "Ny på HENDR",
+    xp: 0,
+    nextXp: 50,
+  },
+  {
+    level: 2,
+    title: "Observatör",
+    xp: 50,
+    nextXp: 150,
+  },
+  {
+    level: 3,
+    title: "Rapportör",
+    xp: 150,
+    nextXp: 350,
+  },
+  {
+    level: 4,
+    title: "Lokal källa",
+    xp: 350,
+    nextXp: 700,
+  },
+  {
+    level: 5,
+    title: "HENDR-källa",
+    xp: 700,
+    nextXp: 1500,
+  },
+  {
+    level: 6,
+    title: "Betrodd källa",
+    xp: 1500,
+    nextXp: 3000,
+  },
+  {
+    level: 7,
+    title: "HENDR-proffs",
+    xp: 3000,
+    nextXp: null,
+  },
+];
+
+function getLevelInfo(level, xp) {
+  const currentLevel =
+    LEVELS.find((item) => item.level === level) ||
+    LEVELS[0];
+
+  const nextLevel =
+    LEVELS.find(
+      (item) => item.level === level + 1
+    );
+
+  return {
+    ...currentLevel,
+    nextXp: nextLevel?.xp ?? null,
+    xp,
+  };
+}
+
 function Profile({
   user,
   onEventClick,
@@ -22,12 +84,13 @@ function Profile({
 
   const [articleTab, setArticleTab] = useState("mine");
 
-  const [stats, setStats] =
-    useState({
-    articleCount: 0,
-    confirmationCount: 0,
-    updateCount: 0
-  });
+  const [stats, setStats] = useState({
+  articleCount: 0,
+  confirmationCount: 0,
+  updateCount: 0,
+  xp: 0,
+  level: 1
+});
 
   const [loading, setLoading] =
     useState(true);

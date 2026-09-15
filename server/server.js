@@ -2037,6 +2037,9 @@ app.get(
           `
           SELECT
 
+            xp,
+            level,
+
             (
               SELECT COUNT(*)
               FROM Events
@@ -2057,6 +2060,8 @@ app.get(
               WHERE userID = $1
             ) AS "updateCount"
 
+          FROM Users
+          WHERE userid = $1
           `,
           [userID]
         );
