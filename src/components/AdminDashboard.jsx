@@ -104,9 +104,49 @@ setUsers(usersData);
         </div>
 
       </div>
+            <div className="admin-users">
+
+        <h2>Användare</h2>
+
+        <div className="admin-users-table">
+
+          <div className="admin-users-header">
+            <span>Användare</span>
+            <span>Roll</span>
+            <span>Level</span>
+            <span>XP</span>
+            <span>Skapad</span>
+          </div>
+
+          {users.map((user) => (
+            <div
+              className="admin-user-row"
+              key={user.userid}
+            >
+              <span>{user.username}</span>
+
+              <span>{user.role}</span>
+
+              <span>{user.level}</span>
+
+              <span>{user.xp}</span>
+
+              <span>
+                {new Date(
+                  user.createdAt
+                ).toLocaleDateString("sv-SE")}
+              </span>
+            </div>
+          ))}
+
+        </div>
+
+      </div>
 
     </div>
   );
+
+  
 }
 
 export default AdminDashboard;
