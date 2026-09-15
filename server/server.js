@@ -1212,12 +1212,14 @@ const eventOwnerID =
           ]
         );
 
-        await addXP(
-  eventOwnerID,
-  "confirmation_received",
-  eventID,
-  5
-);
+        if (eventOwnerID !== userID) {
+  await addXP(
+    eventOwnerID,
+    "confirmation_received",
+    eventID,
+    5
+  );
+}
 
               console.log(
   "SKAPAR BEKRÄFTELSENOTIS",
