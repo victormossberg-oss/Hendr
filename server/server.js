@@ -260,6 +260,20 @@ async function createNotification({
 
 }
 
+async function addXP(userID, amount) {
+  const result = await pool.query(
+    `
+      UPDATE Users
+      SET xp = xp + $1
+      WHERE userid = $2
+      RETURNING xp, level
+    `,
+    [amount, userID]
+  );
+
+  return result.rows[0];
+}
+
 
 // =========================
 // HÄMTA ALLA HÄNDELSER
@@ -453,7 +467,7 @@ app.get(
 
 
 // =========================
-// SKAPA NY HÄNDELSE
+// SKAPA NY ARTIKEL
 // =========================
 
 app.post(
@@ -591,7 +605,9 @@ const result =
 
             const newEvent = result.rows[0];
 
-res.status(201).json(newEvent);
+            await addXP(req.user.userid, 10);
+
+            res.status(201).json(newEvent);
 
 
     } catch (error) {
