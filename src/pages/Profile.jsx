@@ -320,7 +320,13 @@ setStats({
     Number(statsData.confirmationCount) || 0,
 
   updateCount:
-    Number(statsData.updateCount) || 0
+    Number(statsData.updateCount) || 0,
+
+  xp:
+    Number(statsData.xp) || 0,
+
+  level:
+    Number(statsData.level) || 1
 });
 
 
