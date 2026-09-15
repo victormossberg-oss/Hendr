@@ -260,8 +260,37 @@ async function createNotification({
 
 }
 
-async function addXP(userID, amount) {
+async function addXP(userID, type, referenceID, amount) {
   const result = await pool.query(
+    `
+      INSERT INTO "XPTransactions"
+      (
+        userID,
+        type,
+        referenceID,
+        amount
+      )
+      VALUES
+      (
+        $1,
+        $2,
+        $3,
+        $4
+      )
+      ON CONFLICT (userID, type, referenceID)
+      DO NOTHING
+      RETURNING xpTransactionID
+    `,
+    [userID, type, referenceID, amount]
+  );
+
+  // Handlingen har redan gett XP
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  // Dela bara ut XP om transaktionen skapades
+  const xpResult = await pool.query(
     `
       UPDATE Users
       SET
@@ -281,7 +310,7 @@ async function addXP(userID, amount) {
     [amount, userID]
   );
 
-  return result.rows[0];
+  return xpResult.rows[0];
 }
 
 
@@ -615,7 +644,12 @@ const result =
 
             const newEvent = result.rows[0];
 
-            await addXP(req.user.userid, 10);
+            await addXP(
+  req.user.userid,
+  "article_created",
+  newEvent.id,
+  10
+);
 
             res.status(201).json(newEvent);
 
@@ -774,7 +808,12 @@ const articleOwnerID =
   );
 
 if (articleOwnerID !== userID) {
-  await addXP(userID, 3);
+  await addXP(
+    userID,
+    "update_created",
+    observationID,
+    3
+  );
 }
 
 if (articleOwnerID !== userID) {
@@ -872,7 +911,12 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
     );
 
     if (eventResult.rows[0].userid !== userID) {
-  await addXP(userID, 1);
+  await addXP(
+    userID,
+    "follow_created",
+    eventID,
+    1
+  );
 }
 
     return res.json({
@@ -1168,7 +1212,12 @@ const eventOwnerID =
           ]
         );
 
-        await addXP(eventOwnerID, 5);
+        await addXP(
+  eventOwnerID,
+  "confirmation_received",
+  eventID,
+  5
+);
 
               console.log(
   "SKAPAR BEKRÄFTELSENOTIS",
