@@ -8443,7 +8443,7 @@ body,
 
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 40px;
 }
@@ -8523,4 +8523,36 @@ body,
   .admin-user-row {
     min-width: 600px;
   }
+}
+
+.admin-stat-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f3f3f3;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.admin-role {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-role.user {
+  background: #f1f1f1;
+  color: #666;
+}
+
+.admin-role.admin {
+  background: #e9e9e9;
+  color: #222;
 }

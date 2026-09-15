@@ -125,18 +125,21 @@ useEffect(() => {
   });
 
   useEffect(() => {
-
+    console.log("NOTIFICATION EFFECT - USER:", user);
   async function loadUnreadNotifications() {
 
   if (!user) {
     setUnreadNotifications(0);
     return;
   }
+    console.log("STARTAR NOTISHÄMTNING");
 
   try {
 
     const token =
       localStorage.getItem("hendr_token");
+      console.log("TOKEN HÄMTAD:", !!token);
+
 
     const response =
       await fetch(
@@ -148,6 +151,7 @@ useEffect(() => {
           },
         }
       );
+      console.log("NOTIFICATION RESPONSE:", response.status);
 
     if (!response.ok) {
       throw new Error(
@@ -176,7 +180,7 @@ useEffect(() => {
   }
 
 }
-
+loadUnreadNotifications();
 }, [user]);
 
 

@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
-
-
+import {
+  Users,
+  Newspaper,
+  RefreshCw,
+  CheckCircle,
+  Bookmark
+} from "lucide-react";
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -85,30 +90,54 @@ setUsers(usersData);
 
       <div className="admin-stats">
 
-        <div className="admin-stat-card">
-          <span>Användare</span>
-          <strong>{stats.userCount}</strong>
-        </div>
+        <div className="admin-stats">
 
-        <div className="admin-stat-card">
-          <span>Artiklar</span>
-          <strong>{stats.eventCount}</strong>
-        </div>
+  <div className="admin-stat-card">
+    <div className="admin-stat-icon">
+      <Users size={22} />
+    </div>
 
-        <div className="admin-stat-card">
-          <span>Uppdateringar</span>
-          <strong>{stats.observationCount}</strong>
-        </div>
+    <span>Användare</span>
+    <strong>{stats.userCount}</strong>
+  </div>
 
-        <div className="admin-stat-card">
-          <span>Bekräftelser</span>
-          <strong>{stats.confirmationCount}</strong>
-        </div>
+  <div className="admin-stat-card">
+    <div className="admin-stat-icon">
+      <Newspaper size={22} />
+    </div>
 
-        <div className="admin-stat-card">
-          <span>Följningar</span>
-          <strong>{stats.followCount}</strong>
-        </div>
+    <span>Artiklar</span>
+    <strong>{stats.eventCount}</strong>
+  </div>
+
+  <div className="admin-stat-card">
+    <div className="admin-stat-icon">
+      <RefreshCw size={22} />
+    </div>
+
+    <span>Uppdateringar</span>
+    <strong>{stats.observationCount}</strong>
+  </div>
+
+  <div className="admin-stat-card">
+    <div className="admin-stat-icon">
+      <CheckCircle size={22} />
+    </div>
+
+    <span>Bekräftelser</span>
+    <strong>{stats.confirmationCount}</strong>
+  </div>
+
+  <div className="admin-stat-card">
+    <div className="admin-stat-icon">
+      <Bookmark size={22} />
+    </div>
+
+    <span>Följningar</span>
+    <strong>{stats.followCount}</strong>
+  </div>
+
+</div>
 
       </div>
     </section>
@@ -132,7 +161,9 @@ setUsers(usersData);
             key={user.userid}
           >
             <span>{user.username}</span>
-            <span>{user.role}</span>
+            <span className={`admin-role ${user.role.toLowerCase()}`}>
+              {user.role}
+            </span>
             <span>{user.level}</span>
             <span>{user.xp}</span>
             <span>
