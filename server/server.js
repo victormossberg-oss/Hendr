@@ -1150,6 +1150,8 @@ const eventOwnerID =
           ]
         );
 
+        await addXP(eventOwnerID, 5);
+
               console.log(
   "SKAPAR BEKRÄFTELSENOTIS",
   {
