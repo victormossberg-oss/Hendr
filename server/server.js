@@ -264,12 +264,12 @@ async function addXP(userID, type, referenceID, amount) {
   const result = await pool.query(
     `
       INSERT INTO "XPTransactions"
-(
-  "userID",
-  type,
-  "referenceID",
-  amount
-)
+      (
+        "userID",
+        type,
+        "referenceID",
+        amount
+      )
       VALUES
       (
         $1,
@@ -277,9 +277,9 @@ async function addXP(userID, type, referenceID, amount) {
         $3,
         $4
       )
-      ON CONFLICT (userID, type, referenceID)
+      ON CONFLICT ("userID", type, "referenceID")
       DO NOTHING
-      RETURNING xpTransactionID
+      RETURNING "xpTransactionID"
     `,
     [userID, type, referenceID, amount]
   );
