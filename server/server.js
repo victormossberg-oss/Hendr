@@ -630,7 +630,7 @@ const result =
 
 
 // =========================
-// SKAPA OBSERVATION
+// SKAPA UPPDATERING
 // =========================
 
 app.post(
@@ -711,48 +711,12 @@ const articleOwnerID =
           : null;
 
 
-      const result =
+            const result =
         await pool.query(
           `
           INSERT INTO Observations
-          (
-            userID,
-            eventID,
-            description,
-            image_url,
-            latitude,
-            longitude
-          )
-
-          VALUES
-          (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6
-          )
-
-          RETURNING
-
-            observationID AS id,
-
-            userID,
-
-            eventID,
-
-            description,
-
-            image_url AS "imageUrl",
-
-            created_at AS "createdAt",
-
-            latitude,
-
-            longitude
+          ...
           `,
-
           [
             userID,
             eventID,
@@ -763,7 +727,9 @@ const articleOwnerID =
           ]
         );
 
- if (articleOwnerID !== userID) {
+      await addXP(userID, 3);
+
+      if (articleOwnerID !== userID) {
 
   await createNotification({
     userID: articleOwnerID,
