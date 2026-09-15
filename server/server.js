@@ -773,7 +773,9 @@ const articleOwnerID =
     ]
   );
 
-await addXP(userID, 3);
+if (articleOwnerID !== userID) {
+  await addXP(userID, 3);
+}
 
 if (articleOwnerID !== userID) {
 
@@ -821,7 +823,7 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
   try {
     const eventResult = await pool.query(
       `
-        SELECT eventID
+        SELECT eventID, userid
         FROM Events
         WHERE eventID = $1
       `,
@@ -869,7 +871,9 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
       [userID, eventID]
     );
 
-    await addXP(userID, 1);
+    if (eventResult.rows[0].userid !== userID) {
+  await addXP(userID, 1);
+}
 
     return res.json({
       following: true
@@ -3104,8 +3108,7 @@ app.get(
 const PORT =
   process.env.PORT || 3000;
 
-
-app.listen(
+  app.listen(
   PORT,
   "0.0.0.0",
 
