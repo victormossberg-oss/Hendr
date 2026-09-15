@@ -1555,10 +1555,13 @@ app.get(
 
     try {
       if (req.user.role !== "Admin") {
-        return res.status(403).json({
-          message: "Du har inte behörighet."
-        });
-      }
+  console.log("ADMIN NEKAD:", req.user);
+
+  return res.status(403).json({
+    message: "Du har inte behörighet.",
+    debug: req.user
+  });
+}
 
       const result = await pool.query(`
         SELECT
