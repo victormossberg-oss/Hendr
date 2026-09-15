@@ -62,14 +62,11 @@ function getLevelInfo(level, xp) {
     );
 
   return {
-
-    ...currentLevel,
-
-    currentXp: Number(xp) || 0,
-
-    nextXp: nextLevel?.xp ?? null,
-
-  };
+  ...currentLevel,
+  currentXp: Number(xp) || 0,
+  nextXp: nextLevel?.xp ?? null,
+  nextTitle: nextLevel?.title ?? null,
+};
 
 }
 
@@ -133,6 +130,8 @@ const [profileImage, setProfileImage] =
   stats.level,
   Number(stats.xp) || 0
 );
+
+const [showXpInfo, setShowXpInfo] = useState(false);
 
 const fileInputRef = useRef(null);
 
@@ -902,7 +901,6 @@ const updateCount =
       <span className="profile-xp-level">
         Level {levelInfo.level}
       </span>
-
       <span className="profile-xp-title">
         · {levelInfo.title}
       </span>
@@ -910,8 +908,8 @@ const updateCount =
 
     <span className="profile-xp-value">
       {levelInfo.nextXp !== null
-  ? `${levelInfo.currentXp} / ${levelInfo.nextXp} XP`
-  : `${levelInfo.currentXp} XP · Maxnivå`}
+        ? `${levelInfo.currentXp} / ${levelInfo.nextXp} XP`
+        : `${levelInfo.currentXp} XP · Maxnivå`}
     </span>
   </div>
 
@@ -924,29 +922,54 @@ const updateCount =
             100,
             Math.max(
               0,
-              ((levelInfo.currentXp -
-                levelInfo.xp) /
-                (levelInfo.nextXp -
-                  levelInfo.xp)) *
-                100
+              (levelInfo.currentXp / levelInfo.nextXp) * 100
             )
           )}%`,
         }}
       />
     </div>
   )}
-</div>
 
-<div className="profile-xp-info">
-  <span className="profile-xp-info-label">Så tjänar du XP</span>
+  <div className="profile-xp-subrow">
+    <button
+      type="button"
+      className="profile-xp-toggle"
+      onClick={() => setShowXpInfo((current) => !current)}
+    >
+      <span>Så tjänar du XP</span>
+      <span>{showXpInfo ? "−" : "+"}</span>
+    </button>
 
-  <div className="profile-xp-actions">
-    <span><strong>+10</strong> artikel</span>
-    <span><strong>+5</strong> bekräftelse</span>
-    <span><strong>+3</strong> uppdatering</span>
-    <span><strong>+1</strong> följ</span>
+    {levelInfo.nextXp !== null && (
+      <div className="profile-xp-next">
+        {levelInfo.nextXp - levelInfo.currentXp} XP till{" "}
+        {levelInfo.nextTitle}
+      </div>
+    )}
   </div>
+
+  {showXpInfo && (
+    <div className="profile-xp-details">
+      <div>
+        <strong>+10 XP</strong>
+        <span>Skapa en artikel</span>
+      </div>
+      <div>
+        <strong>+5 XP</strong>
+        <span>Få en bekräftelse på din artikel</span>
+      </div>
+      <div>
+        <strong>+3 XP</strong>
+        <span>Skriva en uppdatering</span>
+      </div>
+      <div>
+        <strong>+1 XP</strong>
+        <span>Följa en artikel</span>
+      </div>
+    </div>
+  )}
 </div>
+
 
         <section className="profile-stats">
 
