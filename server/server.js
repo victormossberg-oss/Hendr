@@ -1807,9 +1807,9 @@ app.get(
 
             r.reportID AS id,
 
-            r.eventID,
-
-            r.observationID,
+            r.eventID AS "eventID",
+            
+            r.observationID AS "observationID",
 
             r.reportedBy,
 
