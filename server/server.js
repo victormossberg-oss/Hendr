@@ -860,6 +860,133 @@ if (articleOwnerID !== userID) {
   }
 );
 
+// =========================
+// SKAPA RAPPORT
+// =========================
+
+app.post(
+  "/api/reports",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      const {
+        eventID,
+        observationID,
+        reason,
+        description
+      } = req.body;
+
+
+      const userID =
+        req.user.userid;
+
+
+      if (!eventID && !observationID) {
+
+        return res.status(400).json({
+          message:
+            "En artikel eller uppdatering måste anges."
+        });
+
+      }
+
+
+      if (eventID && observationID) {
+
+        return res.status(400).json({
+          message:
+            "En rapport kan bara gälla en artikel eller en uppdatering."
+        });
+
+      }
+
+
+      if (!reason) {
+
+        return res.status(400).json({
+          message:
+            "En anledning måste anges."
+        });
+
+      }
+
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO Reports
+          (
+            eventID,
+            observationID,
+            reportedBy,
+            reason,
+            description
+          )
+
+          VALUES
+          (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5
+          )
+
+          RETURNING
+
+            reportID AS id,
+
+            eventID,
+
+            observationID,
+
+            reportedBy,
+
+            reason,
+
+            description,
+
+            status,
+
+            created_at AS "createdAt"
+          `,
+
+          [
+            eventID || null,
+            observationID || null,
+            userID,
+            reason,
+            description || null
+          ]
+        );
+
+
+      res.status(201).json(
+        result.rows[0]
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid skapande av rapport:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte skapa rapporten."
+      });
+
+    }
+
+  }
+);
+
 // =================================
 // FÖLJ / SLUTA FÖLJA ARTIKEL
 // =================================
