@@ -92,6 +92,8 @@ function EventDetail({
     useState(false);
 
   const [reportOpen, setReportOpen] = useState(false);
+  const [reportType, setReportType] = useState("event");
+  const [reportObservationID, setReportObservationID] = useState(null);
   const [reportReason, setReportReason] = useState("");
   const [reportDescription, setReportDescription] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
@@ -517,10 +519,12 @@ async function handleSubmitReport() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          eventID: event.id,
-          reason: reportReason,
-          description: reportDescription.trim(),
-        }),
+  ...(reportType === "event"
+    ? { eventID: event.id }
+    : { observationID: reportObservationID }),
+  reason: reportReason,
+  description: reportDescription.trim(),
+}),
       }
     );
 
@@ -533,9 +537,11 @@ async function handleSubmitReport() {
       );
     }
 
-    setReportOpen(false);
-    setReportReason("");
-    setReportDescription("");
+   setReportOpen(false);
+setReportType("event");
+setReportObservationID(null);
+setReportReason("");
+setReportDescription("");
 
     alert("Tack! Din anmälan har skickats.");
   } catch (error) {
@@ -684,9 +690,11 @@ async function handleSubmitReport() {
     <button
   type="button"
   onClick={() => {
-    setMenuOpen(false);
-    setReportOpen(true);
-  }}
+  setMenuOpen(false);
+  setReportType("event");
+  setReportObservationID(null);
+  setReportOpen(true);
+}}
 >
   
   Anmäl artikel
@@ -1099,6 +1107,19 @@ async function handleSubmitReport() {
       return null;
     }
   })()}
+
+  <button
+  type="button"
+  className="article-update-report"
+  onClick={() => {
+  setReportType("observation");
+  setReportObservationID(observation.id);
+  setReportOpen(true);
+}}
+  aria-label="Anmäl uppdatering"
+>
+  <Flag size={14} />
+</button>
 </div>
 
 
@@ -1182,11 +1203,15 @@ async function handleSubmitReport() {
 {reportOpen && (
   <div className="report-overlay">
     <div className="report-dialog">
-      <h2>Anmäl artikel</h2>
+      <h2>
+  {reportType === "event"
+    ? "Anmäl artikel"
+    : "Anmäl uppdatering"}
+</h2>
 
-      <p>
-        Varför vill du anmäla den här artikeln?
-      </p>
+      {reportType === "event"
+  ? "Varför vill du anmäla den här artikeln?"
+  : "Varför vill du anmäla den här uppdateringen?"}
 
       <select
         value={reportReason}
@@ -1230,10 +1255,12 @@ async function handleSubmitReport() {
         <button
           type="button"
           onClick={() => {
-            setReportOpen(false);
-            setReportReason("");
-            setReportDescription("");
-          }}
+  setReportOpen(false);
+  setReportType("event");
+  setReportObservationID(null);
+  setReportReason("");
+  setReportDescription("");
+}}
         >
           Avbryt
         </button>
