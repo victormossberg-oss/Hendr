@@ -1068,18 +1068,7 @@ setReportDescription("");
     )}
   </span>
 
-  <button
-  type="button"
-  className="article-update-report"
-  onClick={() => {
-    setReportType("observation");
-    setReportObservationID(observation.id);
-    setReportOpen(true);
-  }}
-  aria-label="Anmäl uppdatering"
->
-  <Flag size={14} />
-</button>
+
 
   {(() => {
     const savedUser =
@@ -1136,6 +1125,19 @@ setReportDescription("");
                     alt=""
                   />
                 )}
+
+                  <button
+  type="button"
+  className="article-update-report"
+  onClick={() => {
+    setReportType("observation");
+    setReportObservationID(observation.id);
+    setReportOpen(true);
+  }}
+  aria-label="Anmäl uppdatering"
+>
+  <Flag size={14} />
+</button>
 
               </div>
 
