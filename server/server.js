@@ -380,6 +380,7 @@ LEFT JOIN Users u
 
 LEFT JOIN Observations o
   ON o.eventID = e.eventID
+  AND o.moderation_status != 'blocked'
 
 LEFT JOIN EventConfirmations ec
   ON ec.eventID = e.eventID
