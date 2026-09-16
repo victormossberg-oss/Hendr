@@ -5,6 +5,7 @@ const axios = require("axios");
 const cloudinary = require("./cloudinary");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const OpenAI = require("openai");
 
 require("dotenv").config();
 console.log(
@@ -15,6 +16,10 @@ console.log(
 const pool = require("./db");
 
 const app = express();
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 
 // =========================
@@ -83,13 +88,37 @@ async function moderateContent({
   description = "",
   imageUrl = null
 }) {
-  // Tillfällig implementation.
-  // AI-moderering kopplas in här senare.
+  const input = [
+    {
+      type: "text",
+      text: `Titel: ${title}\n\nText: ${description}`
+    }
+  ];
+
+  if (imageUrl) {
+    input.push({
+      type: "image_url",
+      image_url: {
+        url: imageUrl
+      }
+    });
+  }
+
+  const response = await openai.moderations.create({
+    model: "omni-moderation-latest",
+    input
+  });
+
+  const result = response.results[0];
 
   return {
-    status: "safe",
-    categories: [],
-    confidence: 0
+    status: result.flagged ? "review" : "safe",
+    categories: Object.keys(result.categories).filter(
+      (category) => result.categories[category]
+    ),
+    confidence: Math.max(
+      ...Object.values(result.category_scores)
+    )
   };
 }
 
