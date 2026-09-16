@@ -14,6 +14,60 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reports, setReports] = useState([]);
+  const [reportActionLoading, setReportActionLoading] = useState(null);
+
+  async function handleReportAction(reportID, status) {
+  const token = localStorage.getItem("hendr_token");
+
+  if (!token) return;
+
+  setReportActionLoading(reportID);
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/admin/reports/${reportID}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          "Kunde inte hantera rapporten."
+      );
+    }
+
+    setReports((currentReports) =>
+      currentReports.map((report) =>
+        report.id === reportID
+          ? {
+              ...report,
+              status: data.status,
+            }
+          : report
+      )
+    );
+  } catch (error) {
+    console.error(
+      "Fel vid hantering av rapport:",
+      error
+    );
+
+    alert(error.message);
+  } finally {
+    setReportActionLoading(null);
+  }
+}
 
   useEffect(() => {
     const loadStats = async () => {
@@ -225,15 +279,51 @@ setReports(reportsData);
           </div>
 
           <div>
-            <span>
-              Anmäld av:{" "}
-              {report.reporterUsername}
-            </span>
+  <span>
+    Rapporterad av:{" "}
+    {report.reporterUsername}
+  </span>
 
-            <span>
-              Status: {report.status}
-            </span>
-          </div>
+  <span>
+    Status: {report.status}
+  </span>
+
+  {report.status === "pending" && (
+    <div className="admin-report-actions">
+
+      <button
+        type="button"
+        onClick={() =>
+          handleReportAction(
+            report.id,
+            "approved"
+          )
+        }
+        disabled={
+          reportActionLoading === report.id
+        }
+      >
+        Godkänn
+      </button>
+
+      <button
+        type="button"
+        onClick={() =>
+          handleReportAction(
+            report.id,
+            "removed"
+          )
+        }
+        disabled={
+          reportActionLoading === report.id
+        }
+      >
+        Ta bort innehåll
+      </button>
+
+    </div>
+  )}
+</div>
         </div>
       ))
     )}
