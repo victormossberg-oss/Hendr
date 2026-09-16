@@ -1764,6 +1764,104 @@ app.get(
 );
 
 // =========================
+// HÄMTA RAPPORTER FÖR ADMIN
+// =========================
+
+app.get(
+  "/api/admin/reports",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      if (req.user.role !== "Admin") {
+
+        return res.status(403).json({
+          message:
+            "Du saknar behörighet."
+        });
+
+      }
+
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+
+            r.reportID AS id,
+
+            r.eventID,
+
+            r.observationID,
+
+            r.reportedBy,
+
+            reporter.username AS "reportedByUsername",
+
+            r.reason,
+
+            r.description,
+
+            r.status,
+
+            r.reviewedBy,
+
+            reviewer.username AS "reviewedByUsername",
+
+            r.reviewed_at AS "reviewedAt",
+
+            r.created_at AS "createdAt",
+
+            e.title AS "articleTitle",
+
+            o.description AS "updateDescription"
+
+          FROM Reports r
+
+          LEFT JOIN Users reporter
+            ON reporter.userid = r.reportedBy
+
+          LEFT JOIN Users reviewer
+            ON reviewer.userid = r.reviewedBy
+
+          LEFT JOIN Events e
+            ON e.eventID = r.eventID
+
+          LEFT JOIN Observations o
+            ON o.observationID = r.observationID
+
+          ORDER BY
+            r.created_at DESC
+          `
+        );
+
+
+      res.json(
+        result.rows
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hämtning av rapporter:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta rapporterna."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // REDIGERA HÄNDELSE
 // ÄGAREN ELLER ADMIN
 // =========================
