@@ -384,7 +384,9 @@ LEFT JOIN Observations o
 LEFT JOIN EventConfirmations ec
   ON ec.eventID = e.eventID
 
-          GROUP BY
+WHERE e.status != 'Removed'
+
+GROUP BY
   e.eventID,
   u.username
 
@@ -479,10 +481,13 @@ app.get(
             ON ec.eventID = e.eventID
 
           WHERE
-            e.title ILIKE $1
-            OR e.description ILIKE $1
-            OR e.location ILIKE $1
-            OR e.category ILIKE $1
+  e.status != 'Removed'
+  AND (
+    e.title ILIKE $1
+    OR e.description ILIKE $1
+    OR e.location ILIKE $1
+    OR e.category ILIKE $1
+  )
 
           GROUP BY
             e.eventID,
@@ -588,30 +593,32 @@ const result =
   await pool.query(
     `
     INSERT INTO Events
-    (
-      title,
-      description,
-      category,
-      status,
-      image_url,
-      latitude,
-      longitude,
-      userid,
-      location
-    )
+(
+  title,
+  description,
+  category,
+  status,
+  image_url,
+  latitude,
+  longitude,
+  userid,
+  location,
+  moderation_status
+)
 
     VALUES
-    (
-      $1,
-      $2,
-      $3,
-      $4,
-      $5,
-      $6,
-      $7,
-      $8,
-      $9
-    )
+(
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9,
+  'safe'
+)
 
     RETURNING
 
@@ -768,24 +775,26 @@ const articleOwnerID =
   await pool.query(
     `
     INSERT INTO Observations
-    (
-      userID,
-      eventID,
-      description,
-      image_url,
-      latitude,
-      longitude
-    )
+(
+  userID,
+  eventID,
+  description,
+  image_url,
+  latitude,
+  longitude,
+  moderation_status
+)
 
-    VALUES
-    (
-      $1,
-      $2,
-      $3,
-      $4,
-      $5,
-      $6
-    )
+   VALUES
+(
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  'safe'
+)
 
     RETURNING
 
@@ -1001,6 +1010,7 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
         SELECT eventID, userid
         FROM Events
         WHERE eventID = $1
+        AND status != 'Removed'
       `,
       [eventID]
     );
@@ -1143,6 +1153,7 @@ app.get(
       ON u.userid = o.userID
 
     WHERE o.eventID = $1
+AND o.moderation_status != 'blocked'
 
     ORDER BY
       o.created_at DESC
@@ -1248,10 +1259,10 @@ app.post(
         const eventResult =
   await pool.query(
     `
-      SELECT
-        userid
+      SELECT eventID, userid
       FROM Events
       WHERE eventID = $1
+      AND status != 'Removed'
     `,
     [eventID]
   );
@@ -1554,7 +1565,11 @@ app.delete(
       const event =
         eventResult.rows[0];
 
-
+if (event.status === "Removed" && req.user.role !== "Admin") {
+  return res.status(403).json({
+    message: "Den här artikeln är borttagen."
+  });
+}
       if (
   event.userid !== userID &&
   req.user.role !== "Admin"
@@ -2044,11 +2059,12 @@ app.put(
       const eventResult = await pool.query(
         `
         SELECT
-          eventID,
-          userid,
-          image_url
-        FROM Events
-        WHERE eventID = $1
+  eventID,
+  userid,
+  image_url,
+  status
+FROM Events
+WHERE eventID = $1
         `,
         [eventID]
       );
@@ -2156,11 +2172,18 @@ app.put(
         title = $1,
         description = $2,
         category = $3,
-        status = $4,
+        status = CASE
+          WHEN status = 'Removed' THEN 'Removed'
+          ELSE $4
+        END,
         image_url = $5,
         latitude = $6,
         longitude = $7,
         location = $8,
+        moderation_status = 'safe',
+        moderation_categories = NULL,
+        moderation_confidence = NULL,
+        moderated_at = NULL,
         updated_at = CURRENT_TIMESTAMP
         WHERE eventID = $9
         RETURNING
@@ -2330,6 +2353,7 @@ app.get(
             ON u.userid = e.userid
 
           WHERE f."userID" = $1
+AND e.status != 'Removed'
 
           ORDER BY
             f.created_at DESC
@@ -2994,6 +3018,7 @@ app.get(
           ON u.userid = e.userid
 
         WHERE e.userid = $1
+AND e.status != 'Removed'
 
         ORDER BY e.created_at DESC
         `,
@@ -3063,7 +3088,8 @@ app.get(
           LEFT JOIN Users u
             ON u.userid = o.userID
 
-          WHERE o.userID = $1
+          WHERE o.eventID = $1
+AND o.moderation_status != 'blocked'
 
           ORDER BY
             o.created_at DESC
