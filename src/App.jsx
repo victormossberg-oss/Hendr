@@ -970,15 +970,15 @@ else if (
   // =========================
 
   else if (
-    currentPage === "admin" &&
-    user
-  ) {
-
-    content = (
-      <AdminDashboard />
-    );
-
-  }
+  currentPage === "admin" &&
+  user
+) {
+  content = (
+    <AdminDashboard
+      onEventClick={handleEventClick}
+    />
+  );
+}
 
     // =========================
   // NOTISER

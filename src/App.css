@@ -8720,3 +8720,19 @@ body,
   border-radius: 10px;
   margin-top: 8px;
 }
+
+.admin-report-title {
+  display: inline-block;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-report-title:hover {
+  text-decoration: underline;
+}

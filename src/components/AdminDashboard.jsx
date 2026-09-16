@@ -8,7 +8,7 @@ import {
   Bookmark
 } from "lucide-react";
 
-function AdminDashboard() {
+function AdminDashboard({ onEventClick }) {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -288,11 +288,24 @@ setReports(reportsData);
     : "Anmäld uppdatering"}
 </strong>
 
-<h3>
-  {report.eventID
-    ? report.articleTitle || "Okänd artikel"
-    : "Uppdatering"}
-</h3>
+{report.eventID ? (
+  <button
+    type="button"
+    className="admin-report-title"
+    onClick={() => {
+      onEventClick({
+        id: report.eventID,
+        title: report.articleTitle,
+        description: report.articleDescription,
+        imageUrl: report.articleImageUrl,
+      });
+    }}
+  >
+    {report.articleTitle || "Okänd artikel"}
+  </button>
+) : (
+  <h3>Uppdatering</h3>
+)}
 
 {report.eventID && (
   <p>
