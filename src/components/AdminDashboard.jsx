@@ -262,14 +262,32 @@ setReports(reportsData);
         >
           <div>
             <strong>
-              {report.eventID
-                ? `Artikel #${report.eventID}`
-                : `Uppdatering #${report.observationID}`}
-            </strong>
+  {report.eventID
+    ? `Artikel: ${report.articleTitle || "Okänd artikel"}`
+    : `Uppdatering`}
+</strong>
 
-            <p>
-              Anledning: {report.reason}
-            </p>
+{report.eventID && (
+  <p>
+    Artikel-ID: {report.eventID}
+  </p>
+)}
+
+{report.observationID && (
+  <p>
+    Uppdatering-ID: {report.observationID}
+  </p>
+)}
+
+{report.updateDescription && (
+  <p>
+    Innehåll: {report.updateDescription}
+  </p>
+)}
+
+<p>
+  Anledning: {report.reason}
+</p>
 
             {report.description && (
               <p>
@@ -280,9 +298,9 @@ setReports(reportsData);
 
           <div>
   <span>
-    Rapporterad av:{" "}
-    {report.reporterUsername}
-  </span>
+  Rapporterad av:{" "}
+  {report.reportedByUsername || "Okänd användare"}
+</span>
 
   <span>
     Status: {report.status}
@@ -308,12 +326,18 @@ setReports(reportsData);
 
       <button
         type="button"
-        onClick={() =>
-          handleReportAction(
-            report.id,
-            "removed"
-          )
-        }
+        onClick={() => {
+  const confirmed = window.confirm(
+    "Är du säker på att du vill ta bort det anmälda innehållet?"
+  );
+
+  if (!confirmed) return;
+
+  handleReportAction(
+    report.id,
+    "removed"
+  );
+}}
         disabled={
           reportActionLoading === report.id
         }
