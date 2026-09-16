@@ -8248,10 +8248,11 @@ body,
 
 .article-update-report {
   margin-left: auto;
-  padding: 0;
+  margin-right: 10px;
+  padding: 4px;
   border: none;
   background: transparent;
-  color: #777;
+  color: #d32f2f;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -8259,7 +8260,7 @@ body,
 }
 
 .article-update-report:hover {
-  color: #222;
+  color: #b71c1c;
 }
 
 .news-article-image-meta {
