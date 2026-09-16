@@ -304,7 +304,23 @@ setReports(reportsData);
     {report.articleTitle || "Okänd artikel"}
   </button>
 ) : (
-  <h3>Uppdatering</h3>
+  <>
+    <h3>Anmäld uppdatering</h3>
+
+    {report.updateEventID && (
+      <button
+        type="button"
+        className="admin-report-title"
+        onClick={() =>
+          onEventClick({
+            id: report.updateEventID,
+          })
+        }
+      >
+        Visa tillhörande artikel
+      </button>
+    )}
+  </>
 )}
 
 {report.eventID && (
@@ -373,12 +389,12 @@ setReports(reportsData);
 
           <div>
   <span>
-  Rapporterad av:{" "}
+  Anmäld av:{" "}
   {report.reportedByUsername || "Okänd användare"}
 </span>
 
 <span>
-  Rapporterad:{" "}
+  Anmäld:{" "}
   {new Date(report.createdAt).toLocaleString("sv-SE")}
 </span>
 

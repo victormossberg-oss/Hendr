@@ -1833,6 +1833,7 @@ app.get(
             e.description AS "articleDescription",
             e.image_url AS "articleImageUrl",
             o.description AS "updateDescription",
+            o.eventID AS "updateEventID",
             o.image_url AS "updateImageUrl"
 
           FROM Reports r
