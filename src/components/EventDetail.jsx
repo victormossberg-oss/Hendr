@@ -4,6 +4,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Flag,
   MapPin,
   MoreHorizontal,
   Send,
@@ -89,6 +90,11 @@ function EventDetail({
 
   const [menuOpen, setMenuOpen] =
     useState(false);
+
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDescription, setReportDescription] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
 
   const [imageOpen, setImageOpen] =
     useState(false);
@@ -484,6 +490,66 @@ async function handleDeleteUpdate(observationID) {
   }
 }
 
+async function handleSubmitReport() {
+  const token = localStorage.getItem("hendr_token");
+
+  if (!token) {
+    alert("Du måste vara inloggad för att rapportera en artikel.");
+    return;
+  }
+
+  if (!reportReason) {
+    alert("Välj en anledning.");
+    return;
+  }
+
+  if (reportSubmitting) return;
+
+  setReportSubmitting(true);
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/reports`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          eventID: event.id,
+          reason: reportReason,
+          description: reportDescription.trim(),
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          "Kunde inte skicka anmälan."
+      );
+    }
+
+    setReportOpen(false);
+    setReportReason("");
+    setReportDescription("");
+
+    alert("Tack! Din anmälan har skickats.");
+  } catch (error) {
+    console.error(
+      "Fel vid anmälning av artikel:",
+      error
+    );
+
+    alert(error.message);
+  } finally {
+    setReportSubmitting(false);
+  }
+}
+
   function handleDelete() {
     setMenuOpen(false);
 
@@ -615,8 +681,19 @@ async function handleDeleteUpdate(observationID) {
         </button>
       </>
     )}
+    <button
+  type="button"
+  onClick={() => {
+    setMenuOpen(false);
+    setReportOpen(true);
+  }}
+>
+  
+  Anmäl artikel
+</button>
 
   </div>
+  
 )}
 
             </div>
@@ -1102,7 +1179,80 @@ async function handleDeleteUpdate(observationID) {
 
           </div>
         )}
+{reportOpen && (
+  <div className="report-overlay">
+    <div className="report-dialog">
+      <h2>Anmäl artikel</h2>
 
+      <p>
+        Varför vill du anmäla den här artikeln?
+      </p>
+
+      <select
+        value={reportReason}
+        onChange={(e) =>
+          setReportReason(e.target.value)
+        }
+      >
+        <option value="">
+          Välj anledning
+        </option>
+        <option value="violence">
+          Våldsamt eller grafiskt innehåll
+        </option>
+        <option value="sexual">
+          Sexuellt innehåll
+        </option>
+        <option value="hate">
+          Hat eller trakasserier
+        </option>
+        <option value="threat">
+          Hot eller uppmaning till våld
+        </option>
+        <option value="self_harm">
+          Självskadeinnehåll
+        </option>
+        <option value="other">
+          Annat
+        </option>
+      </select>
+
+      <textarea
+        value={reportDescription}
+        onChange={(e) =>
+          setReportDescription(e.target.value)
+        }
+        placeholder="Beskriv gärna problemet..."
+        rows={4}
+      />
+
+      <div className="report-actions">
+        <button
+          type="button"
+          onClick={() => {
+            setReportOpen(false);
+            setReportReason("");
+            setReportDescription("");
+          }}
+        >
+          Avbryt
+        </button>
+
+        <button
+          type="button"
+          onClick={handleSubmitReport}
+          disabled={
+            reportSubmitting || !reportReason
+          }
+        >
+          {reportSubmitting
+            ? "Skickar..."
+            : "Skicka anmälan"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </main>
   );
 }
