@@ -1862,6 +1862,167 @@ app.get(
 );
 
 // =========================
+// HANTERA RAPPORT FÖR ADMIN
+// =========================
+
+app.patch(
+  "/api/admin/reports/:id",
+  authenticateToken,
+
+  async (req, res) => {
+
+    try {
+
+      if (req.user.role !== "Admin") {
+
+        return res.status(403).json({
+          message:
+            "Du saknar behörighet."
+        });
+
+      }
+
+
+      const reportID =
+        Number(req.params.id);
+
+      const {
+        status
+      } = req.body;
+
+
+      if (
+        !["approved", "removed"].includes(status)
+      ) {
+
+        return res.status(400).json({
+          message:
+            "Ogiltig rapportstatus."
+        });
+
+      }
+
+
+      const reportResult =
+        await pool.query(
+          `
+          SELECT
+            reportID,
+            eventID,
+            observationID
+          FROM Reports
+          WHERE reportID = $1
+          `,
+          [reportID]
+        );
+
+
+      if (
+        reportResult.rows.length === 0
+      ) {
+
+        return res.status(404).json({
+          message:
+            "Rapporten hittades inte."
+        });
+
+      }
+
+
+      const report =
+        reportResult.rows[0];
+
+
+      if (status === "removed") {
+
+        if (report.eventid) {
+
+          await pool.query(
+            `
+            UPDATE Events
+            SET status = 'Removed'
+            WHERE eventID = $1
+            `,
+            [report.eventid]
+          );
+
+        }
+
+
+        if (report.observationid) {
+
+          await pool.query(
+            `
+            UPDATE Observations
+            SET moderation_status = 'blocked'
+            WHERE observationID = $1
+            `,
+            [report.observationid]
+          );
+
+        }
+
+      }
+
+
+      const result =
+        await pool.query(
+          `
+          UPDATE Reports
+
+          SET
+            status = $1,
+            reviewedBy = $2,
+            reviewed_at = CURRENT_TIMESTAMP
+
+          WHERE reportID = $3
+
+          RETURNING
+
+            reportID AS id,
+            eventID,
+            observationID,
+            reportedBy,
+            reason,
+            description,
+            status,
+            reviewedBy,
+            reviewed_at AS "reviewedAt",
+            created_at AS "createdAt"
+          `,
+
+          [
+            status,
+            req.user.userid,
+            reportID
+          ]
+        );
+
+
+      res.json(
+        result.rows[0]
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid hantering av rapport:",
+        error
+      );
+
+
+      res.status(500).json({
+        message:
+          "Kunde inte hantera rapporten."
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // REDIGERA HÄNDELSE
 // ÄGAREN ELLER ADMIN
 // =========================
