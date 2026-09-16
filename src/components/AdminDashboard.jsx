@@ -13,6 +13,7 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reports, setReports] = useState([]);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -52,6 +53,23 @@ if (!usersResponse.ok) {
 const usersData = await usersResponse.json();
 
 setUsers(usersData);
+
+const reportsResponse = await fetch(
+  `${API_URL}/api/admin/reports`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+if (!reportsResponse.ok) {
+  throw new Error("Kunde inte hämta anmälningar.");
+}
+
+const reportsData = await reportsResponse.json();
+
+setReports(reportsData);
       } catch (error) {
         console.error(
           "Fel vid hämtning av admin-statistik:",
@@ -174,6 +192,54 @@ setUsers(usersData);
 
       </div>
     </section>
+
+    <section className="admin-reports">
+  <h2>Anmälningar</h2>
+
+  <div className="admin-reports-list">
+
+    {reports.length === 0 ? (
+      <p>Inga anmälningar.</p>
+    ) : (
+      reports.map((report) => (
+        <div
+          className="admin-report-row"
+          key={report.id}
+        >
+          <div>
+            <strong>
+              {report.eventID
+                ? `Artikel #${report.eventID}`
+                : `Uppdatering #${report.observationID}`}
+            </strong>
+
+            <p>
+              Anledning: {report.reason}
+            </p>
+
+            {report.description && (
+              <p>
+                Beskrivning: {report.description}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <span>
+              Anmäld av:{" "}
+              {report.reporterUsername}
+            </span>
+
+            <span>
+              Status: {report.status}
+            </span>
+          </div>
+        </div>
+      ))
+    )}
+
+  </div>
+</section>
 
   </div>
 );
