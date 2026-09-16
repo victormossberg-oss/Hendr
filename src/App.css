@@ -8241,8 +8241,25 @@ body,
   cursor: pointer;
 }
 
+
 .article-update-delete:hover {
   color: #171717;
+}
+
+.article-update-report {
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.article-update-report:hover {
+  color: #222;
 }
 
 .news-article-image-meta {
