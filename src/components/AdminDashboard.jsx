@@ -255,7 +255,28 @@ setReports(reportsData);
     {reports.length === 0 ? (
       <p>Inga anmälningar.</p>
     ) : (
-      reports.map((report) => (
+      [...reports]
+  .sort((a, b) => {
+    if (
+      a.status === "pending" &&
+      b.status !== "pending"
+    ) {
+      return -1;
+    }
+
+    if (
+      a.status !== "pending" &&
+      b.status === "pending"
+    ) {
+      return 1;
+    }
+
+    return (
+      new Date(b.createdAt) -
+      new Date(a.createdAt)
+    );
+  })
+  .map((report) => (
         <div
           className="admin-report-row"
           key={report.id}
@@ -263,9 +284,15 @@ setReports(reportsData);
           <div>
             <strong>
   {report.eventID
-    ? `Artikel: ${report.articleTitle || "Okänd artikel"}`
-    : `Uppdatering`}
+    ? "Anmäld artikel"
+    : "Anmäld uppdatering"}
 </strong>
+
+<h3>
+  {report.eventID
+    ? report.articleTitle || "Okänd artikel"
+    : "Uppdatering"}
+</h3>
 
 {report.eventID && (
   <p>
@@ -308,7 +335,20 @@ setReports(reportsData);
 )}
 
 <p>
-  Anledning: {report.reason}
+  Anledning:{" "}
+  {report.reason === "violence"
+    ? "Våldsamt eller grafiskt innehåll"
+    : report.reason === "sexual"
+    ? "Sexuellt innehåll"
+    : report.reason === "hate"
+    ? "Hat eller trakasserier"
+    : report.reason === "threat"
+    ? "Hot eller uppmaning till våld"
+    : report.reason === "self_harm"
+    ? "Självskadeinnehåll"
+    : report.reason === "other"
+    ? "Annat"
+    : report.reason}
 </p>
 
             {report.description && (
@@ -324,9 +364,21 @@ setReports(reportsData);
   {report.reportedByUsername || "Okänd användare"}
 </span>
 
+<span>
+  Rapporterad:{" "}
+  {new Date(report.createdAt).toLocaleString("sv-SE")}
+</span>
+
   <span>
-    Status: {report.status}
-  </span>
+  Status:{" "}
+  {report.status === "pending"
+    ? "Väntar på granskning"
+    : report.status === "approved"
+    ? "Godkänd"
+    : report.status === "removed"
+    ? "Innehåll borttaget"
+    : report.status}
+</span>
 
   {report.status === "pending" && (
     <div className="admin-report-actions">
