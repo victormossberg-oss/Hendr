@@ -8711,3 +8711,12 @@ body,
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.admin-report-image {
+  width: 100%;
+  max-width: 320px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 8px;
+}

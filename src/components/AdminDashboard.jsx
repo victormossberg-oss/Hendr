@@ -273,6 +273,20 @@ setReports(reportsData);
   </p>
 )}
 
+{report.articleDescription && (
+  <p>
+    Innehåll: {report.articleDescription}
+  </p>
+)}
+
+{report.articleImageUrl && (
+  <img
+    src={report.articleImageUrl}
+    alt="Anmäld artikel"
+    className="admin-report-image"
+  />
+)}
+
 {report.observationID && (
   <p>
     Uppdatering-ID: {report.observationID}
@@ -283,6 +297,14 @@ setReports(reportsData);
   <p>
     Innehåll: {report.updateDescription}
   </p>
+)}
+
+{report.updateImageUrl && (
+  <img
+    src={report.updateImageUrl}
+    alt="Anmäld uppdatering"
+    className="admin-report-image"
+  />
 )}
 
 <p>

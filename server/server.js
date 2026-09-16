@@ -1830,8 +1830,10 @@ app.get(
             r.created_at AS "createdAt",
 
             e.title AS "articleTitle",
-
-            o.description AS "updateDescription"
+            e.description AS "articleDescription",
+            e.image_url AS "articleImageUrl",
+            o.description AS "updateDescription",
+            o.image_url AS "updateImageUrl"
 
           FROM Reports r
 
