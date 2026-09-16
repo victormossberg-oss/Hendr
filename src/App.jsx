@@ -124,34 +124,24 @@ useEffect(() => {
 
   });
 
-  useEffect(() => {
-    console.log("NOTIFICATION EFFECT - USER:", user);
   async function loadUnreadNotifications() {
-
   if (!user) {
     setUnreadNotifications(0);
     return;
   }
-    console.log("STARTAR NOTISHÄMTNING");
 
   try {
-
     const token =
       localStorage.getItem("hendr_token");
-      console.log("TOKEN HÄMTAD:", !!token);
 
-
-    const response =
-      await fetch(
-        `${API_URL}/api/notifications`,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("NOTIFICATION RESPONSE:", response.status);
+    const response = await fetch(
+      `${API_URL}/api/notifications`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -159,37 +149,34 @@ useEffect(() => {
       );
     }
 
-    const data =
-      await response.json();
+    const data = await response.json();
 
-    const unread =
-      data.filter(
-        (notification) =>
-          !notification.isRead
-      ).length;
+    const unread = data.filter(
+      (notification) =>
+        !notification.isRead
+    ).length;
 
     setUnreadNotifications(unread);
 
   } catch (error) {
-
     console.error(
       "Fel vid hämtning av olästa notiser:",
       error
     );
-
   }
-
 }
-loadUnreadNotifications();
 
-const interval = setInterval(
-  loadUnreadNotifications,
-  30000
-);
+useEffect(() => {
+  loadUnreadNotifications();
 
-return () => {
-  clearInterval(interval);
-};
+  const interval = setInterval(
+    loadUnreadNotifications,
+    30000
+  );
+
+  return () => {
+    clearInterval(interval);
+  };
 }, [user]);
 
 

@@ -196,7 +196,7 @@ function Notifications({
           : item
       )
     );
-
+    console.log("ANROPAR onNotificationRead");
     onNotificationRead?.();
   } catch (error) {
     console.error(
