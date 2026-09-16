@@ -2468,6 +2468,40 @@ app.patch(
   }
 );
 
+// RENSA NOTISER
+app.delete(
+  "/api/notifications/read",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        `
+          DELETE FROM Notifications
+          WHERE userID = $1
+          AND isRead = TRUE
+          RETURNING notificationID
+        `,
+        [req.user.userid]
+      );
+
+      res.json({
+        message: "Lästa notiser raderade.",
+        deletedCount: result.rowCount
+      });
+
+    } catch (error) {
+      console.error(
+        "Fel vid radering av lästa notiser:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Kunde inte radera lästa notiser."
+      });
+    }
+  }
+);
+
 // =========================
 // HÄMTA PUBLIK ANVÄNDARPROFIL
 // =========================

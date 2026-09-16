@@ -52,6 +52,44 @@ function Notifications({
   return `${years} ${years === 1 ? "år" : "år"} sedan`;
 }
 
+async function clearReadNotifications() {
+  try {
+    const token =
+      localStorage.getItem("hendr_token");
+
+    const response = await fetch(
+      `${API_URL}/api/notifications/read`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte rensa lästa notiser."
+      );
+    }
+
+    setNotifications((current) =>
+      current.filter(
+        (notification) =>
+          !notification.isRead
+      )
+    );
+
+    onNotificationRead?.();
+
+  } catch (error) {
+    console.error(
+      "Kunde inte rensa lästa notiser:",
+      error
+    );
+  }
+}
+
   useEffect(() => {
     async function loadNotifications() {
       try {
@@ -102,9 +140,24 @@ function Notifications({
 
   return (
     <div className="notifications-page">
-      <h1>Notiser</h1>
+  <div className="notifications-header">
+    <h1>Notiser</h1>
 
-      {notifications.length === 0 ? (
+    {notifications.some(
+      (notification) =>
+        notification.isRead
+    ) && (
+      <button
+        type="button"
+        className="clear-read-button"
+        onClick={clearReadNotifications}
+      >
+        Rensa lästa
+      </button>
+    )}
+  </div>
+
+  {notifications.length === 0 ? (
         <p>Du har inga notiser ännu.</p>
       ) : (
         <div className="notifications-list">
