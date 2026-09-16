@@ -74,6 +74,25 @@ function uploadToCloudinary(file, folder) {
 
 }
 
+// =========================
+// MODERERING
+// =========================
+
+async function moderateContent({
+  title = "",
+  description = "",
+  imageUrl = null
+}) {
+  // Tillfällig implementation.
+  // AI-moderering kopplas in här senare.
+
+  return {
+    status: "safe",
+    categories: [],
+    confidence: 0
+  };
+}
+
 
 // =========================
 // HÄMTA PLATS FRÅN KOORDINATER
@@ -662,14 +681,40 @@ const result =
 
             const newEvent = result.rows[0];
 
-            await addXP(
+const moderationResult = await moderateContent({
+  title: newEvent.title,
+  description: newEvent.description,
+  imageUrl: newEvent.imageUrl
+});
+
+await pool.query(
+  `
+  UPDATE Events
+  SET
+    moderation_status = $1,
+    moderation_categories = $2,
+    moderation_confidence = $3,
+    moderated_at = CURRENT_TIMESTAMP
+  WHERE eventID = $4
+  `,
+  [
+    moderationResult.status,
+    moderationResult.categories,
+    moderationResult.confidence,
+    newEvent.id
+  ]
+);
+
+newEvent.moderation_status = moderationResult.status;
+
+await addXP(
   req.user.userid,
   "article_created",
   newEvent.id,
   10
 );
 
-            res.status(201).json(newEvent);
+res.status(201).json(newEvent);
 
 
     } catch (error) {
