@@ -181,6 +181,15 @@ useEffect(() => {
 
 }
 loadUnreadNotifications();
+
+const interval = setInterval(
+  loadUnreadNotifications,
+  30000
+);
+
+return () => {
+  clearInterval(interval);
+};
 }, [user]);
 
 

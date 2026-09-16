@@ -173,15 +173,7 @@ function Notifications({
                           )
                       );
 
-                    if (!event) {
-  console.error(
-    "Kunde inte hitta artikeln:",
-    notification.eventid
-  );
-  return;
-}
-
-if (!notification.isRead) {
+                    if (!notification.isRead) {
   try {
     await fetch(
       `${API_URL}/api/notifications/${notification.id}/read`,
@@ -212,6 +204,14 @@ if (!notification.isRead) {
       error
     );
   }
+}
+
+if (!event) {
+  console.error(
+    "Kunde inte hitta artikeln:",
+    notification.eventid
+  );
+  return;
 }
 
 onEventClick?.(event);
