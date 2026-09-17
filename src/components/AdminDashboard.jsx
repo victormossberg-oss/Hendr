@@ -426,6 +426,11 @@ setPendingUpdates(pendingUpdatesData);
   onEventClick({
     id: update.eventID,
     title: update.articleTitle,
+    description: update.articleDescription,
+    imageUrl: update.articleImageUrl,
+    category: update.articleCategory,
+    status: update.articleStatus,
+    location: update.articleLocation,
   })
 }
 >
