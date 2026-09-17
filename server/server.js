@@ -1253,7 +1253,7 @@ app.get(
       ON u.userid = o.userID
 
     WHERE o.eventID = $1
-AND o.moderation_status != 'blocked'
+AND o.moderation_status = 'safe'
 
     ORDER BY
       o.created_at DESC
