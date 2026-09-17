@@ -417,6 +417,17 @@ setPendingUpdates(pendingUpdatesData);
                 update.createdAt
               ).toLocaleString("sv-SE")}
             </p>
+            <button
+  type="button"
+  className="admin-report-title"
+  onClick={() =>
+    onEventClick({
+      id: update.eventID,
+    })
+  }
+>
+  Visa artikel
+</button>
           </div>
           <div className="admin-pending-actions">
 
