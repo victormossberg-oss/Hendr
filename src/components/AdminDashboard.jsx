@@ -75,6 +75,51 @@ const handleArticleModeration = async (
   articleID,
   status
 ) => {
+  const handleUpdateModeration = async (
+  updateID,
+  status
+) => {
+  try {
+    const token =
+      localStorage.getItem("hendr_token");
+
+    const response = await fetch(
+      `${API_URL}/api/admin/updates/${updateID}/moderation`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte ändra uppdateringens modereringsstatus."
+      );
+    }
+
+    setPendingUpdates((currentUpdates) =>
+      currentUpdates.filter(
+        (update) => update.id !== updateID
+      )
+    );
+
+  } catch (error) {
+    console.error(
+      "Fel vid moderering av uppdatering:",
+      error
+    );
+
+    setError(
+      "Kunde inte ändra uppdateringens modereringsstatus."
+    );
+  }
+};
   try {
     const token =
       localStorage.getItem("hendr_token");
