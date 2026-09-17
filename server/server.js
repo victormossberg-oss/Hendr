@@ -1208,8 +1208,8 @@ app.get("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
 
 
 // =========================
-// HÄMTA OBSERVATIONER
-// FÖR ETT EVENT
+// HÄMTA UPPDATERINGAR
+// FÖR EN ARTIKEL
 // =========================
 
 app.get(
@@ -1934,6 +1934,55 @@ app.patch(
 
       res.status(500).json({
         message: "Kunde inte ändra modereringsstatus."
+      });
+    }
+  }
+);
+
+app.get(
+  "/api/admin/pending-updates",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      if (req.user.role !== "Admin") {
+        return res.status(403).json({
+          message: "Åtkomst nekad."
+        });
+      }
+
+      const result = await pool.query(
+        `
+        SELECT
+          o.observationID AS id,
+          o.eventID,
+          o.userID,
+          o.description,
+          o.image_url AS "imageUrl",
+          o.created_at AS "createdAt",
+          u.username AS username,
+          e.title AS "articleTitle",
+          o.moderation_status AS "moderationStatus"
+        FROM Observations o
+        LEFT JOIN Users u
+          ON u.userid = o.userID
+        LEFT JOIN Events e
+          ON e.eventID = o.eventID
+        WHERE o.moderation_status = 'pending'
+        ORDER BY o.created_at DESC
+        `
+      );
+
+      res.json(result.rows);
+
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av pending-uppdateringar:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte hämta väntande uppdateringar."
       });
     }
   }

@@ -15,6 +15,7 @@ function AdminDashboard({ onEventClick }) {
   const [error, setError] = useState("");
   const [reports, setReports] = useState([]);
   const [pendingArticles, setPendingArticles] = useState([]);
+  const [pendingUpdates, setPendingUpdates] = useState([]);
   const [reportActionLoading, setReportActionLoading] = useState(null);
 
   async function handleReportAction(reportID, status) {
@@ -192,6 +193,26 @@ const pendingArticlesData =
 
 setPendingArticles(pendingArticlesData);
 
+const pendingUpdatesResponse = await fetch(
+  `${API_URL}/api/admin/pending-updates`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+if (!pendingUpdatesResponse.ok) {
+  throw new Error(
+    "Kunde inte hämta väntande uppdateringar."
+  );
+}
+
+const pendingUpdatesData =
+  await pendingUpdatesResponse.json();
+
+setPendingUpdates(pendingUpdatesData);
+
       } catch (error) {
         console.error(
           "Fel vid hämtning av admin-statistik:",
@@ -315,6 +336,48 @@ setPendingArticles(pendingArticlesData);
       </div>
     </section>
 
+    <section className="admin-pending">
+  <h2>Väntande uppdateringar</h2>
+
+  <div className="admin-pending-list">
+
+    {pendingUpdates.length === 0 ? (
+      <p>Inga uppdateringar väntar på granskning.</p>
+    ) : (
+      pendingUpdates.map((update) => (
+        <div
+          className="admin-pending-row"
+          key={update.id}
+        >
+          <div>
+            <strong>
+              {update.articleTitle || "Okänd artikel"}
+            </strong>
+
+            <p>
+              Uppdatering:{" "}
+              {update.description || "Ingen text"}
+            </p>
+
+            <p>
+              Skapad av:{" "}
+              {update.username || "Okänd användare"}
+            </p>
+
+            <p>
+              Skapad:{" "}
+              {new Date(
+                update.createdAt
+              ).toLocaleString("sv-SE")}
+            </p>
+          </div>
+        </div>
+      ))
+    )}
+
+  </div>
+</section>
+
     <section className="admin-reports">
           <section className="admin-pending">
       <h2>Väntande artiklar</h2>
@@ -388,6 +451,8 @@ setPendingArticles(pendingArticlesData);
 
       </div>
     </section>
+
+
   <h2>Anmälningar</h2>
 
   <div className="admin-reports-list">
