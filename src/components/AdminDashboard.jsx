@@ -393,11 +393,12 @@ setPendingUpdates(pendingUpdatesData);
     ) : (
       pendingUpdates.map((update) => (
         <div
-          className="admin-pending-row"
-          key={update.id}
-        >
-          console.log("PENDING UPDATE:", update);
-          <div>
+  className="admin-pending-row"
+  key={update.id}
+>
+  {console.log("PENDING UPDATE:", update)}
+
+  <div>
             <strong>
               {update.articleTitle || "Okänd artikel"}
             </strong>
