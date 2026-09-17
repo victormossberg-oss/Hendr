@@ -396,6 +396,7 @@ setPendingUpdates(pendingUpdatesData);
           className="admin-pending-row"
           key={update.id}
         >
+          console.log("PENDING UPDATE:", update);
           <div>
             <strong>
               {update.articleTitle || "Okänd artikel"}
