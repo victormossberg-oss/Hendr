@@ -113,13 +113,11 @@ try {
     input
   });
 } catch (error) {
-  console.error("OPENAI MODERATION ERROR:", {
-    status: error.status,
-    message: error.message,
-    code: error.code,
-    type: error.type,
-    headers: error.headers
-  });
+  console.error(
+  "OPENAI MODERATION ERROR:",
+  error.status,
+  error.message
+);
 
   throw error;
 }
@@ -387,7 +385,7 @@ async function addXP(userID, type, referenceID, amount) {
 
 
 // =========================
-// HÄMTA ALLA HÄNDELSER
+// HÄMTA ALLA ARTIKLAR
 // =========================
 
 app.get(
@@ -449,6 +447,7 @@ LEFT JOIN EventConfirmations ec
   ON ec.eventID = e.eventID
 
 WHERE e.status != 'Removed'
+AND e.moderation_status = 'safe'
 
 GROUP BY
   e.eventID,
@@ -478,7 +477,7 @@ GROUP BY
 );
 
 // =========================
-// SÖK HÄNDELSER
+// SÖK Artikel
 // =========================
 
 app.get(
