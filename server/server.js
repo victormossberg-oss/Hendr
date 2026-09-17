@@ -104,10 +104,24 @@ async function moderateContent({
     });
   }
 
-  const response = await openai.moderations.create({
+  let response;
+
+try {
+  response = await openai.moderations.create({
     model: "omni-moderation-latest",
     input
   });
+} catch (error) {
+  console.error("OPENAI MODERATION ERROR:", {
+    status: error.status,
+    message: error.message,
+    code: error.code,
+    type: error.type,
+    headers: error.headers
+  });
+
+  throw error;
+}
 
   const result = response.results[0];
 
