@@ -1954,7 +1954,7 @@ app.get(
         `
         SELECT
           o.observationID AS id,
-          o.eventID,
+          o.eventID AS "eventID",
           o.userID,
           o.description,
           o.image_url AS "imageUrl",
