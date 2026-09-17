@@ -1988,6 +1988,61 @@ app.get(
   }
 );
 
+app.patch(
+  "/api/admin/updates/:id/moderation",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      if (req.user.role !== "Admin") {
+        return res.status(403).json({
+          message: "Åtkomst nekad."
+        });
+      }
+
+      const { status } = req.body;
+
+      if (!["safe", "blocked"].includes(status)) {
+        return res.status(400).json({
+          message: "Ogiltig modereringsstatus."
+        });
+      }
+
+      const result = await pool.query(
+        `
+        UPDATE Observations
+        SET
+          moderation_status = $1,
+          moderated_at = CURRENT_TIMESTAMP
+        WHERE observationID = $2
+        RETURNING
+          observationID AS id,
+          moderation_status AS "moderationStatus"
+        `,
+        [status, req.params.id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: "Uppdateringen hittades inte."
+        });
+      }
+
+      res.json(result.rows[0]);
+
+    } catch (error) {
+      console.error(
+        "Fel vid moderering av uppdatering:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte ändra uppdateringens modereringsstatus."
+      });
+    }
+  }
+);
+
 // =========================
 // ADMIN – ANVÄNDARE
 // =========================
