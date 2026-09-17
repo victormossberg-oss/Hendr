@@ -725,31 +725,41 @@ const result =
 
             const newEvent = result.rows[0];
 
-const moderationResult = await moderateContent({
-  title: newEvent.title,
-  description: newEvent.description,
-  imageUrl: newEvent.imageUrl
-});
+try {
+  const moderationResult = await moderateContent({
+    title: newEvent.title,
+    description: newEvent.description,
+    imageUrl: newEvent.imageUrl
+  });
 
-await pool.query(
-  `
-  UPDATE Events
-  SET
-    moderation_status = $1,
-    moderation_categories = $2,
-    moderation_confidence = $3,
-    moderated_at = CURRENT_TIMESTAMP
-  WHERE eventID = $4
-  `,
-  [
-    moderationResult.status,
-    moderationResult.categories,
-    moderationResult.confidence,
-    newEvent.id
-  ]
-);
+  await pool.query(
+    `
+    UPDATE Events
+    SET
+      moderation_status = $1,
+      moderation_categories = $2,
+      moderation_confidence = $3,
+      moderated_at = CURRENT_TIMESTAMP
+    WHERE eventID = $4
+    `,
+    [
+      moderationResult.status,
+      moderationResult.categories,
+      moderationResult.confidence,
+      newEvent.id
+    ]
+  );
 
-newEvent.moderation_status = moderationResult.status;
+  newEvent.moderation_status = moderationResult.status;
+
+} catch (moderationError) {
+  console.error(
+    "Automatisk moderering misslyckades. Artikeln ligger kvar som pending.",
+    moderationError
+  );
+
+  newEvent.moderation_status = "pending";
+}
 
 await addXP(
   req.user.userid,
