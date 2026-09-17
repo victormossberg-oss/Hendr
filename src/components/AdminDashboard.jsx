@@ -416,6 +416,33 @@ setPendingUpdates(pendingUpdatesData);
               ).toLocaleString("sv-SE")}
             </p>
           </div>
+          <div className="admin-pending-actions">
+
+  <button
+    type="button"
+    onClick={() =>
+      handleUpdateModeration(
+        update.id,
+        "safe"
+      )
+    }
+  >
+    Godkänn
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      handleUpdateModeration(
+        update.id,
+        "blocked"
+      )
+    }
+  >
+    Blockera
+  </button>
+
+</div>
         </div>
       ))
     )}
