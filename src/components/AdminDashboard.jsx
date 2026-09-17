@@ -423,10 +423,11 @@ setPendingUpdates(pendingUpdatesData);
   type="button"
   className="admin-report-title"
   onClick={() =>
-    onEventClick({
-      id: update.eventID,
-    })
-  }
+  onEventClick({
+    id: update.eventID,
+    title: update.articleTitle,
+  })
+}
 >
   Visa artikel
 </button>

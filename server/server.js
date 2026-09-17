@@ -1961,6 +1961,11 @@ app.get(
           o.created_at AS "createdAt",
           u.username AS username,
           e.title AS "articleTitle",
+          e.description AS "articleDescription",
+          e.image_url AS "articleImageUrl",
+          e.category AS "articleCategory",
+          e.status AS "articleStatus",
+          e.location AS "articleLocation",
           o.moderation_status AS "moderationStatus"
         FROM Observations o
         LEFT JOIN Users u
