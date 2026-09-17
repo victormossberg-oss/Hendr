@@ -70,6 +70,52 @@ function AdminDashboard({ onEventClick }) {
   }
 }
 
+const handleArticleModeration = async (
+  articleID,
+  status
+) => {
+  try {
+    const token =
+      localStorage.getItem("hendr_token");
+
+    const response = await fetch(
+      `${API_URL}/api/admin/articles/${articleID}/moderation`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte ändra artikelns modereringsstatus."
+      );
+    }
+
+    setPendingArticles((currentArticles) =>
+      currentArticles.filter(
+        (article) => article.id !== articleID
+      )
+    );
+
+  } catch (error) {
+    console.error(
+      "Fel vid moderering av artikel:",
+      error
+    );
+
+    setError(
+      "Kunde inte ändra artikelns modereringsstatus."
+    );
+  }
+};
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -299,15 +345,43 @@ setPendingArticles(pendingArticlesData);
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="admin-report-title"
-                onClick={() =>
-                  onEventClick(article)
-                }
-              >
-                Visa artikel
-              </button>
+              <div className="admin-pending-actions">
+
+  <button
+    type="button"
+    className="admin-report-title"
+    onClick={() =>
+      onEventClick(article)
+    }
+  >
+    Visa artikel
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      handleArticleModeration(
+        article.id,
+        "safe"
+      )
+    }
+  >
+    Godkänn
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      handleArticleModeration(
+        article.id,
+        "blocked"
+      )
+    }
+  >
+    Blockera
+  </button>
+
+</div>
             </div>
           ))
         )}
