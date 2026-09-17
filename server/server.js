@@ -1838,6 +1838,53 @@ app.get(
   }
 );
 
+app.get(
+  "/api/admin/pending-articles",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      if (req.user.role !== "Admin") {
+        return res.status(403).json({
+          message: "Åtkomst nekad."
+        });
+      }
+
+      const result = await pool.query(
+        `
+        SELECT
+          e.eventID AS id,
+          e.title,
+          e.description,
+          e.category,
+          e.created_at AS "createdAt",
+          e.image_url AS "imageUrl",
+          e.userid,
+          u.username AS username,
+          e.moderation_status AS "moderationStatus"
+        FROM Events e
+        LEFT JOIN Users u
+          ON u.userid = e.userid
+        WHERE e.moderation_status = 'pending'
+          AND e.status != 'Removed'
+        ORDER BY e.created_at DESC
+        `
+      );
+
+      res.json(result.rows);
+
+    } catch (error) {
+      console.error(
+        "Fel vid hämtning av pending-artiklar:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Kunde inte hämta väntande artiklar."
+      });
+    }
+  }
+);
+
 // =========================
 // ADMIN – ANVÄNDARE
 // =========================
