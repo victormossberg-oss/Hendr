@@ -75,7 +75,50 @@ const handleArticleModeration = async (
   articleID,
   status
 ) => {
-  const handleUpdateModeration = async (
+  try {
+    const token =
+      localStorage.getItem("hendr_token");
+
+    const response = await fetch(
+      `${API_URL}/api/admin/articles/${articleID}/moderation`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Kunde inte ändra artikelns modereringsstatus."
+      );
+    }
+
+    setPendingArticles((currentArticles) =>
+      currentArticles.filter(
+        (article) => article.id !== articleID
+      )
+    );
+
+  } catch (error) {
+    console.error(
+      "Fel vid moderering av artikel:",
+      error
+    );
+
+    setError(
+      "Kunde inte ändra artikelns modereringsstatus."
+    );
+  }
+};
+
+
+const handleUpdateModeration = async (
   updateID,
   status
 ) => {
@@ -117,47 +160,6 @@ const handleArticleModeration = async (
 
     setError(
       "Kunde inte ändra uppdateringens modereringsstatus."
-    );
-  }
-};
-  try {
-    const token =
-      localStorage.getItem("hendr_token");
-
-    const response = await fetch(
-      `${API_URL}/api/admin/articles/${articleID}/moderation`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        "Kunde inte ändra artikelns modereringsstatus."
-      );
-    }
-
-    setPendingArticles((currentArticles) =>
-      currentArticles.filter(
-        (article) => article.id !== articleID
-      )
-    );
-
-  } catch (error) {
-    console.error(
-      "Fel vid moderering av artikel:",
-      error
-    );
-
-    setError(
-      "Kunde inte ändra artikelns modereringsstatus."
     );
   }
 };
