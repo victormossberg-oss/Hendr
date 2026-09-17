@@ -14,6 +14,7 @@ function AdminDashboard({ onEventClick }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reports, setReports] = useState([]);
+  const [pendingArticles, setPendingArticles] = useState([]);
   const [reportActionLoading, setReportActionLoading] = useState(null);
 
   async function handleReportAction(reportID, status) {
@@ -124,6 +125,27 @@ if (!reportsResponse.ok) {
 const reportsData = await reportsResponse.json();
 
 setReports(reportsData);
+
+const pendingArticlesResponse = await fetch(
+  `${API_URL}/api/admin/pending-articles`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+if (!pendingArticlesResponse.ok) {
+  throw new Error(
+    "Kunde inte hämta väntande artiklar."
+  );
+}
+
+const pendingArticlesData =
+  await pendingArticlesResponse.json();
+
+setPendingArticles(pendingArticlesData);
+
       } catch (error) {
         console.error(
           "Fel vid hämtning av admin-statistik:",
@@ -248,6 +270,50 @@ setReports(reportsData);
     </section>
 
     <section className="admin-reports">
+          <section className="admin-pending">
+      <h2>Väntande artiklar</h2>
+
+      <div className="admin-pending-list">
+
+        {pendingArticles.length === 0 ? (
+          <p>Inga artiklar väntar på granskning.</p>
+        ) : (
+          pendingArticles.map((article) => (
+            <div
+              className="admin-pending-row"
+              key={article.id}
+            >
+              <div>
+                <strong>{article.title}</strong>
+
+                <p>
+                  Skapad av:{" "}
+                  {article.username || "Okänd användare"}
+                </p>
+
+                <p>
+                  Skapad:{" "}
+                  {new Date(
+                    article.createdAt
+                  ).toLocaleString("sv-SE")}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="admin-report-title"
+                onClick={() =>
+                  onEventClick(article)
+                }
+              >
+                Visa artikel
+              </button>
+            </div>
+          ))
+        )}
+
+      </div>
+    </section>
   <h2>Anmälningar</h2>
 
   <div className="admin-reports-list">
