@@ -80,7 +80,7 @@ const handleArticleModeration = async (
       localStorage.getItem("hendr_token");
 
     const response = await fetch(
-      `${API_URL}/api/admin/updates/${articleID}/moderation`,
+      `${API_URL}/api/admin/articles/${articleID}/moderation`,
       {
         method: "PATCH",
         headers: {
