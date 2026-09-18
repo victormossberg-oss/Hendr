@@ -44,7 +44,21 @@ app.use(express.json());
 // =========================
 
 const upload = multer({
-  storage: multer.memoryStorage()
+  storage: multer.memoryStorage(),
+
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  },
+
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(
+        new Error("Endast bildfiler är tillåtna.")
+      );
+    }
+
+    cb(null, true);
+  }
 });
 
 
@@ -3979,7 +3993,36 @@ app.get(
   }
 );
 
+// =========================
+// GLOBAL FELHANTERING
+// =========================
 
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        message: "Bilden får vara högst 5 MB."
+      });
+    }
+
+    return res.status(400).json({
+      message: "Fel vid bilduppladdningen."
+    });
+  }
+
+  if (error) {
+    console.error(
+      "Ohanterat serverfel:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "Ett oväntat serverfel inträffade."
+    });
+  }
+
+  next();
+});
 // =========================
 // STARTA SERVERN
 // =========================
