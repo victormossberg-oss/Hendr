@@ -50,11 +50,21 @@ function VerifyEmail() {
       )}
 
       {status === "success" && (
-        <div>
-          <h1>E-postadressen är verifierad!</h1>
-          <p>{message}</p>
-        </div>
-      )}
+  <div>
+    <h1>E-postadressen är verifierad!</h1>
+
+    <p>{message}</p>
+
+    <button
+      type="button"
+      onClick={() => {
+        window.location.href = "/";
+      }}
+    >
+      Logga in
+    </button>
+  </div>
+)}
 
       {status === "error" && (
         <div>

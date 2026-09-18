@@ -27,6 +27,42 @@ function Login({
   const [error, setError] =
     useState("");
 
+    const handleResendVerification = async () => {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/auth/resend-verification`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          "Kunde inte skicka verifieringsmejlet."
+      );
+    }
+
+    alert(data.message);
+
+  } catch (error) {
+    console.error(
+      "Fel vid nytt verifieringsmejl:",
+      error
+    );
+
+    alert(error.message);
+  }
+};
+
 
   // =========================
   // LOGGA IN
@@ -201,31 +237,17 @@ function Login({
       }
 
 
-      // =========================
-      // REGISTRERING LYCKADES
-      // =========================
+// =========================
+// REGISTRERING LYCKADES
+// =========================
 
-      localStorage.setItem(
-        "hendr_token",
-        data.token
-      );
+setError(
+  data.message ||
+  "Kontot skapades. Kontrollera din e-post för att verifiera kontot."
+);
 
-
-      localStorage.setItem(
-        "hendr_user",
-        JSON.stringify(
-          data.user
-        )
-      );
-
-
-      // =========================
-      // SKICKA VIDARE TILL APP
-      // =========================
-
-      onLogin(
-        data.user
-      );
+setPassword("");
+setConfirmPassword("");
 
 
     } catch (error) {

@@ -3785,7 +3785,106 @@ res.status(201).json({
   }
 );
 
+app.post(
+  "/api/auth/resend-verification",
+  async (req, res) => {
+    try {
+      const { email } = req.body;
 
+      if (!email) {
+        return res.status(400).json({
+          message: "E-postadress krävs."
+        });
+      }
+
+      const cleanEmail =
+        email.trim().toLowerCase();
+
+      const result = await pool.query(
+        `
+        SELECT
+          userid,
+          username,
+          email,
+          email_verified
+        FROM users
+        WHERE email = $1
+        `,
+        [cleanEmail]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: "Kontot hittades inte."
+        });
+      }
+
+      const user = result.rows[0];
+
+      if (user.email_verified) {
+        return res.status(400).json({
+          message:
+            "E-postadressen är redan verifierad."
+        });
+      }
+
+      const crypto = require("crypto");
+
+      const verificationToken =
+        crypto.randomBytes(32).toString("hex");
+
+      const verificationTokenHash =
+        crypto
+          .createHash("sha256")
+          .update(verificationToken)
+          .digest("hex");
+
+      await pool.query(
+        `
+        INSERT INTO "EmailVerificationTokens"
+        (
+          "userID",
+          token_hash,
+          expires_at
+        )
+        VALUES
+        (
+          $1,
+          $2,
+          CURRENT_TIMESTAMP + INTERVAL '24 hours'
+        )
+        `,
+        [
+          user.userid,
+          verificationTokenHash
+        ]
+      );
+
+      await sendVerificationEmail(
+        user.email,
+        user.username,
+        verificationToken
+      );
+
+      res.json({
+        message:
+          "Ett nytt verifieringsmejl har skickats."
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid nytt verifieringsmejl:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte skicka verifieringsmejlet."
+      });
+    }
+  }
+);
 // =========================
 // LOGGA IN ANVÄNDARE
 // =========================
