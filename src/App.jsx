@@ -14,6 +14,7 @@ import BottomNav from "./components/BottomNav";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
+import VerifyEmail from "./pages/VerifyEmail";
 import {
   MapPin,
   Search,
@@ -781,7 +782,15 @@ console.log("APP RENDER", {
   currentPage,
   selectedEvent,
 });
+
+const isVerifyEmailPage =
+  window.location.pathname === "/verify-email";
+
   let content;
+
+  if (isVerifyEmailPage) {
+  content = <VerifyEmail />;
+}
 
 
   // =========================
