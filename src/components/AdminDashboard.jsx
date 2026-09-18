@@ -127,18 +127,18 @@ const handleUpdateModeration = async (
       localStorage.getItem("hendr_token");
 
     const response = await fetch(
-      `${API_URL}/api/admin/updates/${updateID}/moderation`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status,
-        }),
-      }
-    );
+  `${API_URL}/api/admin/updates/${updateID}/moderation`,
+  {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      status,
+    }),
+  }
+);
 
     if (!response.ok) {
       throw new Error(
