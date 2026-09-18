@@ -799,12 +799,26 @@ console.log("APP RENDER", {
 const isVerifyEmailPage =
   window.location.pathname === "/verify-email";
 
+const isLoginPage =
+  new URLSearchParams(window.location.search).get("login") === "1";
+
   let content;
 
   if (isVerifyEmailPage) {
   content = <VerifyEmail />;
 }
 
+else if (isLoginPage) {
+  content = (
+    <Login
+      onLogin={handleLogin}
+      onBack={() => {
+        setShowLogin(false);
+        setLoginReason(null);
+      }}
+    />
+  );
+}
 
   // =========================
   // LOGIN

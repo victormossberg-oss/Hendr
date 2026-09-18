@@ -58,8 +58,8 @@ function VerifyEmail() {
     <button
       type="button"
       onClick={() => {
-        window.location.href = "/";
-      }}
+  window.location.href = "/?login=1";
+}}
     >
       Logga in
     </button>

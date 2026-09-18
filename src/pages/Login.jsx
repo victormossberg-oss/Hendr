@@ -27,6 +27,9 @@ function Login({
   const [error, setError] =
     useState("");
 
+  const [registrationComplete, setRegistrationComplete] =
+    useState(false);
+
     const handleResendVerification = async () => {
   try {
     const response = await fetch(
@@ -241,11 +244,7 @@ function Login({
 // REGISTRERING LYCKADES
 // =========================
 
-setError(
-  data.message ||
-  "Kontot skapades. Kontrollera din e-post för att verifiera kontot."
-);
-
+setRegistrationComplete(true);
 setPassword("");
 setConfirmPassword("");
 
@@ -295,6 +294,43 @@ setConfirmPassword("");
 
   }
 
+  if (registrationComplete) {
+  return (
+    <main className="observation-page">
+      <div className="observation-content">
+
+        <span className="event-category">
+          HENDR
+        </span>
+
+        <h1>
+          Kontrollera din e-post
+        </h1>
+
+        <p className="observation-intro">
+          Vi har skickat en verifieringslänk
+          till din e-postadress.
+        </p>
+
+        <button
+          type="button"
+          className="submit-observation"
+          onClick={() => {
+            setRegistrationComplete(false);
+            setRegisterMode(false);
+            setError("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+          }}
+        >
+          Tillbaka till logga in
+        </button>
+
+      </div>
+    </main>
+  );
+}
 
   return (
 
