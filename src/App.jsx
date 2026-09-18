@@ -116,14 +116,27 @@ useEffect(() => {
 
   const [user, setUser] = useState(() => {
 
-    const savedUser =
-      localStorage.getItem("hendr_user");
+  const savedUser =
+    localStorage.getItem("hendr_user");
 
-    return savedUser
-      ? JSON.parse(savedUser)
-      : null;
+  if (!savedUser || savedUser === "undefined") {
+    return null;
+  }
 
-  });
+  try {
+    return JSON.parse(savedUser);
+  } catch (error) {
+    console.error(
+      "Kunde inte läsa sparad användare:",
+      error
+    );
+
+    localStorage.removeItem("hendr_user");
+
+    return null;
+  }
+
+});
 
   async function loadUnreadNotifications() {
   if (!user) {
