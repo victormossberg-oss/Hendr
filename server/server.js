@@ -2071,7 +2071,7 @@ app.patch(
 
       const result = await pool.query(
         `
-        UPDATE Observations
+        UPDATE observations
         SET
           moderation_status = $1,
           moderated_at = CURRENT_TIMESTAMP
