@@ -3612,14 +3612,11 @@ app.post(
           )
 
           RETURNING
-
-            userid,
-
-            username,
-
-            email,
-
-            created_at
+          userid,
+          username,
+          email,
+          role,
+          created_at
           `,
 
           [
