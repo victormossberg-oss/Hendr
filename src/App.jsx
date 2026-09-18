@@ -810,7 +810,7 @@ const isVerifyEmailPage =
   // LOGIN
   // =========================
 
-  if (showLogin) {
+  else if (showLogin) {
 
     content = (
 
