@@ -6,6 +6,7 @@ const cloudinary = require("./cloudinary");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const OpenAI = require("openai");
+const { Resend } = require("resend");
 
 require("dotenv").config();
 console.log(
@@ -21,6 +22,53 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   maxRetries: 0
 });
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// =========================
+// SKICKA VERIFIERINGSMAIL
+// =========================
+
+async function sendVerificationEmail(email, username, token) {
+  const verificationUrl = `https://www.hendr.se/verify-email?token=${token}`;
+
+  await resend.emails.send({
+    from: "HENDR <noreply@hendr.se>",
+    to: email,
+    subject: "Verifiera din e-postadress på HENDR",
+    html: `
+      <h2>Välkommen till HENDR, ${username}!</h2>
+
+      <p>
+        Klicka på knappen nedan för att verifiera din e-postadress.
+      </p>
+
+      <p>
+        <a
+          href="${verificationUrl}"
+          style="
+            display: inline-block;
+            padding: 12px 20px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+          "
+        >
+          Verifiera e-postadress
+        </a>
+      </p>
+
+      <p>
+        Länken är giltig i 24 timmar.
+      </p>
+
+      <p>
+        Om du inte skapade ett konto på HENDR kan du ignorera detta mejl.
+      </p>
+    `
+  });
+}
 
 
 // =========================
@@ -3634,44 +3682,48 @@ app.post(
         );
 
 
-      const user =
-        result.rows[0];
+      const user = result.rows[0];
 
+const verificationToken = require("crypto")
+  .randomBytes(32)
+  .toString("hex");
 
-      // =========================
-      // SKAPA JWT
-      // =========================
+const verificationTokenHash = require("crypto")
+  .createHash("sha256")
+  .update(verificationToken)
+  .digest("hex");
 
-      const token =
-  jwt.sign(
-    {
-      userid:
-        user.userid,
-
-      username:
-        user.username,
-
-      email:
-        user.email,
-
-      role:
-        user.role
-    },
-
-    process.env.JWT_SECRET,
-
-    {
-      expiresIn:
-        "7d"
-    }
-  );
-
-  console.log(
-  "JWT skapad för:",
-  user.userid,
-  user.username,
-  user.role
+  await pool.query(
+  `
+  INSERT INTO "EmailVerificationTokens"
+  (
+    "userID",
+    token_hash,
+    expires_at
+  )
+  VALUES
+  (
+    $1,
+    $2,
+    CURRENT_TIMESTAMP + INTERVAL '24 hours'
+  )
+  `,
+  [
+    user.userid,
+    verificationTokenHash
+  ]
 );
+
+await sendVerificationEmail(
+  user.email,
+  user.username,
+  verificationToken
+);
+
+res.status(201).json({
+  message:
+    "Kontot skapades. Kontrollera din e-post för att verifiera kontot."
+});
 
 
       // =========================
@@ -3783,22 +3835,15 @@ app.post(
         await pool.query(
           `
           SELECT
-
-            userid,
-
-            username,
-
-            email,
-
-            password_hash,
-
-            role,
-
-            created_at
-
-          FROM Users
-
-          WHERE email = $1
+  userid,
+  username,
+  email,
+  password_hash,
+  role,
+  created_at,
+  email_verified
+FROM Users
+WHERE email = $1
           `,
 
           [cleanEmail]
@@ -3848,6 +3893,13 @@ app.post(
         });
 
       }
+
+      if (!user.email_verified) {
+  return res.status(403).json({
+    message:
+      "Du måste verifiera din e-postadress innan du kan logga in."
+  });
+}
 
 console.log(
   "LOGIN JWT SECRET:",
@@ -3930,6 +3982,100 @@ console.log(
 
     }
 
+  }
+);
+
+app.get(
+  "/api/auth/verify-email",
+  async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      if (!token) {
+        return res.status(400).json({
+          message: "Verifieringstoken saknas."
+        });
+      }
+
+      const tokenHash = require("crypto")
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      const result = await pool.query(
+        `
+        SELECT
+          id,
+          "userID",
+          expires_at,
+          used_at
+        FROM "EmailVerificationTokens"
+        WHERE token_hash = $1
+        `,
+        [tokenHash]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(400).json({
+          message:
+            "Verifieringslänken är ogiltig."
+        });
+      }
+
+      const verificationToken = result.rows[0];
+
+      if (verificationToken.used_at) {
+        return res.status(400).json({
+          message:
+            "Verifieringslänken har redan använts."
+        });
+      }
+
+      if (
+        new Date(verificationToken.expires_at) <
+        new Date()
+      ) {
+        return res.status(400).json({
+          message:
+            "Verifieringslänken har gått ut."
+        });
+      }
+
+      await pool.query(
+        `
+        UPDATE Users
+        SET email_verified = TRUE
+        WHERE userid = $1
+        `,
+        [verificationToken.userID]
+      );
+
+      await pool.query(
+        `
+        UPDATE "EmailVerificationTokens"
+        SET used_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+        `,
+        [verificationToken.id]
+      );
+
+      res.json({
+        message:
+          "E-postadressen har verifierats."
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Fel vid e-postverifiering:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          "Kunde inte verifiera e-postadressen."
+      });
+    }
   }
 );
 
