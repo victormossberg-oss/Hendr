@@ -808,7 +808,7 @@ const isLoginPage =
   content = <VerifyEmail />;
 }
 
-else if (isLoginPage) {
+else if (isLoginPage && !user) {
   content = (
     <Login
       onLogin={handleLogin}
