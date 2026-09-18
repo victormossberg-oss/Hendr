@@ -3723,16 +3723,6 @@ res.status(201).json({
 });
 
 
-      // =========================
-      // SVARA
-      // =========================
-
-      res.status(201).json({
-  message:
-    "Kontot skapades. Kontrollera din e-post för att verifiera kontot."
-});
-
-
     } catch (error) {
 
       console.error(
