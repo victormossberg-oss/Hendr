@@ -427,6 +427,16 @@ const [locationName, setLocationName] = useState(
           </p>
         )}
 
+        {!eventToEdit && (
+  <div className="moderation-info">
+    <strong>Artikeln granskas innan publicering</strong>
+    <p>
+      När du skickar in artikeln granskas den först.
+      Den publiceras på HENDR när granskningen är klar.
+    </p>
+  </div>
+)}
+
         <button
   className="publish-button"
   type="submit"

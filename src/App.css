@@ -1362,6 +1362,29 @@ button {
   cursor: wait;
 }
 
+.moderation-info {
+  margin-top: 18px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.moderation-info strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.moderation-info p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--hendr-muted);
+}
+
 /* =========================================================
    HENDR – EVENT DETAIL
    ========================================================= */
