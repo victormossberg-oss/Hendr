@@ -80,7 +80,7 @@ const handleArticleModeration = async (
       localStorage.getItem("hendr_token");
 
     const response = await fetch(
-      `${API_URL}/api/admin/articles/${articleID}/moderation`,
+      `${API_URL}/api/admin/updates/${articleID}/moderation`,
       {
         method: "PATCH",
         headers: {
@@ -92,7 +92,6 @@ const handleArticleModeration = async (
         }),
       }
     );
-
     if (!response.ok) {
       throw new Error(
         "Kunde inte ändra artikelns modereringsstatus."
