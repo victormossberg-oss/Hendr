@@ -9,10 +9,7 @@ const OpenAI = require("openai");
 const { Resend } = require("resend");
 
 require("dotenv").config();
-console.log(
-  "JWT SECRET:",
-  process.env.JWT_SECRET
-);
+
 
 const pool = require("./db");
 
@@ -3901,10 +3898,7 @@ WHERE email = $1
   });
 }
 
-console.log(
-  "LOGIN JWT SECRET:",
-  process.env.JWT_SECRET ? "FINNS" : "SAKNAS"
-);
+
       // =========================
       // SKAPA JWT
       // =========================
