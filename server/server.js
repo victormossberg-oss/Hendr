@@ -546,6 +546,7 @@ app.get(
 
           WHERE
   e.status != 'Removed'
+  AND e.moderation_status = 'safe'
   AND (
     e.title ILIKE $1
     OR e.description ILIKE $1
@@ -820,6 +821,8 @@ app.post(
         userid
       FROM Events
       WHERE eventID = $1
+AND status != 'Removed'
+AND moderation_status = 'safe'
     `,
     [eventID]
   );
@@ -954,14 +957,14 @@ if (articleOwnerID !== userID) {
     } catch (error) {
 
       console.error(
-        "Fel vid skapande av observation:",
+        "Fel vid skapande av uppdatering:",
         error
       );
 
 
       res.status(500).json({
         message:
-          "Kunde inte skapa observationen."
+          "Kunde inte skapa uppdatering."
       });
 
     }
@@ -1021,6 +1024,46 @@ app.post(
         });
 
       }
+
+      if (eventID) {
+
+  const eventResult =
+    await pool.query(
+      `
+      SELECT eventID
+      FROM Events
+      WHERE eventID = $1
+      `,
+      [eventID]
+    );
+
+  if (eventResult.rows.length === 0) {
+    return res.status(404).json({
+      message:
+        "Artikeln hittades inte."
+    });
+  }
+if (observationID) {
+
+  const observationResult =
+    await pool.query(
+      `
+      SELECT observationID
+      FROM Observations
+      WHERE observationID = $1
+      `,
+      [observationID]
+    );
+
+  if (observationResult.rows.length === 0) {
+    return res.status(404).json({
+      message:
+        "Uppdateringen hittades inte."
+    });
+  }
+
+}
+}
 
 
       const result =
@@ -1110,7 +1153,8 @@ app.post("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
         SELECT eventID, userid
         FROM Events
         WHERE eventID = $1
-        AND status != 'Removed'
+AND status != 'Removed'
+AND moderation_status = 'safe'
       `,
       [eventID]
     );
@@ -1185,10 +1229,14 @@ app.get("/api/events/:eventID/follow", authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
       `
-        SELECT "followID"
-        FROM "Follows"
-        WHERE "userID" = $1
-        AND "eventID" = $2
+        SELECT f."followID"
+FROM "Follows" f
+INNER JOIN Events e
+  ON e.eventID = f."eventID"
+WHERE f."userID" = $1
+AND f."eventID" = $2
+AND e.status != 'Removed'
+AND e.moderation_status = 'safe'
       `,
       [userID, eventID]
     );
@@ -1363,6 +1411,7 @@ app.post(
       FROM Events
       WHERE eventID = $1
       AND status != 'Removed'
+      AND moderation_status = 'safe'
     `,
     [eventID]
   );
@@ -1563,13 +1612,15 @@ app.get(
       const result =
         await pool.query(
           `
-          SELECT
-            confirmationID
-
-          FROM EventConfirmations
-
-          WHERE eventID = $1
-          AND userID = $2
+         SELECT
+  ec.confirmationID
+FROM EventConfirmations ec
+JOIN Events e
+  ON e.eventID = ec.eventID
+WHERE ec.eventID = $1
+AND ec.userID = $2
+AND e.status != 'Removed'
+AND e.moderation_status = 'safe'
           `,
 
           [
@@ -1636,12 +1687,10 @@ app.delete(
         await client.query(
           `
           SELECT
-
-            eventID,
-
-            userid
-
-          FROM Events
+  eventID,
+  userid,
+  status
+FROM Events
 
           WHERE eventID = $1
           `,
@@ -1885,59 +1934,8 @@ app.get(
   }
 );
 
-app.patch(
-  "/api/admin/articles/:id/moderation",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      if (req.user.role !== "Admin") {
-        return res.status(403).json({
-          message: "Åtkomst nekad."
-        });
-      }
 
-      const { status } = req.body;
 
-      if (!["safe", "blocked"].includes(status)) {
-        return res.status(400).json({
-          message: "Ogiltig modereringsstatus."
-        });
-      }
-
-      const result = await pool.query(
-        `
-        UPDATE Events
-        SET
-          moderation_status = $1,
-          moderated_at = CURRENT_TIMESTAMP
-        WHERE eventID = $2
-        RETURNING
-          eventID AS id,
-          moderation_status AS "moderationStatus"
-        `,
-        [status, req.params.id]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          message: "Artikeln hittades inte."
-        });
-      }
-
-      res.json(result.rows[0]);
-
-    } catch (error) {
-      console.error(
-        "Fel vid moderering av artikel:",
-        error
-      );
-
-      res.status(500).json({
-        message: "Kunde inte ändra modereringsstatus."
-      });
-    }
-  }
-);
 
 app.get(
   "/api/admin/pending-updates",
@@ -2225,7 +2223,7 @@ app.patch(
 
         return res.status(400).json({
           message:
-            "Ogiltig rapportstatus."
+            "Ogiltig anmälningsstatus."
         });
 
       }
@@ -2235,11 +2233,12 @@ app.patch(
         await pool.query(
           `
           SELECT
-            reportID,
-            eventID,
-            observationID
-          FROM Reports
-          WHERE reportID = $1
+  reportID,
+  eventID,
+  observationID,
+  status
+FROM Reports
+WHERE reportID = $1
           `,
           [reportID]
         );
@@ -2251,7 +2250,7 @@ app.patch(
 
         return res.status(404).json({
           message:
-            "Rapporten hittades inte."
+            "Anmälan hittades inte."
         });
 
       }
@@ -2259,6 +2258,13 @@ app.patch(
 
       const report =
         reportResult.rows[0];
+
+        if (report.status !== "pending") {
+  return res.status(400).json({
+    message:
+      "Anmälan är redan hanterad."
+  });
+}
 
 
       if (status === "removed") {
@@ -2493,7 +2499,7 @@ WHERE eventID = $1
         latitude = $6,
         longitude = $7,
         location = $8,
-        moderation_status = 'safe',
+        moderation_status = 'pending',
         moderation_categories = NULL,
         moderation_confidence = NULL,
         moderated_at = NULL,
@@ -2595,6 +2601,7 @@ app.get(
           FROM Events
 
           WHERE userid = $1
+          AND moderation_status = 'safe'
 
           ORDER BY
             created_at DESC
@@ -2665,8 +2672,9 @@ app.get(
           LEFT JOIN Users u
             ON u.userid = e.userid
 
-          WHERE f."userID" = $1
+     WHERE f."userID" = $1
 AND e.status != 'Removed'
+AND e.moderation_status = 'safe'
 
           ORDER BY
             f.created_at DESC
@@ -2976,7 +2984,7 @@ app.get(
 );
 
 // =========================
-// HÄMTA MINA OBSERVATIONER
+// HÄMTA MINA UPPDATERINGAR
 // =========================
 
 app.get(
@@ -3332,6 +3340,7 @@ app.get(
 
         WHERE e.userid = $1
 AND e.status != 'Removed'
+AND e.moderation_status = 'safe'
 
         ORDER BY e.created_at DESC
         `,
@@ -3401,8 +3410,8 @@ app.get(
           LEFT JOIN Users u
             ON u.userid = o.userID
 
-          WHERE o.eventID = $1
-AND o.moderation_status != 'blocked'
+          WHERE o.userID = $1
+AND o.moderation_status = 'safe'
 
           ORDER BY
             o.created_at DESC
@@ -3419,14 +3428,14 @@ AND o.moderation_status != 'blocked'
     } catch (error) {
 
       console.error(
-        "Fel vid hämtning av användarens observationer:",
+        "Fel vid hämtning av användarens uppdateringar:",
         error
       );
 
 
       res.status(500).json({
         message:
-          "Kunde inte hämta användarens observationer."
+          "Kunde inte hämta användarens uppdateringar."
       });
 
     }
