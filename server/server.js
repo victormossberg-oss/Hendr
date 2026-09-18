@@ -3547,6 +3547,13 @@ app.post(
 
       }
 
+      if (password.length > 128) {
+      return res.status(400).json({
+      message:
+      "Lösenordet får vara högst 128 tecken."
+  });
+}
+
 
       // =========================
       // KONTROLLERA E-POST
