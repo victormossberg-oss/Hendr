@@ -3728,29 +3728,9 @@ res.status(201).json({
       // =========================
 
       res.status(201).json({
-
-        message:
-          "Kontot skapades.",
-
-        token,
-
-        user: {
-
-          userid:
-            user.userid,
-
-          username:
-            user.username,
-
-          email:
-            user.email,
-
-          created_at:
-            user.created_at
-
-        }
-
-      });
+  message:
+    "Kontot skapades. Kontrollera din e-post för att verifiera kontot."
+});
 
 
     } catch (error) {
