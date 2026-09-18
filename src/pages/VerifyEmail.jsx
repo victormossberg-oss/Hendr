@@ -57,7 +57,7 @@ function VerifyEmail() {
 
     <button
       type="button"
-      className="submit-observation"
+      className="verify-login-button"
       onClick={() => {
   window.location.href = "/?login=1";
 }}
