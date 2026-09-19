@@ -420,7 +420,7 @@ const [locationName, setLocationName] = useState(
               : "Lägg till bild (valfritt)"}
           </span>
         </button>
-
+              
         <div className="moderation-info">
   <strong>
     Artikeln granskas innan publicering
