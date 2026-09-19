@@ -24,6 +24,8 @@ function NewEventForm({
   onBack,
   eventToEdit,
 }) {
+
+    console.log("NEWEVENTFORM RENDERAS");
   const [category, setCategory] = useState(
   eventToEdit?.category || "Brand"
 );

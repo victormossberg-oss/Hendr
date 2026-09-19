@@ -890,6 +890,8 @@ else if (isLoginPage && !user) {
 
   else if (creatingEvent) {
 
+    console.log("CREATING EVENT ÄR TRUE");
+
   content = (
 
     <NewEventForm
