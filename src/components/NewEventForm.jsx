@@ -421,18 +421,16 @@ const [locationName, setLocationName] = useState(
           </span>
         </button>
 
-        {!eventToEdit && (
-          <div className="moderation-info">
-            <strong>
-              Artikeln granskas innan publicering
-            </strong>
+        <div className="moderation-info">
+  <strong>
+    Artikeln granskas innan publicering
+  </strong>
 
-            <p>
-              När du skickar in artikeln granskas den först.
-              Den publiceras på HENDR när granskningen är klar.
-            </p>
-          </div>
-        )}
+  <p>
+    När du skickar in artikeln granskas den först.
+    Den publiceras på HENDR när granskningen är klar.
+  </p>
+</div>
 
         {error && (
           <p className="form-error">
