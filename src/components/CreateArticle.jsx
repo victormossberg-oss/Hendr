@@ -61,6 +61,7 @@ const [locationStatus, setLocationStatus] = useState(
 });
   const [mediaMenuOpen, setMediaMenuOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const photoInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -272,17 +273,48 @@ const [locationStatus, setLocationStatus] = useState(
       }
 
       // App kan använda detta för att uppdatera feeden direkt.
-      if (onPublished) {
-        onPublished(data);
-      } else {
-        onBack?.();
-      }
+      if (editEvent) {
+  onPublished?.(data);
+} else {
+  setSubmitted(true);
+}
     } catch (error) {
       console.error("Fel vid publicering av artikel:", error);
       alert(error.message || "Kunde inte publicera artikeln.");
     } finally {
       setPublishing(false);
     }
+  }
+
+    if (submitted) {
+    return (
+      <main className="create-article-page">
+        <div className="article-submitted-screen">
+          <div className="article-submitted-icon">
+            ✓
+          </div>
+
+          <h1>Artikeln har skickats för granskning</h1>
+
+          <p>
+            Tack för ditt bidrag!
+          </p>
+
+          <p>
+            Din artikel granskas just nu av HENDR.
+            Den publiceras när den har godkänts.
+          </p>
+
+          <button
+            type="button"
+            className="article-publish-button"
+            onClick={onBack}
+          >
+            Till startsidan
+          </button>
+        </div>
+      </main>
+    );
   }
 
   return (
