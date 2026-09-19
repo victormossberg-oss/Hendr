@@ -394,7 +394,7 @@ const [locationName, setLocationName] = useState(
           style={{ display: "none" }}
         />
 
-        <button
+                <button
           type="button"
           className={`image-upload-row ${
             previewUrl
@@ -421,21 +421,24 @@ const [locationName, setLocationName] = useState(
           </span>
         </button>
 
+        {!eventToEdit && (
+          <div className="moderation-info">
+            <strong>
+              Artikeln granskas innan publicering
+            </strong>
+
+            <p>
+              När du skickar in artikeln granskas den först.
+              Den publiceras på HENDR när granskningen är klar.
+            </p>
+          </div>
+        )}
+
         {error && (
           <p className="form-error">
             {error}
           </p>
         )}
-
-        {!eventToEdit && (
-  <div className="moderation-info">
-    <strong>Artikeln granskas innan publicering</strong>
-    <p>
-      När du skickar in artikeln granskas den först.
-      Den publiceras på HENDR när granskningen är klar.
-    </p>
-  </div>
-)}
 
         <button
   className="publish-button"
