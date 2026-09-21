@@ -2986,24 +2986,29 @@ app.get(
             level,
 
             (
-              SELECT COUNT(*)
-              FROM Events
-              WHERE userid = $1
-            ) AS "articleCount",
+  SELECT COUNT(*)
+  FROM Events
+  WHERE userid = $1
+    AND status != 'Removed'
+) AS "articleCount",
 
             (
-              SELECT COUNT(*)
-              FROM EventConfirmations ec
-              INNER JOIN Events e
-                ON e.eventID = ec.eventID
-              WHERE e.userid = $1
-            ) AS "confirmationCount",
+  SELECT COUNT(*)
+  FROM EventConfirmations ec
+  INNER JOIN Events e
+    ON e.eventID = ec.eventID
+  WHERE e.userid = $1
+    AND e.status != 'Removed'
+) AS "confirmationCount",
 
             (
-              SELECT COUNT(*)
-              FROM Observations
-              WHERE userID = $1
-            ) AS "updateCount"
+  SELECT COUNT(*)
+  FROM Observations o
+  INNER JOIN Events e
+    ON e.eventID = o.eventID
+  WHERE o.userID = $1
+    AND e.status != 'Removed'
+) AS "updateCount"
 
           FROM Users
           WHERE userid = $1
@@ -3050,24 +3055,29 @@ app.get(
           SELECT
 
             (
-              SELECT COUNT(*)
-              FROM Events
-              WHERE userid = $1
-            ) AS "articleCount",
+  SELECT COUNT(*)
+  FROM Events
+  WHERE userid = $1
+    AND status != 'Removed'
+) AS "articleCount",
 
             (
-              SELECT COUNT(*)
-              FROM EventConfirmations ec
-              INNER JOIN Events e
-                ON e.eventID = ec.eventID
-              WHERE e.userid = $1
-            ) AS "confirmationCount",
+  SELECT COUNT(*)
+  FROM EventConfirmations ec
+  INNER JOIN Events e
+    ON e.eventID = ec.eventID
+  WHERE e.userid = $1
+    AND e.status != 'Removed'
+) AS "confirmationCount",
 
             (
-              SELECT COUNT(*)
-              FROM Observations
-              WHERE userID = $1
-            ) AS "updateCount"
+  SELECT COUNT(*)
+  FROM Observations o
+  INNER JOIN Events e
+    ON e.eventID = o.eventID
+  WHERE o.userID = $1
+    AND e.status != 'Removed'
+) AS "updateCount"
 
           `,
           [userid]
