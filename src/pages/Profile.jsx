@@ -1160,7 +1160,10 @@ const updateCount =
 
         <p>{achievement.description}</p>
 
-        <span>+{achievement.xpReward} XP</span>
+        <span>
+  +{achievement.xpReward} XP ·{" "}
+  {new Date(achievement.unlockedAt).toLocaleDateString("sv-SE")}
+</span>
       </div>
     </div>
   ))}
