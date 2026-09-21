@@ -2126,6 +2126,11 @@ app.patch(
 if (Number(articleCount.rows[0].count) >= 5) {
   await unlockAchievement(userID, "reporter");
 }
+
+if (Number(articleCount.rows[0].count) >= 10) {
+  await unlockAchievement(userID, "local_reporter");
+}
+
   }
 }
 
