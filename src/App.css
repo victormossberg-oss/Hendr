@@ -7202,7 +7202,7 @@ body,
   justify-content: center;
 
   border-radius: 50%;
-  background: #d6c28a;
+  background: var(--hendr-mustard);
 
   font-family: "Playfair Display", serif;
   font-size: 34px;

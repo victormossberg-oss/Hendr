@@ -547,69 +547,71 @@ app.get(
   async (req, res) => {
 
     try {
+      const page = Math.max(
+  Number.parseInt(req.query.page, 10) || 1,
+  1
+);
+
+const limit = Math.min(
+  Number.parseInt(req.query.limit, 10) || 15,
+  50
+);
+
+const offset = (page - 1) * limit;
 
       const result =
         await pool.query(
-          `
-          SELECT
+  `
+    SELECT
+      e.eventID AS id,
+      e.title,
+      e.description,
+      e.category,
+      e.status,
+      e.created_at AS "createdAt",
+      e.updated_at AS "updatedAt",
+      e.image_url AS "imageUrl",
+      e.latitude,
+      e.longitude,
+      e.userid,
+      e.location,
+      u.username AS username,
 
-  e.eventID AS id,
+      COUNT(
+        DISTINCT o.observationID
+      ) AS "observationCount",
 
-  e.title,
+      COUNT(
+        DISTINCT ec.confirmationID
+      ) AS "confirmationCount"
 
-  e.description,
+    FROM Events e
 
-  e.category,
+    LEFT JOIN Users u
+      ON u.userid = e.userid
 
-  e.status,
+    LEFT JOIN Observations o
+      ON o.eventID = e.eventID
+      AND o.moderation_status != 'blocked'
 
-  e.created_at AS "createdAt",
+    LEFT JOIN EventConfirmations ec
+      ON ec.eventID = e.eventID
 
-  e.updated_at AS "updatedAt",
+    WHERE e.status != 'Removed'
+      AND e.moderation_status = 'safe'
 
-  e.image_url AS "imageUrl",
+    GROUP BY
+      e.eventID,
+      u.username
 
-  e.latitude,
+    ORDER BY
+      e.created_at DESC
 
-  e.longitude,
-
-  e.userid,
-
-  e.location,
-
-  u.username AS username,
-
-            COUNT(
-              DISTINCT o.observationID
-            ) AS "observationCount",
-
-            COUNT(
-              DISTINCT ec.confirmationID
-            ) AS "confirmationCount"
-
-          FROM Events e
-
-LEFT JOIN Users u
-  ON u.userid = e.userid
-
-LEFT JOIN Observations o
-  ON o.eventID = e.eventID
-  AND o.moderation_status != 'blocked'
-
-LEFT JOIN EventConfirmations ec
-  ON ec.eventID = e.eventID
-
-WHERE e.status != 'Removed'
-AND e.moderation_status = 'safe'
-
-GROUP BY
-  e.eventID,
-  u.username
-
-          ORDER BY
-            e.created_at DESC
-          `
-        );
+    LIMIT $1
+    OFFSET $2
+  `,
+  [limit, offset]
+);
 
 
       res.json(result.rows);
