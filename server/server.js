@@ -2112,6 +2112,20 @@ app.patch(
 
     await addXP(userID, "article_approved", req.params.id, 10);
     await unlockAchievement(userID, "first_article");
+
+    const articleCount = await pool.query(
+  `
+  SELECT COUNT(*) AS count
+  FROM Events
+  WHERE userid = $1
+    AND moderation_status = 'safe'
+  `,
+  [userID]
+);
+
+if (Number(articleCount.rows[0].count) >= 5) {
+  await unlockAchievement(userID, "reporter");
+}
   }
 }
 
