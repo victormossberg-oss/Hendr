@@ -2990,6 +2990,7 @@ app.get(
   FROM Events
   WHERE userid = $1
     AND status != 'Removed'
+AND moderation_status != 'blocked'
 ) AS "articleCount",
 
             (
@@ -2999,16 +3000,19 @@ app.get(
     ON e.eventID = ec.eventID
   WHERE e.userid = $1
     AND e.status != 'Removed'
+AND e.moderation_status != 'blocked'
 ) AS "confirmationCount",
 
-            (
+  (
   SELECT COUNT(*)
   FROM Observations o
   INNER JOIN Events e
     ON e.eventID = o.eventID
   WHERE o.userID = $1
     AND e.status != 'Removed'
-) AS "updateCount"
+    AND e.moderation_status != 'blocked'
+    AND o.moderation_status != 'blocked'
+) AS updateCount
 
           FROM Users
           WHERE userid = $1
@@ -3059,6 +3063,7 @@ app.get(
   FROM Events
   WHERE userid = $1
     AND status != 'Removed'
+AND moderation_status != 'blocked'
 ) AS "articleCount",
 
             (
@@ -3068,16 +3073,19 @@ app.get(
     ON e.eventID = ec.eventID
   WHERE e.userid = $1
     AND e.status != 'Removed'
+AND e.moderation_status != 'blocked'
 ) AS "confirmationCount",
 
-            (
+  (
   SELECT COUNT(*)
   FROM Observations o
   INNER JOIN Events e
     ON e.eventID = o.eventID
   WHERE o.userID = $1
     AND e.status != 'Removed'
-) AS "updateCount"
+    AND e.moderation_status != 'blocked'
+    AND o.moderation_status != 'blocked'
+) AS updateCount
 
           `,
           [userid]
