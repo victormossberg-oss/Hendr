@@ -1989,7 +1989,7 @@ app.get(
       const result = await pool.query(`
         SELECT
           (SELECT COUNT(*) FROM Users) AS "userCount",
-          (SELECT COUNT(*) FROM Events) AS "eventCount",
+          (SELECT COUNT(*) FROM Events WHERE moderation_status = 'safe') AS "eventCount",
           (SELECT COUNT(*) FROM Observations) AS "observationCount",
           (SELECT COUNT(*) FROM EventConfirmations) AS "confirmationCount",
           (SELECT COUNT(*) FROM "Follows") AS "followCount"
@@ -2569,7 +2569,7 @@ WHERE reportID = $1
 );
 
 // =========================
-// REDIGERA HÄNDELSE
+// REDIGERA ARTIKEL
 // ÄGAREN ELLER ADMIN
 // =========================
 
@@ -2584,7 +2584,7 @@ app.put(
 
     try {
       // =========================
-      // HÄMTA HÄNDELSEN
+      // HÄMTA ARTIKEL
       // =========================
 
       const eventResult = await pool.query(
