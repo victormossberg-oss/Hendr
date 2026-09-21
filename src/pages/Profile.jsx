@@ -194,8 +194,6 @@ function Profile({
 });
 
 const [achievements, setAchievements] = useState([]);
-const [achievementPopup, setAchievementPopup] = useState(null);
-const [achievementQueue, setAchievementQueue] = useState([]);
 
 
   const [loading, setLoading] =
@@ -443,27 +441,6 @@ if (!achievementsResponse.ok) {
 const achievementsData =
   await achievementsResponse.json();
 
-const unlockedAchievements =
-  achievementsData.filter(
-    (achievement) => achievement.unlocked
-  );
-
-const seenAchievementIds = JSON.parse(
-  localStorage.getItem("hendr_seen_achievements") || "[]"
-);
-
-const newAchievements =
-  unlockedAchievements.filter(
-    (achievement) =>
-      !seenAchievementIds.includes(
-        achievement.achievementID
-      )
-  );
-
-if (newAchievements.length > 0) {
-  setAchievementPopup(newAchievements[0]);
-  setAchievementQueue(newAchievements.slice(1));
-}
 
 setAchievements(achievementsData);
 
@@ -775,88 +752,6 @@ const updateCount =
 
   return (
   <main className="profile-page">
-
-    {achievementPopup && (
-      <div className="achievement-popup-overlay">
-        <div className="achievement-popup">
-
-          <button
-            type="button"
-            className="achievement-popup-close"
-            onClick={() => setAchievementPopup(null)}
-            aria-label="Stäng"
-          >
-            ×
-          </button>
-
-          <div className="achievement-popup-icon">
-            {(() => {
-              const Icon = getAchievementIcon(
-                achievementPopup.icon
-              );
-
-              return (
-                <Icon
-                  size={42}
-                  strokeWidth={1.8}
-                />
-              );
-            })()}
-          </div>
-
-          <span className="achievement-popup-label">
-            NY BADGE!
-          </span>
-
-          <h2>{achievementPopup.name}</h2>
-
-          <p>{achievementPopup.description}</p>
-
-          <strong>
-            +{achievementPopup.xpReward} XP
-          </strong>
-
-          <button
-  type="button"
-  className="achievement-popup-button"
-  onClick={() => {
-  const seenAchievementIds = JSON.parse(
-    localStorage.getItem("hendr_seen_achievements") || "[]"
-  );
-
-  if (
-    achievementPopup &&
-    !seenAchievementIds.includes(
-      achievementPopup.achievementID
-    )
-  ) {
-    seenAchievementIds.push(
-      achievementPopup.achievementID
-    );
-
-    localStorage.setItem(
-      "hendr_seen_achievements",
-      JSON.stringify(seenAchievementIds)
-    );
-  }
-
-  if (achievementQueue.length > 0) {
-    const [nextAchievement, ...remaining] =
-      achievementQueue;
-
-    setAchievementQueue(remaining);
-    setAchievementPopup(nextAchievement);
-  } else {
-    setAchievementPopup(null);
-  }
-}}
->
-  Snyggt!
-</button>
-
-        </div>
-      </div>
-    )}
 
     <div className="profile-content">
 

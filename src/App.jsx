@@ -1,5 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { API_URL } from "./config";
 import MapPage from "./components/MapPage";
 import Feed from "./components/Feed";
@@ -27,6 +27,61 @@ function App() {
 
   const [events, setEvents] = useState([]);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
+  const [achievementPopup, setAchievementPopup] = useState(null);
+  const [achievementQueue, setAchievementQueue] = useState([]);
+async function checkForNewAchievements() {
+  if (!user) return;
+
+  try {
+    const token = localStorage.getItem("hendr_token");
+
+    const response = await fetch(
+      `${API_URL}/api/users/me/achievements`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Kunde inte hämta badges");
+    }
+
+    const achievements = await response.json();
+
+    const unlockedAchievements =
+      achievements.filter(
+        (achievement) => achievement.unlocked
+      );
+
+    const seenAchievementIds = JSON.parse(
+      localStorage.getItem(
+        "hendr_seen_achievements"
+      ) || "[]"
+    );
+
+    const newAchievements =
+      unlockedAchievements.filter(
+        (achievement) =>
+          !seenAchievementIds.includes(
+            achievement.achievementID
+          )
+      );
+
+    if (newAchievements.length > 0) {
+      setAchievementPopup(newAchievements[0]);
+      setAchievementQueue(newAchievements.slice(1));
+    }
+  } catch (error) {
+    console.error(
+      "Fel vid kontroll av nya badges:",
+      error
+    );
+  }
+}
+
+
   const [feedFilter, setFeedFilter] = useState("latest");
   const [userLocation, setUserLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
@@ -137,6 +192,12 @@ useEffect(() => {
   }
 
 });
+
+useEffect(() => {
+  if (!user) return;
+
+  checkForNewAchievements();
+}, [user]);
 
   async function loadUnreadNotifications() {
   if (!user) {
@@ -1372,7 +1433,71 @@ setSelectedEvent(null);
   
   return (
   <div className="app">
-        {content}
+
+    {achievementPopup && (
+      <div className="achievement-popup-overlay">
+        <div className="achievement-popup">
+
+          <button
+            type="button"
+            className="achievement-popup-close"
+            onClick={() => {
+              if (achievementQueue.length > 0) {
+                const [nextAchievement, ...remaining] =
+                  achievementQueue;
+
+                setAchievementQueue(remaining);
+                setAchievementPopup(nextAchievement);
+              } else {
+                setAchievementPopup(null);
+              }
+            }}
+            aria-label="Stäng"
+          >
+            ×
+          </button>
+
+          <div className="achievement-popup-icon">
+            <span>
+              🏆
+            </span>
+          </div>
+
+          <span className="achievement-popup-label">
+            NY BADGE!
+          </span>
+
+          <h2>{achievementPopup.name}</h2>
+
+          <p>{achievementPopup.description}</p>
+
+          <strong>
+            +{achievementPopup.xpReward} XP
+          </strong>
+
+          <button
+            type="button"
+            className="achievement-popup-button"
+            onClick={() => {
+              if (achievementQueue.length > 0) {
+                const [nextAchievement, ...remaining] =
+                  achievementQueue;
+
+                setAchievementQueue(remaining);
+                setAchievementPopup(nextAchievement);
+              } else {
+                setAchievementPopup(null);
+              }
+            }}
+          >
+            Snyggt!
+          </button>
+
+        </div>
+      </div>
+    )}
+
+    {content}
 
    
 
