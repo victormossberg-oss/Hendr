@@ -3072,6 +3072,36 @@ AND e.moderation_status = 'safe'
   }
 );
 
+app.get("/api/users/me/achievements", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+        SELECT
+          a.achievementid AS "achievementID",
+          a.name,
+          a.description,
+          a.icon,
+          a.category,
+          a.xpreward AS "xpReward",
+          ua.unlockedat AS "unlockedAt"
+        FROM userachievements ua
+        JOIN achievements a
+          ON a.achievementid = ua.achievementid
+        WHERE ua.userid = $1
+        ORDER BY ua.unlockedat DESC
+      `,
+      [req.user.userid]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Fel vid hämtning av achievements:", error);
+    res.status(500).json({
+      message: "Kunde inte hämta achievements."
+    });
+  }
+});
+
 // =========================
 // REDIGERA MIN PROFIL
 // =========================
