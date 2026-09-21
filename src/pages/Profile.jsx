@@ -90,6 +90,7 @@ function Profile({
     useState([]);
 
   const [articleTab, setArticleTab] = useState("mine");
+  const [profileTab, setProfileTab] = useState("articles");
 
   const [stats, setStats] = useState({
   articleCount: 0,
@@ -1060,18 +1061,26 @@ const updateCount =
           <div className="filters profile-article-tabs">
   <button
     type="button"
-    className={articleTab === "mine" ? "active" : ""}
-    onClick={() => setArticleTab("mine")}
+    className={profileTab === "articles" ? "active" : ""}
+    onClick={() => setProfileTab("articles")}
   >
     Mina artiklar
   </button>
 
   <button
     type="button"
-    className={articleTab === "followed" ? "active" : ""}
-    onClick={() => setArticleTab("followed")}
+    className={profileTab === "followed" ? "active" : ""}
+    onClick={() => setProfileTab("followed")}
   >
     Följda artiklar
+  </button>
+
+  <button
+    type="button"
+    className={profileTab === "badges" ? "active" : ""}
+    onClick={() => setProfileTab("badges")}
+  >
+    Badges
   </button>
 </div>
 
