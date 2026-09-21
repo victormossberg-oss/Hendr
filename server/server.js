@@ -1060,6 +1060,23 @@ if (articleOwnerID !== userID) {
   );
 }
 
+const updateCount = await pool.query(
+  `
+  SELECT COUNT(*) AS count
+  FROM Observations
+  WHERE userID = $1
+    AND moderation_status = 'safe'
+  `,
+  [userID]
+);
+
+if (Number(updateCount.rows[0].count) >= 5) {
+  await unlockAchievement(
+    userID,
+    "contributor"
+  );
+}
+
 if (articleOwnerID !== userID) {
 
   await createNotification({
