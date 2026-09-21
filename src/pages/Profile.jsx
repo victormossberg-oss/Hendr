@@ -121,6 +121,48 @@ function getAchievementIcon(icon) {
   return icons[icon] || Trophy;
 }
 
+function AchievementCard({ achievement }) {
+  const Icon = getAchievementIcon(achievement.icon);
+
+  return (
+    <div
+      className={`profile-achievement ${
+        achievement.unlocked ? "unlocked" : "locked"
+      }`}
+    >
+      <div className="profile-achievement-icon">
+        <Icon
+          size={28}
+          strokeWidth={1.8}
+          style={{
+            opacity: achievement.unlocked ? 1 : 0.35,
+          }}
+        />
+
+        {!achievement.unlocked && (
+          <span className="profile-achievement-lock">
+            🔒
+          </span>
+        )}
+      </div>
+
+      <div className="profile-achievement-content">
+        <strong>{achievement.name}</strong>
+
+        <p>{achievement.description}</p>
+
+        <span>
+          {achievement.unlocked
+            ? `+${achievement.xpReward} XP · Upplåst ${new Date(
+                achievement.unlockedAt
+              ).toLocaleDateString("sv-SE")}`
+            : `+${achievement.xpReward} XP · Låst`}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Profile({
   user,
   onEventClick,
@@ -1150,54 +1192,49 @@ const updateCount =
     Hämtar artiklar...
   </div>
 ) : profileTab === "badges" ? (
-  <div className="profile-achievements-list">
-  {sortedAchievements.map((achievement) => (
-    <div
-  className={`profile-achievement ${
-    achievement.unlocked ? "unlocked" : "locked"
-  }`}
-  key={achievement.achievementID}
->
-      <div className="profile-achievement-icon">
-  {(() => {
-    const Icon = getAchievementIcon(achievement.icon);
-
-    return (
+  <>
+    {sortedAchievements.some(
+      (achievement) => achievement.unlocked
+    ) && (
       <>
-        <Icon
-          size={28}
-          strokeWidth={1.8}
-          style={{
-            opacity: achievement.unlocked ? 1 : 0.35,
-          }}
-        />
+        <h3 className="profile-achievements-heading">
+          Upplåsta badges
+        </h3>
 
-        {!achievement.unlocked && (
-          <span className="profile-achievement-lock">
-            🔒
-          </span>
-        )}
+        <div className="profile-achievements-list">
+          {sortedAchievements
+            .filter((achievement) => achievement.unlocked)
+            .map((achievement) => (
+              <AchievementCard
+                key={achievement.achievementID}
+                achievement={achievement}
+              />
+            ))}
+        </div>
       </>
-    );
-  })()}
-</div>
+    )}
 
-      <div className="profile-achievement-content">
-        <strong>{achievement.name}</strong>
+    {sortedAchievements.some(
+      (achievement) => !achievement.unlocked
+    ) && (
+      <>
+        <h3 className="profile-achievements-heading">
+          Att låsa upp
+        </h3>
 
-        <p>{achievement.description}</p>
-
-<span>
-  {achievement.unlocked
-    ? `+${achievement.xpReward} XP · Upplåst ${new Date(
-        achievement.unlockedAt
-      ).toLocaleDateString("sv-SE")}`
-    : `+${achievement.xpReward} XP · Låst`}
-</span>
-      </div>
-    </div>
-  ))}
-</div>
+        <div className="profile-achievements-list">
+          {sortedAchievements
+            .filter((achievement) => !achievement.unlocked)
+            .map((achievement) => (
+              <AchievementCard
+                key={achievement.achievementID}
+                achievement={achievement}
+              />
+            ))}
+        </div>
+      </>
+    )}
+  </>
 ) : profileTab === "articles" ? (
   events.length === 0 ? (
     <div className="profile-empty">
@@ -1213,57 +1250,50 @@ const updateCount =
           onClick={() => onEventClick(event)}
         >
           <div className="profile-article-image">
-  {event.imageUrl ? (
-    <img
-      src={event.imageUrl}
-      alt=""
-    />
-  ) : (
-    <div className="profile-article-placeholder">
-      {event.category || "Annat"}
-    </div>
-  )}
-</div>
+            {event.imageUrl ? (
+              <img
+                src={event.imageUrl}
+                alt=""
+              />
+            ) : (
+              <div className="profile-article-placeholder">
+                {event.category || "Annat"}
+              </div>
+            )}
+          </div>
 
-<div className="profile-article-content">
-  <span className="profile-article-category">
-    {event.category || "Annat"}
-  </span>
+          <div className="profile-article-content">
+            <span className="profile-article-category">
+              {event.category || "Annat"}
+            </span>
 
-  <h3>
-    {event.title}
-  </h3>
+            <h3>{event.title}</h3>
 
-  {event.description && (
-    <p>
-      {event.description}
-    </p>
-  )}
+            {event.description && (
+              <p>{event.description}</p>
+            )}
 
-  <div className="profile-article-meta">
-    <span>
-      {event.createdAt
-        ? new Date(
-            event.createdAt
-          ).toLocaleDateString(
-            "sv-SE",
-            {
-              day: "numeric",
-              month: "short"
-            }
-          )
-        : ""}
-    </span>
+            <div className="profile-article-meta">
+              <span>
+                {event.createdAt
+                  ? new Date(
+                      event.createdAt
+                    ).toLocaleDateString("sv-SE", {
+                      day: "numeric",
+                      month: "short",
+                    })
+                  : ""}
+              </span>
 
-    <span>
-      ✓ {Number(event.confirmationCount) || 0}
-    </span>
+              <span>
+                ✓ {Number(event.confirmationCount) || 0}
+              </span>
 
-    <span>
-      ○ {Number(event.observationCount) || 0}
-    </span>
-  </div>
-</div>
+              <span>
+                ○ {Number(event.observationCount) || 0}
+              </span>
+            </div>
+          </div>
         </button>
       ))}
     </div>
@@ -1283,57 +1313,50 @@ const updateCount =
           onClick={() => onEventClick(event)}
         >
           <div className="profile-article-image">
-  {event.imageUrl ? (
-    <img
-      src={event.imageUrl}
-      alt=""
-    />
-  ) : (
-    <div className="profile-article-placeholder">
-      {event.category || "Annat"}
-    </div>
-  )}
-</div>
+            {event.imageUrl ? (
+              <img
+                src={event.imageUrl}
+                alt=""
+              />
+            ) : (
+              <div className="profile-article-placeholder">
+                {event.category || "Annat"}
+              </div>
+            )}
+          </div>
 
-<div className="profile-article-content">
-  <span className="profile-article-category">
-    {event.category || "Annat"}
-  </span>
+          <div className="profile-article-content">
+            <span className="profile-article-category">
+              {event.category || "Annat"}
+            </span>
 
-  <h3>
-    {event.title}
-  </h3>
+            <h3>{event.title}</h3>
 
-  {event.description && (
-    <p>
-      {event.description}
-    </p>
-  )}
+            {event.description && (
+              <p>{event.description}</p>
+            )}
 
-  <div className="profile-article-meta">
-    <span>
-      {event.createdAt
-        ? new Date(
-            event.createdAt
-          ).toLocaleDateString(
-            "sv-SE",
-            {
-              day: "numeric",
-              month: "short"
-            }
-          )
-        : ""}
-    </span>
+            <div className="profile-article-meta">
+              <span>
+                {event.createdAt
+                  ? new Date(
+                      event.createdAt
+                    ).toLocaleDateString("sv-SE", {
+                      day: "numeric",
+                      month: "short",
+                    })
+                  : ""}
+              </span>
 
-    <span>
-      ✓ {Number(event.confirmationCount) || 0}
-    </span>
+              <span>
+                ✓ {Number(event.confirmationCount) || 0}
+              </span>
 
-    <span>
-      ○ {Number(event.observationCount) || 0}
-    </span>
-  </div>
-</div>
+              <span>
+                ○ {Number(event.observationCount) || 0}
+              </span>
+            </div>
+          </div>
         </button>
       ))}
     </div>
