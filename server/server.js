@@ -905,6 +905,25 @@ try {
 
   newEvent.moderation_status = moderationResult.status;
 
+  if (newEvent.moderation_status === "safe") {
+  const articleCount = await pool.query(
+    `
+      SELECT COUNT(*) AS count
+      FROM Events
+      WHERE userid = $1
+        AND moderation_status = 'safe'
+        AND status != 'Removed'
+    `,
+    [req.user.userid]
+  );
+
+  const userID = req.user.userid;
+
+  if (Number(articleCount.rows[0].count) >= 11) {
+    await unlockAchievement(userID, "journalist");
+  }
+}
+
 } catch (moderationError) {
   console.error(
     "Automatisk moderering misslyckades. Artikeln ligger kvar som pending.",
