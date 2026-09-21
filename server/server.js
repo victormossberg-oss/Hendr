@@ -1356,6 +1356,22 @@ AND moderation_status = 'safe'
   );
 }
 
+const followedArticleCount = await pool.query(
+  `
+  SELECT COUNT(*) AS count
+  FROM "Follows"
+  WHERE "userID" = $1
+  `,
+  [userID]
+);
+
+if (Number(followedArticleCount.rows[0].count) >= 10) {
+  await unlockAchievement(
+    userID,
+    "engaged"
+  );
+}
+
     return res.json({
       following: true
     });
