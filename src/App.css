@@ -8849,3 +8849,59 @@ body,
 .admin-report-title:hover {
   text-decoration: underline;
 }
+
+.profile-achievements-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.profile-achievement {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.profile-achievement-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f3f4f6;
+}
+
+.profile-achievement-content {
+  min-width: 0;
+}
+
+.profile-achievement-content strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.profile-achievement-content p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #6b7280;
+}
+
+.profile-achievement-content span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .profile-achievements-list {
+    grid-template-columns: 1fr;
+  }
+}

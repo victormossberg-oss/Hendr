@@ -1148,8 +1148,12 @@ const updateCount =
       key={achievement.achievementID}
     >
       <div className="profile-achievement-icon">
-        {achievement.icon}
-      </div>
+  {(() => {
+    const Icon = getAchievementIcon(achievement.icon);
+
+    return <Icon size={28} strokeWidth={1.8} />;
+  })()}
+</div>
 
       <div className="profile-achievement-content">
         <strong>{achievement.name}</strong>
