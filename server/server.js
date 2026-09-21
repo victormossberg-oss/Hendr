@@ -1640,6 +1640,22 @@ const eventOwnerID =
   );
 }
 
+const confirmationCount = await pool.query(
+  `
+  SELECT COUNT(*) AS count
+  FROM EventConfirmations
+  WHERE eventID = $1
+  `,
+  [eventID]
+);
+
+if (Number(confirmationCount.rows[0].count) >= 10) {
+  await unlockAchievement(
+    eventOwnerID,
+    "trusted_source"
+  );
+}
+
               console.log(
   "SKAPAR BEKRÄFTELSENOTIS",
   {
