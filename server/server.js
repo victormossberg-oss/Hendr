@@ -1656,6 +1656,27 @@ if (Number(confirmationCount.rows[0].count) >= 10) {
   );
 }
 
+if (Number(confirmationCount.rows[0].count) >= 25) {
+  await unlockAchievement(
+    eventOwnerID,
+    "well_confirmed"
+  );
+}
+
+if (Number(confirmationCount.rows[0].count) >= 50) {
+  await unlockAchievement(
+    eventOwnerID,
+    "top_article"
+  );
+}
+
+if (Number(confirmationCount.rows[0].count) >= 100) {
+  await unlockAchievement(
+    eventOwnerID,
+    "local_talk"
+  );
+}
+
               console.log(
   "SKAPAR BEKRÄFTELSENOTIS",
   {
