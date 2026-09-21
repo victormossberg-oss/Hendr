@@ -3003,14 +3003,10 @@ AND moderation_status != 'blocked'
 AND e.moderation_status != 'blocked'
 ) AS "confirmationCount",
 
-  (
+(
   SELECT COUNT(*)
   FROM Observations o
-  INNER JOIN Events e
-    ON e.eventID = o.eventID
   WHERE o.userID = $1
-    AND e.status != 'Removed'
-    AND e.moderation_status != 'blocked'
     AND o.moderation_status != 'blocked'
 ) AS updateCount
 
@@ -3076,14 +3072,10 @@ AND moderation_status != 'blocked'
 AND e.moderation_status != 'blocked'
 ) AS "confirmationCount",
 
-  (
+(
   SELECT COUNT(*)
   FROM Observations o
-  INNER JOIN Events e
-    ON e.eventID = o.eventID
   WHERE o.userID = $1
-    AND e.status != 'Removed'
-    AND e.moderation_status != 'blocked'
     AND o.moderation_status != 'blocked'
 ) AS updateCount
 
