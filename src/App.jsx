@@ -70,9 +70,23 @@ async function checkForNewAchievements() {
       );
 
     if (newAchievements.length > 0) {
-      setAchievementPopup(newAchievements[0]);
-      setAchievementQueue(newAchievements.slice(1));
-    }
+  const newAchievementIds = newAchievements.map(
+    (achievement) => achievement.achievementID
+  );
+
+  const updatedSeenAchievementIds = [
+    ...seenAchievementIds,
+    ...newAchievementIds,
+  ];
+
+  localStorage.setItem(
+    "hendr_seen_achievements",
+    JSON.stringify(updatedSeenAchievementIds)
+  );
+
+  setAchievementPopup(newAchievements[0]);
+  setAchievementQueue(newAchievements.slice(1));
+}
   } catch (error) {
     console.error(
       "Fel vid kontroll av nya badges:",
@@ -197,6 +211,14 @@ useEffect(() => {
   if (!user) return;
 
   checkForNewAchievements();
+
+  const interval = setInterval(() => {
+    checkForNewAchievements();
+  }, 10000);
+
+  return () => {
+    clearInterval(interval);
+  };
 }, [user]);
 
   async function loadUnreadNotifications() {
