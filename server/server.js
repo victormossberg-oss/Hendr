@@ -2158,6 +2158,32 @@ app.patch(
   );
 }
 
+const locationCount = await pool.query(
+  `
+  SELECT COUNT(DISTINCT TRIM(location)) AS count
+  FROM Events
+  WHERE userid = $1
+    AND moderation_status = 'safe'
+    AND location IS NOT NULL
+    AND TRIM(location) != ''
+  `,
+  [userID]
+);
+
+if (Number(locationCount.rows[0].count) >= 5) {
+  await unlockAchievement(
+    userID,
+    "local_expert"
+  );
+}
+
+if (Number(locationCount.rows[0].count) >= 10) {
+  await unlockAchievement(
+    userID,
+    "explorer"
+  );
+}
+
     const articleCount = await pool.query(
   `
   SELECT COUNT(*) AS count
