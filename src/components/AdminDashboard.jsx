@@ -49,16 +49,11 @@ function AdminDashboard({ onEventClick }) {
       );
     }
 
-    setReports((currentReports) =>
-      currentReports.map((report) =>
-        report.id === reportID
-          ? {
-              ...report,
-              status: data.status,
-            }
-          : report
-      )
-    );
+   setReports((currentReports) =>
+  currentReports.filter(
+    (report) => report.id !== reportID
+  )
+);
   } catch (error) {
     console.error(
       "Fel vid hantering av rapport:",
