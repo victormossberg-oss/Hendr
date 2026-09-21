@@ -859,11 +859,9 @@ const updateCount =
   </p>
 )}
 
-  {bio && (
   <p className="profile-bio">
-    {bio}
-  </p>
-)}
+  {levelInfo.title} på HENDR
+</p>
 
 </section>
 
@@ -956,23 +954,7 @@ const updateCount =
   />
 </label>
 
-    <label className="profile-edit-label">
-      Presentation
-
-      <textarea
-        value={bio}
-        onChange={(e) =>
-          setBio(e.target.value)
-        }
-        maxLength={180}
-        placeholder="Berätta kort om dig själv..."
-        rows={4}
-      />
-    </label>
-
-    <div className="profile-edit-counter">
-      {bio.length}/180
-    </div>
+    
 
     <button
   type="button"
@@ -1139,23 +1121,6 @@ const updateCount =
           </div>
 
         </section>
-
-
-        {/* =========================
-            SKAPA ARTIKEL
-        ========================= */}
-
-        <button
-          type="button"
-          className="profile-create-button"
-          onClick={onCreateArticle}
-        >
-          <span>
-            +
-          </span>
-
-          Skapa ny artikel
-        </button>
 
 
         {/* =========================
