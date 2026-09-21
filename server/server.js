@@ -3090,12 +3090,12 @@ app.get(
             xp,
             level,
 
-            (
+   (
   SELECT COUNT(*)
   FROM Events
   WHERE userid = $1
     AND status != 'Removed'
-AND moderation_status != 'blocked'
+    AND moderation_status = 'safe'
 ) AS "articleCount",
 
             (
@@ -3159,12 +3159,12 @@ app.get(
           `
           SELECT
 
-            (
+  (
   SELECT COUNT(*)
   FROM Events
   WHERE userid = $1
     AND status != 'Removed'
-AND moderation_status != 'blocked'
+    AND moderation_status = 'safe'
 ) AS "articleCount",
 
             (
