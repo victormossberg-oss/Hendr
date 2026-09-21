@@ -2137,9 +2137,11 @@ app.patch(
       if (status === "safe") {
   const article = await pool.query(
     `
-    SELECT userid
-    FROM Events
-    WHERE eventID = $1
+    SELECT
+    userid,
+    location
+  FROM Events
+  WHERE eventID = $1
     `,
     [req.params.id]
   );
@@ -2149,6 +2151,12 @@ app.patch(
 
     await addXP(userID, "article_approved", req.params.id, 10);
     await unlockAchievement(userID, "first_article");
+    if (article.rows[0].location?.trim()) {
+  await unlockAchievement(
+    userID,
+    "first_location"
+  );
+}
 
     const articleCount = await pool.query(
   `
