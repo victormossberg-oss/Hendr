@@ -1664,6 +1664,22 @@ const eventOwnerID =
   );
 }
 
+const verificationCount = await pool.query(
+  `
+  SELECT COUNT(*) AS count
+  FROM EventConfirmations
+  WHERE userID = $1
+  `,
+  [userID]
+);
+
+if (Number(verificationCount.rows[0].count) >= 25) {
+  await unlockAchievement(
+    userID,
+    "verifier"
+  );
+}
+
 const confirmationCount = await pool.query(
   `
   SELECT COUNT(*) AS count
