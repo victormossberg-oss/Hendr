@@ -1083,6 +1083,7 @@ if (articleOwnerID !== userID) {
     result.rows[0].id,
     3
   );
+  await checkActivityAchievements(userID);
 }
 
 const updateCount = await pool.query(
@@ -1379,6 +1380,8 @@ AND moderation_status = 'safe'
     eventID,
     1
   );
+
+  await checkActivityAchievements(userID);
 }
 
 const followedArticleCount = await pool.query(
