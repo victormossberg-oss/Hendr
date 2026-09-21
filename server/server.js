@@ -955,7 +955,7 @@ const articleOwnerID =
   $4,
   $5,
   $6,
-  'pending'
+  'safe'
 )
 
     RETURNING
