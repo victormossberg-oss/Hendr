@@ -1085,11 +1085,15 @@ const updateCount =
 </div>
 
 
-          {loading ? (
+  {loading ? (
   <div className="profile-empty">
     Hämtar artiklar...
   </div>
-) : articleTab === "mine" ? (
+) : profileTab === "badges" ? (
+  <div>
+    <p>Här kommer dina badges.</p>
+  </div>
+) : profileTab === "articles" ? (
   events.length === 0 ? (
     <div className="profile-empty">
       Du har inte skapat några artiklar ännu.
