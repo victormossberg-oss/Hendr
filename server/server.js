@@ -2252,7 +2252,29 @@ app.patch(
   if (article.rows.length > 0) {
     const userID = article.rows[0].userid;
 
-    await addXP(userID, "article_approved", req.params.id, 10);
+    const todayArticleXP = await pool.query(
+  `
+    SELECT COUNT(*) AS count
+    FROM "XPTransactions"
+    WHERE "userID" = $1
+      AND type = 'article_approved'
+      AND created_at >= CURRENT_DATE
+  `,
+  [userID]
+);
+
+const articlesWithXPToday = Number(
+  todayArticleXP.rows[0].count
+);
+
+if (articlesWithXPToday < 3) {
+  await addXP(
+    userID,
+    "article_approved",
+    req.params.id,
+    10
+  );
+}
     await checkActivityAchievements(userID);
     await unlockAchievement(userID, "first_article");
     if (article.rows[0].location?.trim()) {
