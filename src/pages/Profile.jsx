@@ -1090,9 +1090,26 @@ const updateCount =
     Hämtar artiklar...
   </div>
 ) : profileTab === "badges" ? (
-  <div>
-    <p>Här kommer dina badges.</p>
-  </div>
+  <div className="profile-achievements-list">
+  {achievements.map((achievement) => (
+    <div
+      className="profile-achievement"
+      key={achievement.achievementID}
+    >
+      <div className="profile-achievement-icon">
+        {achievement.icon}
+      </div>
+
+      <div className="profile-achievement-content">
+        <strong>{achievement.name}</strong>
+
+        <p>{achievement.description}</p>
+
+        <span>+{achievement.xpReward} XP</span>
+      </div>
+    </div>
+  ))}
+</div>
 ) : profileTab === "articles" ? (
   events.length === 0 ? (
     <div className="profile-empty">
