@@ -3075,23 +3075,27 @@ AND e.moderation_status = 'safe'
 app.get("/api/users/me/achievements", authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      `
-        SELECT
-          a.achievementid AS "achievementID",
-          a.name,
-          a.description,
-          a.icon,
-          a.category,
-          a.xpreward AS "xpReward",
-          ua.unlockedat AS "unlockedAt"
-        FROM userachievements ua
-        JOIN achievements a
-          ON a.achievementid = ua.achievementid
-        WHERE ua.userid = $1
-        ORDER BY ua.unlockedat DESC
-      `,
-      [req.user.userid]
-    );
+  `
+    SELECT
+      a.achievementid AS "achievementID",
+      a.name,
+      a.description,
+      a.icon,
+      a.category,
+      a.xpreward AS "xpReward",
+      ua.unlockedat AS "unlockedAt",
+      CASE
+        WHEN ua.achievementid IS NOT NULL THEN true
+        ELSE false
+      END AS unlocked
+    FROM achievements a
+    LEFT JOIN userachievements ua
+      ON ua.achievementid = a.achievementid
+      AND ua.userid = $1
+    ORDER BY a.achievementid ASC
+  `,
+  [req.user.userid]
+);
 
     res.json(result.rows);
   } catch (error) {
