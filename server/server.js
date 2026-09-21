@@ -889,14 +889,7 @@ try {
   newEvent.moderation_status = "pending";
 }
 
-await addXP(
-  req.user.userid,
-  "article_created",
-  newEvent.id,
-  10
-);
 
-await unlockAchievement(req.user.userid, "first_article");
 
 res.status(201).json(newEvent);
 
@@ -2103,6 +2096,24 @@ app.patch(
           message: "Artikeln hittades inte."
         });
       }
+
+      if (status === "safe") {
+  const article = await pool.query(
+    `
+    SELECT userid
+    FROM Events
+    WHERE eventID = $1
+    `,
+    [req.params.id]
+  );
+
+  if (article.rows.length > 0) {
+    const userID = article.rows[0].userid;
+
+    await addXP(userID, "article_approved", req.params.id, 10);
+    await unlockAchievement(userID, "first_article");
+  }
+}
 
       res.json(result.rows[0]);
 
