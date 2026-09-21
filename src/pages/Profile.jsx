@@ -319,7 +319,7 @@ setStats({
     Number(statsData.confirmationCount) || 0,
 
   updateCount:
-    Number(statsData.updateCount) || 0,
+    Number(statsData.updatecount) || 0,
 
   xp:
     Number(statsData.xp) || 0,
