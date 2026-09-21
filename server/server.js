@@ -511,6 +511,31 @@ async function unlockAchievement(userID, icon) {
   };
 }
 
+async function checkActivityAchievements(userID) {
+  const result = await pool.query(
+    `
+      SELECT COUNT(DISTINCT DATE_TRUNC('week', created_at)) AS active_weeks
+      FROM "XPTransactions"
+      WHERE "userID" = $1
+        AND type IN (
+          'article_created',
+          'update_created',
+          'follow_created'
+        )
+    `,
+    [userID]
+  );
+
+  const activeWeeks = Number(result.rows[0].active_weeks);
+
+  if (activeWeeks >= 3) {
+    await unlockAchievement(userID, "on_the_move");
+  }
+
+  if (activeWeeks >= 8) {
+    await unlockAchievement(userID, "regular");
+  }
+}
 
 // =========================
 // HÄMTA ALLA ARTIKLAR
@@ -2206,6 +2231,7 @@ app.patch(
     const userID = article.rows[0].userid;
 
     await addXP(userID, "article_approved", req.params.id, 10);
+    await checkActivityAchievements(userID);
     await unlockAchievement(userID, "first_article");
     if (article.rows[0].location?.trim()) {
   await unlockAchievement(
