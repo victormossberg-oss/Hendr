@@ -8868,14 +8868,17 @@ body,
 }
 
 .profile-achievement-icon {
-  width: 52px;
-  height: 52px;
+  position: relative;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: #ffffff;
+  border: 3px solid #D5A52C;
+  color: #111111;
 }
 
 .profile-achievement-content {
