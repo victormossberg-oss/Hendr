@@ -919,7 +919,7 @@ try {
 
   const userID = req.user.userid;
 
-  if (Number(articleCount.rows[0].count) >= 11) {
+  if (Number(articleCount.rows[0].count) >= 25) {
     await unlockAchievement(userID, "journalist");
   }
 }
@@ -2306,7 +2306,7 @@ if (Number(articleCount.rows[0].count) >= 10) {
   await unlockAchievement(userID, "local_reporter");
 }
 
-if (Number(articleCount.rows[0].count) >= 11) {
+if (Number(articleCount.rows[0].count) >= 25) {
   await unlockAchievement(userID, "journalist");
 }
 
