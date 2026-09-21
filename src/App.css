@@ -8905,3 +8905,28 @@ body,
     grid-template-columns: 1fr;
   }
 }
+
+.profile-achievement.locked {
+  opacity: 0.55;
+  background: #f8f8f8;
+}
+
+.profile-achievement.locked .profile-achievement-icon {
+  background: #e5e7eb;
+}
+
+.profile-achievement.locked .profile-achievement-content span {
+  color: #9ca3af;
+}
+
+.profile-achievement-icon {
+  position: relative;
+}
+
+.profile-achievement-lock {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  font-size: 13px;
+  line-height: 1;
+}

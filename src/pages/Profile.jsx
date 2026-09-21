@@ -695,6 +695,15 @@ const confirmationCount =
 const updateCount =
   stats.updateCount;
 
+  const sortedAchievements = [
+  ...achievements.filter(
+    (achievement) => achievement.unlocked
+  ),
+  ...achievements.filter(
+    (achievement) => !achievement.unlocked
+  ),
+];
+
   return (
     <main className="profile-page">
 
@@ -1142,16 +1151,34 @@ const updateCount =
   </div>
 ) : profileTab === "badges" ? (
   <div className="profile-achievements-list">
-  {achievements.map((achievement) => (
+  {sortedAchievements.map((achievement) => (
     <div
-      className="profile-achievement"
-      key={achievement.achievementID}
-    >
+  className={`profile-achievement ${
+    achievement.unlocked ? "unlocked" : "locked"
+  }`}
+  key={achievement.achievementID}
+>
       <div className="profile-achievement-icon">
   {(() => {
     const Icon = getAchievementIcon(achievement.icon);
 
-    return <Icon size={28} strokeWidth={1.8} />;
+    return (
+      <>
+        <Icon
+          size={28}
+          strokeWidth={1.8}
+          style={{
+            opacity: achievement.unlocked ? 1 : 0.35,
+          }}
+        />
+
+        {!achievement.unlocked && (
+          <span className="profile-achievement-lock">
+            🔒
+          </span>
+        )}
+      </>
+    );
   })()}
 </div>
 
@@ -1160,9 +1187,12 @@ const updateCount =
 
         <p>{achievement.description}</p>
 
-        <span>
-  +{achievement.xpReward} XP ·{" "}
-  {new Date(achievement.unlockedAt).toLocaleDateString("sv-SE")}
+<span>
+  {achievement.unlocked
+    ? `+${achievement.xpReward} XP · Upplåst ${new Date(
+        achievement.unlockedAt
+      ).toLocaleDateString("sv-SE")}`
+    : `+${achievement.xpReward} XP · Låst`}
 </span>
       </div>
     </div>
