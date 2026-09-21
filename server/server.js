@@ -442,6 +442,75 @@ async function addXP(userID, type, referenceID, amount) {
   return xpResult.rows[0];
 }
 
+async function unlockAchievement(userID, icon) {
+  const achievementResult = await pool.query(
+    `
+      SELECT
+        achievementid,
+        name,
+        description,
+        icon,
+        category,
+        xpreward
+      FROM achievements
+      WHERE icon = $1
+    `,
+    [icon]
+  );
+
+  // Badgen finns inte
+  if (achievementResult.rows.length === 0) {
+    return null;
+  }
+
+  const achievement = achievementResult.rows[0];
+
+  // Försök låsa upp badgen
+  const result = await pool.query(
+    `
+      INSERT INTO userachievements
+      (
+        userid,
+        achievementid
+      )
+      VALUES
+      (
+        $1,
+        $2
+      )
+      ON CONFLICT (userid, achievementid)
+      DO NOTHING
+      RETURNING userachievementid, unlockedat
+    `,
+    [userID, achievement.achievementid]
+  );
+
+  // Användaren hade redan badgen
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  // Ge XP för badgen
+  if (achievement.xpreward > 0) {
+    await addXP(
+      userID,
+      "achievement_unlocked",
+      achievement.achievementid,
+      achievement.xpreward
+    );
+  }
+
+  return {
+    achievementID: achievement.achievementid,
+    name: achievement.name,
+    description: achievement.description,
+    icon: achievement.icon,
+    category: achievement.category,
+    xpReward: achievement.xpreward,
+    unlockedAt: result.rows[0].unlockedat
+  };
+}
+
 
 // =========================
 // HÄMTA ALLA ARTIKLAR
@@ -826,6 +895,8 @@ await addXP(
   newEvent.id,
   10
 );
+
+await unlockAchievement(req.user.userid, "first_article");
 
 res.status(201).json(newEvent);
 
