@@ -1,5 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import { Edit, Settings, X, ShieldCheck } from "lucide-react";
+import {
+  Edit,
+  Settings,
+  X,
+  ShieldCheck,
+  Newspaper,
+  FileText,
+  MapPin,
+  CheckCircle,
+  Star,
+  MessageCircle,
+  Users,
+  Compass,
+  UserCheck,
+  Eye,
+  UserPlus,
+  Flame,
+  Trophy,
+  Zap
+} from "lucide-react";
 import { API_URL } from "../config";
 
 const LEVELS = [
@@ -68,6 +87,38 @@ function getLevelInfo(level, xp) {
   nextTitle: nextLevel?.title ?? null,
 };
 
+}
+
+function getAchievementIcon(icon) {
+  const icons = {
+    first_article: Newspaper,
+    reporter: FileText,
+    local_reporter: MapPin,
+    journalist: Newspaper,
+
+    trusted_source: CheckCircle,
+    well_confirmed: CheckCircle,
+    top_article: Star,
+    local_talk: MessageCircle,
+
+    first_location: MapPin,
+    local_expert: Compass,
+    explorer: Compass,
+
+    contributor: UserPlus,
+    community_builder: Users,
+    verifier: UserCheck,
+    engaged: Eye,
+
+    on_the_move: Zap,
+    regular: Flame,
+
+    first_on_scene: Trophy,
+    hendr_pioneer: Star,
+    all_round_reporter: Trophy
+  };
+
+  return icons[icon] || Trophy;
 }
 
 function Profile({
