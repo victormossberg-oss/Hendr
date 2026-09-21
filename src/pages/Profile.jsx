@@ -99,6 +99,8 @@ function Profile({
   level: 1
 });
 
+const [achievements, setAchievements] = useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -327,6 +329,29 @@ setStats({
   level:
     Number(statsData.level) || 1
 });
+
+const achievementsResponse = await fetch(
+  `${API_URL}/api/users/me/achievements`,
+  {
+    headers
+  }
+);
+
+if (!achievementsResponse.ok) {
+  throw new Error(
+    "Kunde inte hämta dina badges"
+  );
+}
+
+const achievementsData =
+  await achievementsResponse.json();
+
+setAchievements(achievementsData);
+
+console.log(
+  "MINA BADGES:",
+  achievementsData
+);
 
 
       } catch (error) {
