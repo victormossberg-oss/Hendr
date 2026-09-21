@@ -26,7 +26,7 @@ import "./App.css";
 function App() {
 
   const [events, setEvents] = useState([]);
-
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const [feedFilter, setFeedFilter] = useState("latest");
   const [userLocation, setUserLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
@@ -997,6 +997,7 @@ else if (
   onLogout={handleLogout}
   onCreateArticle={() => setCreatingArticle(true)}
   onAdminClick={() => setCurrentPage("admin")}
+  profileRefreshKey={profileRefreshKey}
 />
 
     );
@@ -1199,11 +1200,15 @@ onObservationDeleted={(observationID) => {
     }
 
     setEvents((current) =>
-      current.filter(
-        (event) =>
-          String(event.id) !== String(eventID)
-      )
-    );
+  current.filter(
+    (event) =>
+      String(event.id) !== String(eventID)
+  )
+);
+
+setProfileRefreshKey((current) => current + 1);
+
+setSelectedEvent(null);
 
     setSelectedEvent(null);
   } catch (error) {

@@ -77,6 +77,7 @@ function Profile({
   onLogout,
   onCreateArticle,
   onAdminClick,
+  profileRefreshKey,
 }) {
 
   const [events, setEvents] =
@@ -347,7 +348,7 @@ setStats({
 
     fetchMyData();
 
-  }, []);
+  }, [profileRefreshKey]);
 
 
   // =========================
