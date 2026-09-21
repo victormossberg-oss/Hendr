@@ -1077,6 +1077,13 @@ if (Number(updateCount.rows[0].count) >= 5) {
   );
 }
 
+if (Number(updateCount.rows[0].count) >= 25) {
+  await unlockAchievement(
+    userID,
+    "community_builder"
+  );
+}
+
 if (articleOwnerID !== userID) {
 
   await createNotification({
