@@ -762,7 +762,13 @@ app.post(
   location
 } = req.body;
 
-if (!location?.trim()) {
+if (
+  !location?.trim() &&
+  (latitude === undefined ||
+    latitude === "" ||
+    longitude === undefined ||
+    longitude === "")
+) {
   return res.status(400).json({
     message: "En plats krävs för att skapa en artikel."
   });
