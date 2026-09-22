@@ -9274,3 +9274,52 @@ body,
   box-shadow: none;
   outline: none;
 }
+
+/* =========================
+   PLATSSÖKNING – RESULTAT
+========================= */
+
+.article-location-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2ddd3;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--hendr-dark);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.article-location-result::before {
+  content: "📍";
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.article-location-result:hover {
+  background: #faf7ef;
+  border-color: var(--hendr-mustard);
+}
+
+.article-location-result:active {
+  transform: scale(0.99);
+  background: #f5edda;
+}
+
+.article-location-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
