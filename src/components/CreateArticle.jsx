@@ -154,6 +154,7 @@ const [locationStatus, setLocationStatus] = useState(
           }
 
           
+          setLocationName(name);
           setLocationStatus(name);
         } catch {
           setLocationName("Din nuvarande position");
