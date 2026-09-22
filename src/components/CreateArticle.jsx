@@ -118,6 +118,8 @@ const [locationStatus, setLocationStatus] = useState(
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
+        console.log("GPS:", lat, lng);
+
         setLatitude(lat);
         setLongitude(lng);
 
@@ -149,7 +151,7 @@ const [locationStatus, setLocationStatus] = useState(
             name = `${locality}, ${city}`;
           }
 
-          setLocationName(name);
+          
           setLocationStatus(name);
         } catch {
           setLocationName("Din nuvarande position");
@@ -547,6 +549,19 @@ const [locationStatus, setLocationStatus] = useState(
     </strong>
   </div>
 </div>
+
+<input
+  type="text"
+  className="article-location-input"
+  value={locationName}
+  onChange={(event) => {
+  setLocationName(event.target.value);
+  setLocationStatus(event.target.value);
+  setLatitude("");
+  setLongitude("");
+}}
+  placeholder="Skriv plats, ort eller adress..."
+/>
 
             <h2 className="article-media-heading">
               Bilder

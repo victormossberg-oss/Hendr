@@ -753,13 +753,20 @@ app.post(
     try {
 
       const {
-        title,
-        description,
-        category,
-        status,
-        latitude,
-        longitude
-      } = req.body;
+  title,
+  description,
+  category,
+  status,
+  latitude,
+  longitude,
+  location
+} = req.body;
+
+if (!location?.trim()) {
+  return res.status(400).json({
+    message: "En plats krävs för att skapa en artikel."
+  });
+}
 
 
       let imageUrl = null;

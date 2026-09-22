@@ -9126,3 +9126,28 @@ body,
 .feed {
   padding-bottom: 15px !important;
 }
+
+.article-location-input {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+
+  border: 1px solid #ddd8cd;
+  border-radius: 10px;
+
+  background: #fff;
+  color: var(--hendr-dark);
+  font: inherit;
+  font-size: 14px;
+
+  box-sizing: border-box;
+  outline: none;
+}
+
+.article-location-input::placeholder {
+  color: #99958c;
+}
+
+.article-location-input:focus {
+  border-color: var(--hendr-mustard);
+}
