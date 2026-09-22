@@ -616,6 +616,12 @@ const [locationStatus, setLocationStatus] = useState(
       setLatitude("");
       setLongitude("");
     }}
+    onKeyDown={(event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      searchLocation();
+    }
+  }}
     placeholder="Skriv plats, ort eller adress..."
   />
 
