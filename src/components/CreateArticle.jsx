@@ -235,10 +235,13 @@ const [locationStatus, setLocationStatus] = useState(
     }
 
     if (step === 2) {
-  if (!locationName.trim()) {
-    alert("Du måste ange en plats för artikeln.");
-    return;
-  }
+  if (
+  !locationName.trim() &&
+  (latitude === "" || longitude === "")
+) {
+  alert("Du måste ange en plats för artikeln.");
+  return;
+}
 
   setStep(3);
   return;
