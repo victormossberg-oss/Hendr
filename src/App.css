@@ -9122,3 +9122,7 @@ body,
   color: #333;
   background: #f7f7f7;
 }
+
+.feed {
+  padding-bottom: 15px !important;
+}
