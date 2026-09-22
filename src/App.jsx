@@ -26,6 +26,8 @@ import "./App.css";
 function App() {
 
   const [events, setEvents] = useState([]);
+  const [currentEventPage, setCurrentEventPage] = useState(1);
+  const [hasMoreEvents, setHasMoreEvents] = useState(true);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const [achievementPopup, setAchievementPopup] = useState(null);
   const [achievementQueue, setAchievementQueue] = useState([]);
@@ -499,6 +501,35 @@ async function refreshFeed() {
   });
 }
 
+async function loadMoreEvents() {
+  const nextPage = currentEventPage + 1;
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/events?page=${nextPage}&limit=15`
+    );
+
+    if (!response.ok) {
+      throw new Error("Kunde inte hämta fler artiklar.");
+    }
+
+    const data = await response.json();
+
+    if (data.length < 15) {
+  setHasMoreEvents(false);
+}
+
+    setEvents((currentEvents) => [
+      ...currentEvents,
+      ...data,
+    ]);
+
+    setCurrentEventPage(nextPage);
+  } catch (error) {
+    console.error("Kunde inte hämta fler artiklar:", error);
+  }
+}
+
 const eventsWithDistance = events.map((event) => {
   if (
     !userLocation ||
@@ -571,8 +602,8 @@ const filteredEvents =
 
     try {
       const response = await fetch(
-        `${API_URL}/api/events`
-      );
+  `${API_URL}/api/events?page=1&limit=15`
+);
 
       if (!response.ok) {
         throw new Error(
@@ -581,6 +612,7 @@ const filteredEvents =
       }
 
       const data = await response.json();
+      setHasMoreEvents(data.length === 15);
 
       console.log("Första eventet:", data[0]);
       console.log("Username:", data[0]?.username);
@@ -1422,6 +1454,16 @@ setSelectedEvent(null);
           }
 
         />
+        {hasMoreEvents && (
+  <button
+    type="button"
+    className="load-more-button"
+    onClick={loadMoreEvents}
+  >
+    Ladda fler
+    <span>↓</span>
+  </button>
+)}
 
       </>
 

@@ -9091,3 +9091,34 @@ body,
     transform: scale(1) translateY(0);
   }
 }
+
+.load-more-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  margin: 20px auto 30px;
+  padding: 8px 14px;
+
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.load-more-button span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.load-more-button:hover {
+  border-color: #bbb;
+  color: #333;
+  background: #f7f7f7;
+}
