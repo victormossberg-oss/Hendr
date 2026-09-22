@@ -182,7 +182,7 @@ function MapPage({
       return;
     }
 
-
+console.log("Försöker hämta GPS...");
     navigator.geolocation.getCurrentPosition(
 
       (position) => {
