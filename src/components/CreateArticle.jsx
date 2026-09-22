@@ -37,6 +37,8 @@ const [category, setCategory] = useState(
   const [locationName, setLocationName] = useState(
   editEvent?.location || ""
 );
+
+const [locationResults, setLocationResults] = useState([]);
 const [latitude, setLatitude] = useState(
   editEvent?.latitude ?? ""
 );
@@ -172,6 +174,55 @@ const [locationStatus, setLocationStatus] = useState(
       }
     );
   }
+
+  function getShortLocationName(result) {
+  const address = result.address || {};
+
+  const area =
+    address.suburb ||
+    address.neighbourhood ||
+    address.quarter ||
+    address.city_district;
+
+  const city =
+    address.city ||
+    address.town ||
+    address.village ||
+    address.municipality;
+
+  if (city && area && city !== area) {
+    return `${city}, ${area}`;
+  }
+
+  return city || area || result.display_name;
+}
+
+  async function searchLocation() {
+  if (!locationName.trim()) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&countrycodes=se&q=${encodeURIComponent(
+        locationName.trim()
+      )}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Kunde inte söka efter plats.");
+    }
+
+    const results = await response.json();
+
+    console.log("Platssökning:", results);
+
+    setLocationResults(results);
+  } catch (error) {
+    console.error("Kunde inte söka efter plats:", error);
+    setLocationResults([]);
+  }
+}
 
   function nextStep() {
     if (step === 1) {
@@ -533,12 +584,14 @@ const [locationStatus, setLocationStatus] = useState(
             <div className="article-map-placeholder">
               <div className="article-map-grid" />
 
-              <div className="article-map-pin">
-                <MapPin
-                  size={44}
-                  fill="currentColor"
-                />
-              </div>
+              {latitude !== "" && longitude !== "" && (
+  <div className="article-map-pin">
+    <MapPin
+      size={44}
+      fill="currentColor"
+    />
+  </div>
+)}
             </div>
             <div className="article-selected-location">
   <div>
@@ -550,18 +603,53 @@ const [locationStatus, setLocationStatus] = useState(
   </div>
 </div>
 
-<input
-  type="text"
-  className="article-location-input"
-  value={locationName}
-  onChange={(event) => {
-  setLocationName(event.target.value);
-  setLocationStatus(event.target.value);
-  setLatitude("");
-  setLongitude("");
-}}
-  placeholder="Skriv plats, ort eller adress..."
-/>
+<div className="article-location-search">
+  <input
+    type="text"
+    className="article-location-input"
+    value={locationName}
+    onChange={(event) => {
+      const value = event.target.value;
+
+      setLocationName(value);
+      setLocationStatus(value);
+      setLatitude("");
+      setLongitude("");
+    }}
+    placeholder="Skriv plats, ort eller adress..."
+  />
+
+  <button
+    type="button"
+    onClick={searchLocation}
+  >
+    Sök
+  </button>
+</div>
+{locationResults.length > 0 && (
+  <div className="article-location-results">
+    {locationResults.map((result) => {
+  const shortName = getShortLocationName(result);
+
+  return (
+    <button
+      key={result.place_id}
+      type="button"
+      className="article-location-result"
+      onClick={() => {
+        setLocationName(shortName);
+        setLocationStatus(shortName);
+        setLatitude(Number(result.lat));
+        setLongitude(Number(result.lon));
+        setLocationResults([]);
+      }}
+    >
+      {shortName}
+    </button>
+  );
+})}
+  </div>
+)}
 
             <h2 className="article-media-heading">
               Bilder
