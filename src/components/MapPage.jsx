@@ -193,15 +193,14 @@ function MapPage({
         ];
 
         console.log(
-          "GPS-position:",
-          {
-            latitude:
-              position.coords.latitude,
-
-            longitude:
-              position.coords.longitude
-          }
-        );
+  "GPS-position:",
+  {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+    accuracy: position.coords.accuracy,
+    timestamp: new Date(position.timestamp)
+  }
+);
 
         setUserLocation(location);
 
