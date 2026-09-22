@@ -182,9 +182,14 @@ const [locationStatus, setLocationStatus] = useState(
     }
 
     if (step === 2) {
-      setStep(3);
-      return;
-    }
+  if (!locationName.trim()) {
+    alert("Du måste ange en plats för artikeln.");
+    return;
+  }
+
+  setStep(3);
+  return;
+}
   }
 
   function previousStep() {
