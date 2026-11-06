@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const OpenAI = require("openai");
 const { Resend } = require("resend");
+const rateLimit = require("express-rate-limit");
 
 require("dotenv").config();
 
@@ -4556,6 +4557,16 @@ app.get(
 );
 
 
+const meRouteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "För många förfrågningar. Försök igen senare."
+  }
+});
+
 // =========================
 // HÄMTA AKTUELL ANVÄNDARPROFIL
 // =========================
@@ -4563,6 +4574,7 @@ app.get(
 app.get(
   "/api/auth/me",
   authenticateToken,
+  meRouteLimiter,
 
   async (req, res) => {
 
